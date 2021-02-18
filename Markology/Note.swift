@@ -27,6 +27,10 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     let text: String
     let modified: Date
     let binary: Bool
+
+    func reference() -> Reference {
+        Reference(file: file, name: name)
+    }
 }
 
 extension Note {
@@ -72,6 +76,14 @@ extension Note {
 }
 
 extension World {
+    func search(query: String, onChange: @escaping ([Note]) -> Void) -> DatabaseCancellable {
+        ValueObservation.tracking { db -> [Note] in
+            let wildcard = "%\(query.replacingOccurrences(of: " ", with: "%"))%"
+            return try Note.filter(Note.Columns.text.like(wildcard) || Note.Columns.name.like(wildcard))
+                .order(Note.Columns.modified.desc).fetchAll(db)
+        }.start(in: db, onError: { _ in }, onChange: onChange)
+    }
+
     func load(note: Reference, onChange: @escaping (Note.Entry?) -> Void) -> DatabaseCancellable {
         ValueObservation.tracking { db in
             try Note.Entry.fetchOne(db, Note.Entry.query.filter(key: note.file))

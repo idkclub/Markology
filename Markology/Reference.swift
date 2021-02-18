@@ -12,8 +12,8 @@ struct Reference: Codable, Equatable, FetchableRecord {
 extension World {
     func search(query: String, limit: Int = 10, onChange: @escaping ([Reference]) -> Void) -> DatabaseCancellable {
         ValueObservation.tracking { db -> [Reference] in
-            let wildcard = query.replacingOccurrences(of: " ", with: "%")
-            let request = Reference.query.filter(Note.Columns.name.like("%\(wildcard)%"))
+            let wildcard = "%\(query.replacingOccurrences(of: " ", with: "%"))%"
+            let request = Reference.query.filter(Note.Columns.name.like(wildcard))
                 .order(Note.Columns.modified.desc).limit(limit)
             return try Reference.fetchAll(db, request)
         }.start(in: db, onError: { _ in }, onChange: onChange)
@@ -30,10 +30,27 @@ extension Reference {
     class Cell: UITableViewCell {
         static let id = "reference"
 
+        override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+            super.init(style: style, reuseIdentifier: reuseIdentifier)
+            accessoryView = UIImageView(image: UIImage(systemName: "chevron.forward"))
+            accessoryView?.tintColor = .secondaryLabel
+        }
+
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
         func render(name: String) {
             let empty = name == ""
             textLabel?.text = empty ? "Empty Note" : name
             textLabel?.textColor = empty ? .placeholderText : .label
         }
+    }
+}
+
+extension UIViewController {
+    func navigate(to note: Reference) {
+        show(ViewController(note: note), sender: self)
     }
 }

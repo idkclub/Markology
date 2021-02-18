@@ -39,23 +39,8 @@ class EditController: UIViewController {
         query != "" ? "# \(query)\n\n" : ""
     }
 
-    private func insert(note: Reference) {
-        guard let url = note.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
-        textView.insertText("[\(note.name)](\(url))")
-        dismiss(animated: true)
-    }
-
     @objc private func link() {
-        let menu = MenuController(
-            style: .grouped,
-            emptyCreate: false,
-            select: insert,
-            create: { [weak self] query in
-                let new = World.shared.url(for: nil)
-                World.shared.write(contents: EditController.body(from: query), to: new)
-                self?.insert(note: Reference(file: World.shared.local(for: new), name: query))
-            }
-        )
+        let menu = MenuController(style: .grouped, emptyCreate: false, delegate: self)
         menu.modalPresentationStyle = .popover
         menu.popoverPresentationController?.barButtonItem = addLink
         present(menu, animated: true)
@@ -69,6 +54,20 @@ class EditController: UIViewController {
 
     @objc private func cancel() {
         dismiss(animated: true)
+    }
+}
+
+extension EditController: MenuDelegate {
+    func select(note: Reference) {
+        guard let url = note.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
+        textView.insertText("[\(note.name)](\(url))")
+        dismiss(animated: true)
+    }
+
+    func create(query: String) {
+        let new = World.shared.url(for: nil)
+        World.shared.write(contents: EditController.body(from: query), to: new)
+        select(note: Reference(file: World.shared.local(for: new), name: query))
     }
 }
 

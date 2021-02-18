@@ -2,21 +2,13 @@ import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     class RootController: UISplitViewController {
-        let note = ViewController()
+        let page = UINavigationController()
         override func viewDidLoad() {
             super.viewDidLoad()
-            setViewController(note, for: .secondary)
-            setViewController(MenuController(
-                select: { [weak self] note in
-                    guard let self = self else { return }
-                    self.note.set(note: note)
-                    self.note.navigationController?.popToRootViewController(animated: true)
-                    self.show(.secondary)
-                },
-                create: { [weak self] query in
-                    self?.present(EditController(text: EditController.body(from: query)), animated: true)
-                }
-            ), for: .primary)
+            page.navigationBar.prefersLargeTitles = true
+            page.viewControllers = [UIViewController()]
+            setViewController(MenuController(delegate: self), for: .primary)
+            setViewController(page, for: .secondary)
         }
     }
 
@@ -28,5 +20,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.rootViewController = RootController(style: .doubleColumn)
         window.makeKeyAndVisible()
         self.window = window
+    }
+}
+
+extension SceneDelegate.RootController: MenuDelegate {
+    private func navigate(to controller: UIViewController) {
+        page.viewControllers[0] = controller
+        page.popToRootViewController(animated: true)
+    }
+
+    func select(note: Reference) {
+        navigate(to: ViewController(note: note))
+    }
+
+    func create(query: String) {
+        present(EditController(text: EditController.body(from: query)), animated: true)
+    }
+
+    func search(query: String) {
+        navigate(to: ResultController(query: query))
     }
 }

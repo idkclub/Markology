@@ -44,7 +44,8 @@ extension Note {
 extension Note.Cell: UITextViewDelegate {
     func textView(_: UITextView, shouldInteractWith url: URL, in _: NSRange, interaction _: UITextItemInteraction) -> Bool {
         guard url.host == nil else { return true }
-        guard let note = World.shared.load(file: url.path) else { return false }
+        guard let path = url.path.removingPercentEncoding,
+              let note = World.shared.load(file: path) else { return false }
         navigate?(note)
         return false
     }

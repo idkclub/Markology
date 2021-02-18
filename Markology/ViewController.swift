@@ -3,10 +3,23 @@ import UIKit
 
 class ViewController: UIViewController {
     let body = UITableView(frame: .zero, style: .insetGrouped)
+    let note: Reference
     var entryQuery: DatabaseCancellable?
-    var note: Reference?
     var entry: Note.Entry?
     var menuButton: UIBarButtonItem?
+
+    init(note: Reference) {
+        self.note = note
+        super.init(nibName: nil, bundle: nil)
+        title = note.name
+        entryQuery = World.shared.load(note: note, onChange: reload)
+        menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     private enum Section: Int, CaseIterable {
         case from, to, note
@@ -28,15 +41,6 @@ class ViewController: UIViewController {
         return sections
     }
 
-    @discardableResult func set(note: Reference) -> Self {
-        guard note != self.note else { return self }
-        entry = nil
-        title = note.name
-        self.note = note
-        entryQuery = World.shared.load(note: note, onChange: reload)
-        return self
-    }
-
     func reload(entry: Note.Entry?) {
         defer { body.reloadData() }
         self.entry = entry
@@ -53,8 +57,6 @@ class ViewController: UIViewController {
     }
 
     override func viewDidLoad() {
-        menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
-        navigationController?.navigationBar.prefersLargeTitles = true
         body.anchored(to: view, horizontal: true, bottom: true)
         body.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         body.dataSource = self
@@ -83,10 +85,6 @@ class ViewController: UIViewController {
     @objc private func edit() {
         guard let entry = entry else { return }
         present(EditController(path: entry.note.file, text: entry.note.text), animated: true)
-    }
-
-    func navigate(to note: Reference) {
-        show(ViewController().set(note: note), sender: self)
     }
 }
 

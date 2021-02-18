@@ -5,16 +5,14 @@ import UIKit
 class MenuController: UIViewController {
     let results: UITableView
     let emptyCreate: Bool
-    let select: (Reference) -> Void
-    let create: (String) -> Void
-    var search: String = ""
+    let delegate: MenuDelegate
+    var query: String = ""
     var notes: [Reference] = []
     var notesQuery: DatabaseCancellable?
     var progressSubscription: AnyCancellable?
 
-    init(style: UITableView.Style = .insetGrouped, emptyCreate: Bool = true, select: @escaping (Reference) -> Void, create: @escaping (String) -> Void) {
-        self.select = select
-        self.create = create
+    init(style: UITableView.Style = .insetGrouped, emptyCreate: Bool = true, delegate: MenuDelegate) {
+        self.delegate = delegate
         self.emptyCreate = emptyCreate
         results = UITableView(frame: .zero, style: style)
         super.init(nibName: nil, bundle: nil)
@@ -34,7 +32,7 @@ class MenuController: UIViewController {
         if notes.count > 0 {
             sections.append(.recent)
         }
-        if emptyCreate || search != "" {
+        if emptyCreate || query != "" {
             sections.append(.new)
         }
         return sections
@@ -42,7 +40,7 @@ class MenuController: UIViewController {
 
     override func viewDidLoad() {
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.backgroundColor = .systemBackground
+        navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
         title = "Markology"
         let progress = UIProgressView().anchored(to: view, horizontal: true, top: true)
         progress.progressTintColor = .systemBackground
@@ -73,7 +71,7 @@ class MenuController: UIViewController {
     }
 
     func reloadQuery() {
-        notesQuery = World.shared.search(query: search) { [weak self] notes in
+        notesQuery = World.shared.search(query: query) { [weak self] (notes: [Reference]) in
             guard let self = self else { return }
             self.notes = notes
             self.results.reloadData()
@@ -87,8 +85,12 @@ class MenuController: UIViewController {
 
 extension MenuController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange _: String) {
-        search = searchBar.text ?? ""
+        query = searchBar.text ?? ""
         reloadQuery()
+    }
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        delegate.search(query: searchBar.text ?? "")
     }
 }
 
@@ -105,9 +107,9 @@ extension MenuController: UITableViewDelegate {
     func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch sections[indexPath.section] {
         case .recent:
-            select(notes[indexPath.row])
+            delegate.select(note: notes[indexPath.row])
         case .new:
-            create(search)
+            delegate.create(query: query)
         }
     }
 }
@@ -132,8 +134,18 @@ extension MenuController: UITableViewDataSource {
         case .recent:
             cell.render(name: notes[indexPath.row].name)
         case .new:
-            cell.render(name: search)
+            cell.render(name: query)
         }
         return cell
     }
+}
+
+protocol MenuDelegate {
+    func select(note: Reference)
+    func create(query: String)
+    func search(query: String)
+}
+
+extension MenuDelegate {
+    func search(query _: String) {}
 }
