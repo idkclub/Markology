@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Down",
+        "repositoryURL": "https://github.com/johnxnguyen/Down.git",
+        "state": {
+          "branch": null,
+          "revision": "f2e4658f79f2c1a482b1e73fbfce6ac9e0aad8b8",
+          "version": "0.9.5"
+        }
+      },
+      {
+        "package": "GRDB",
+        "repositoryURL": "https://github.com/groue/GRDB.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "cceb24a1e58dae37a199ba54987df425bd0ef303",
+          "version": "5.4.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
