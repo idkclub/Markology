@@ -39,6 +39,7 @@ class MenuController: UIViewController {
     }
 
     override func viewDidLoad() {
+        let keyboard = KeyboardGuide(view: view)
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Markology"
         view.backgroundColor = .systemGroupedBackground
@@ -58,13 +59,14 @@ class MenuController: UIViewController {
         let searchBar = UISearchBar().anchored(to: view, horizontal: true)
         searchBar.placeholder = "Search"
         searchBar.delegate = self
-        results.anchored(to: view, horizontal: true, bottom: true)
+        results.anchored(to: view, horizontal: true)
         results.dataSource = self
         results.delegate = self
         results.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
             results.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            results.bottomAnchor.constraint(equalTo: keyboard.topAnchor),
         ])
         reloadQuery()
     }

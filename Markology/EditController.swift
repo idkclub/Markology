@@ -20,8 +20,9 @@ class EditController: UIViewController {
     }
 
     override func viewDidLoad() {
+        let keyboard = KeyboardGuide(view: view)
         addLink = UIBarButtonItem(title: "Add Link", style: .plain, target: self, action: #selector(link))
-        let buttons = UIToolbar(frame: .infinite).anchored(to: view, horizontal: true, bottom: true)
+        let buttons = UIToolbar(frame: .infinite).anchored(to: view, horizontal: true)
         buttons.items = [
             addLink!,
             .flexibleSpace(),
@@ -33,8 +34,11 @@ class EditController: UIViewController {
         textView.textContainerInset = .init(top: 20, left: 10, bottom: 10, right: 10)
         textView.font = .systemFont(ofSize: 17)
         textView.text = text
-        textView.bottomAnchor.constraint(equalTo: buttons.topAnchor).isActive = true
         textView.delegate = self
+        NSLayoutConstraint.activate([
+            textView.bottomAnchor.constraint(equalTo: buttons.topAnchor),
+            buttons.bottomAnchor.constraint(equalTo: keyboard.topAnchor),
+        ])
     }
 
     static func body(from query: String) -> String {
