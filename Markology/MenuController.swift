@@ -43,7 +43,6 @@ class MenuController: UIViewController {
         title = "Markology"
         view.backgroundColor = .systemGroupedBackground
         let progress = UIProgressView().anchored(to: view, horizontal: true, top: true)
-        progress.progressTintColor = .systemFill
         progress.progressViewStyle = .bar
         progress.isUserInteractionEnabled = true
         progress.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(sync)))

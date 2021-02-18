@@ -1,8 +1,7 @@
 import GRDB
 import UIKit
 
-class ViewController: UIViewController {
-    let body = UITableView(frame: .zero, style: .insetGrouped)
+class ViewController: UITableViewController {
     let note: Reference
     var entryQuery: DatabaseCancellable?
     var entry: Note.Entry?
@@ -10,7 +9,7 @@ class ViewController: UIViewController {
 
     init(note: Reference) {
         self.note = note
-        super.init(nibName: nil, bundle: nil)
+        super.init(style: .insetGrouped)
         title = note.name
         entryQuery = World.shared.load(note: note, onChange: reload)
         menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
@@ -42,7 +41,7 @@ class ViewController: UIViewController {
     }
 
     func reload(entry: Note.Entry?) {
-        defer { body.reloadData() }
+        defer { tableView.reloadData() }
         self.entry = entry
         guard let entry = entry, let menuButton = menuButton else {
             title = ""
@@ -57,12 +56,8 @@ class ViewController: UIViewController {
     }
 
     override func viewDidLoad() {
-        body.anchored(to: view, horizontal: true, bottom: true)
-        body.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        body.dataSource = self
-        body.delegate = self
-        body.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
-        body.register(Note.Cell.self, forCellReuseIdentifier: Note.Cell.id)
+        tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
+        tableView.register(Note.Cell.self, forCellReuseIdentifier: Note.Cell.id)
     }
 
     @objc private func menu() {
@@ -86,9 +81,7 @@ class ViewController: UIViewController {
         guard let entry = entry else { return }
         present(EditController(path: entry.note.file, text: entry.note.text), animated: true)
     }
-}
 
-extension ViewController: UITableViewDelegate {
     var date: DateFormatter {
         let date = DateFormatter()
         date.dateStyle = .short
@@ -96,7 +89,7 @@ extension ViewController: UITableViewDelegate {
         return date
     }
 
-    func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+    override func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         guard let entry = entry else { return nil }
         let ref: Reference
         switch sections[indexPath.section] {
@@ -111,7 +104,7 @@ extension ViewController: UITableViewDelegate {
         return indexPath
     }
 
-    func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
+    override func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch sections[section] {
         case .from:
             return "Linked From"
@@ -122,14 +115,12 @@ extension ViewController: UITableViewDelegate {
             return "Last Modified \(date.string(from: entry.note.modified))"
         }
     }
-}
 
-extension ViewController: UITableViewDataSource {
-    func numberOfSections(in _: UITableView) -> Int {
+    override func numberOfSections(in _: UITableView) -> Int {
         sections.count
     }
 
-    func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let entry = entry else { return 0 }
         switch sections[section] {
         case .from:
@@ -141,7 +132,7 @@ extension ViewController: UITableViewDataSource {
         }
     }
 
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let entry = entry else { return UITableViewCell() }
         let ref: Reference
         switch sections[indexPath.section] {

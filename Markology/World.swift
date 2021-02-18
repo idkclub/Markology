@@ -7,6 +7,7 @@ class World {
     static let shared = World()
     let loadingProgress = CurrentValueSubject<Float, Never>(1)
     let db: DatabaseWriter
+    var syncing = false
     private let container: URL
     private let query = NSMetadataQuery()
 
@@ -79,6 +80,8 @@ class World {
     ]
 
     func sync(force: Bool = false) {
+        guard !syncing else { return }
+        syncing = true
         DispatchQueue.global(qos: .background).async {
             do {
                 try self.syncSync(force: force)
@@ -159,6 +162,7 @@ class World {
             }
         }
         loadingProgress.send(1)
+        syncing = false
     }
 
     func url(for name: String?) -> URL {
