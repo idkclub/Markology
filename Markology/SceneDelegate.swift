@@ -34,7 +34,9 @@ extension SceneDelegate.RootController: MenuDelegate {
     }
 
     func create(query: String) {
-        present(EditController(text: EditController.body(from: query)), animated: true)
+        present(EditController(text: EditController.body(from: query)) { [weak self] in
+            self?.navigate(to: ViewController(note: Reference(file: World.shared.local(for: $0), name: "")))
+        }, animated: true)
     }
 
     func search(query: String) {

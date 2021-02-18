@@ -3,12 +3,14 @@ import UIKit
 class EditController: UIViewController {
     let textView = UITextView()
     let url: URL
+    let onSave: ((URL) -> Void)?
     var addLink: UIBarButtonItem?
     var text: String
 
-    init(path: String? = nil, text: String = "") {
+    init(path: String? = nil, text: String = "", onSave: ((URL) -> Void)? = nil) {
         url = World.shared.url(for: path)
         self.text = text
+        self.onSave = onSave
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -49,7 +51,7 @@ class EditController: UIViewController {
     @objc private func save() {
         World.shared.write(contents: text, to: url)
         dismiss(animated: true)
-        // TODO: Present if new?
+        onSave?(url)
     }
 
     @objc private func cancel() {
