@@ -40,10 +40,10 @@ class MenuController: UIViewController {
 
     override func viewDidLoad() {
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.backgroundColor = .systemGroupedBackground
         title = "Markology"
+        view.backgroundColor = .systemGroupedBackground
         let progress = UIProgressView().anchored(to: view, horizontal: true, top: true)
-        progress.progressTintColor = .systemBackground
+        progress.progressTintColor = .systemFill
         progress.progressViewStyle = .bar
         progress.isUserInteractionEnabled = true
         progress.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(sync)))

@@ -9,6 +9,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             page.viewControllers = [UIViewController()]
             setViewController(MenuController(delegate: self), for: .primary)
             setViewController(page, for: .secondary)
+            delegate = self
         }
     }
 
@@ -23,10 +24,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 }
 
+extension SceneDelegate.RootController: UISplitViewControllerDelegate {
+    func splitViewController(_: UISplitViewController, topColumnForCollapsingToProposedTopColumn _: UISplitViewController.Column) -> UISplitViewController.Column {
+        .primary
+    }
+}
+
 extension SceneDelegate.RootController: MenuDelegate {
     private func navigate(to controller: UIViewController) {
         page.viewControllers[0] = controller
         page.popToRootViewController(animated: true)
+        show(.secondary)
     }
 
     func select(note: Reference) {
