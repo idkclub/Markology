@@ -59,6 +59,7 @@ class MenuController: UIViewController {
         let searchBar = UISearchBar().anchored(to: view, horizontal: true)
         searchBar.placeholder = "Search"
         searchBar.delegate = self
+        searchBar.enablesReturnKeyAutomatically = false
         results.anchored(to: view, horizontal: true)
         results.dataSource = self
         results.delegate = self

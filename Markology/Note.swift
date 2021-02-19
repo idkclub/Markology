@@ -1,5 +1,5 @@
-import Foundation
 import GRDB
+import UIKit
 
 struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     enum Columns {
@@ -31,6 +31,10 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     func reference() -> Reference {
         Reference(file: file, name: name)
     }
+
+    lazy var image: UIImage? = {
+        UIImage(contentsOfFile: World.shared.url(for: file).path)
+    }()
 }
 
 extension Note {
@@ -40,7 +44,7 @@ extension Note {
         let modified: Date
     }
 
-    static func modifed(db: Database) throws -> [String: Date] {
+    static func modified(db: Database) throws -> [String: Date] {
         return try File.fetchAll(db, File.query).reduce(into: [:]) {
             $0[$1.file] = $1.modified
         }
@@ -69,7 +73,7 @@ extension Note {
         static let query = Note.all()
             .including(all: Note.to.select(Note.Columns.file, Note.Columns.name))
             .including(all: Note.from.select(Note.Columns.file, Note.Columns.name))
-        let note: Note
+        var note: Note
         let to: [Reference]
         let from: [Reference]
     }

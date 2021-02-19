@@ -25,6 +25,7 @@
 		4E9423F925DB0F7E00BDA7A3 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9423F825DB0F7E00BDA7A3 /* World.swift */; };
 		4E94240025DB22B100BDA7A3 /* EditController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9423FF25DB22B100BDA7A3 /* EditController.swift */; };
 		4E94240325DB230900BDA7A3 /* UIView+anchored.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E94240225DB230900BDA7A3 /* UIView+anchored.swift */; };
+		4EAEE9FE25DF42A9003A9320 /* Note+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAEE9FD25DF42A9003A9320 /* Note+Image.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,7 @@
 		4E9423F825DB0F7E00BDA7A3 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 		4E9423FF25DB22B100BDA7A3 /* EditController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditController.swift; sourceTree = "<group>"; };
 		4E94240225DB230900BDA7A3 /* UIView+anchored.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+anchored.swift"; sourceTree = "<group>"; };
+		4EAEE9FD25DF42A9003A9320 /* Note+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Note+Image.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 				4E59842725DBE9C300236B89 /* Node+iterate.swift */,
 				4E59840C25DBAABE00236B89 /* Note.swift */,
 				4E59842B25DC781700236B89 /* Note+Cell.swift */,
+				4EAEE9FD25DF42A9003A9320 /* Note+Image.swift */,
 				4E59841125DBB06C00236B89 /* Reference.swift */,
 				4E82100625DE4689004EC326 /* ResultController.swift */,
 				4E9423F425DA885900BDA7A3 /* SceneDelegate.swift */,
@@ -194,6 +197,7 @@
 				4E9423F025DA86B900BDA7A3 /* MenuController.swift in Sources */,
 				4E9423F525DA885900BDA7A3 /* SceneDelegate.swift in Sources */,
 				4E9423F925DB0F7E00BDA7A3 /* World.swift in Sources */,
+				4EAEE9FE25DF42A9003A9320 /* Note+Image.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

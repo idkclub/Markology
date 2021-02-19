@@ -14,6 +14,7 @@ class ResultController: UITableViewController {
         }
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(Note.Cell.self, forCellReuseIdentifier: Note.Cell.id)
+        tableView.register(Note.Image.self, forCellReuseIdentifier: Note.Image.id)
     }
 
     @available(*, unavailable)
@@ -26,7 +27,8 @@ class ResultController: UITableViewController {
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
-        notes[section].binary ? 1 : 2
+        guard !notes[section].binary else { return notes[section].image != nil ? 2 : 1 }
+        return 2
     }
 
     override func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -34,9 +36,14 @@ class ResultController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row == 0 {
+        guard indexPath.row > 0 else {
             let cell = tableView.dequeueReusableCell(withIdentifier: Reference.Cell.id, for: indexPath) as! Reference.Cell
             cell.render(name: notes[indexPath.section].name)
+            return cell
+        }
+        guard !notes[indexPath.section].binary else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: Note.Image.id, for: indexPath) as! Note.Image
+            cell.render(image: notes[indexPath.section].image)
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: Note.Cell.id, for: indexPath) as! Note.Cell

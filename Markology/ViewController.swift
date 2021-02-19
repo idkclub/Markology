@@ -21,7 +21,7 @@ class ViewController: UITableViewController {
     }
 
     private enum Section: Int, CaseIterable {
-        case from, to, note
+        case from, to, note, image
     }
 
     private var sections: [Section] {
@@ -33,8 +33,11 @@ class ViewController: UITableViewController {
         if entry.to.count > 0 {
             sections.append(.to)
         }
-        // TODO: Handle binaries.
-        if !entry.note.binary {
+        if entry.note.binary {
+            if self.entry?.note.image != nil {
+                sections.append(.image)
+            }
+        } else {
             sections.append(.note)
         }
         return sections
@@ -58,6 +61,7 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(Note.Cell.self, forCellReuseIdentifier: Note.Cell.id)
+        tableView.register(Note.Image.self, forCellReuseIdentifier: Note.Image.id)
     }
 
     @objc private func menu() {
@@ -72,6 +76,7 @@ class ViewController: UITableViewController {
             })
             self?.present(confirm, animated: true)
         })
+        menu.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         menu.modalPresentationStyle = .popover
         menu.popoverPresentationController?.barButtonItem = menuButton
         present(menu, animated: true)
@@ -97,7 +102,7 @@ class ViewController: UITableViewController {
             ref = entry.to[indexPath.row]
         case .from:
             ref = entry.from[indexPath.row]
-        case .note:
+        case .note, .image:
             return nil
         }
         navigate(to: ref)
@@ -110,7 +115,7 @@ class ViewController: UITableViewController {
             return "Linked From"
         case .to:
             return "Linked To"
-        case .note:
+        case .note, .image:
             guard let entry = entry else { return nil }
             return "Last Modified \(date.string(from: entry.note.modified))"
         }
@@ -127,7 +132,7 @@ class ViewController: UITableViewController {
             return entry.from.count
         case .to:
             return entry.to.count
-        case .note:
+        case .note, .image:
             return 1
         }
     }
@@ -143,6 +148,10 @@ class ViewController: UITableViewController {
         case .note:
             let cell = tableView.dequeueReusableCell(withIdentifier: Note.Cell.id, for: indexPath) as! Note.Cell
             cell.render(note: entry.note, navigate: navigate)
+            return cell
+        case .image:
+            let cell = tableView.dequeueReusableCell(withIdentifier: Note.Image.id, for: indexPath) as! Note.Image
+            cell.render(image: self.entry?.note.image)
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: Reference.Cell.id, for: indexPath) as! Reference.Cell
