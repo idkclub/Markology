@@ -72,7 +72,7 @@ class ViewController: UITableViewController {
             confirm.addAction(.init(title: "Cancel", style: .cancel))
             confirm.addAction(.init(title: "🔥", style: .destructive) { [weak self] _ in
                 World.shared.delete(url: World.shared.url(for: note.file))
-                self?.navigationController?.popViewController(animated: true)
+                self?.navigationController?.pop()
             })
             self?.present(confirm, animated: true)
         })

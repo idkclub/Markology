@@ -20,7 +20,6 @@ class EditController: UIViewController {
     }
 
     override func viewDidLoad() {
-        let keyboard = KeyboardGuide(view: view)
         addLink = UIBarButtonItem(title: "Add Link", style: .plain, target: self, action: #selector(link))
         let buttons = UIToolbar(frame: .infinite).anchored(to: view, horizontal: true)
         buttons.items = [
@@ -37,7 +36,7 @@ class EditController: UIViewController {
         textView.delegate = self
         NSLayoutConstraint.activate([
             textView.bottomAnchor.constraint(equalTo: buttons.topAnchor),
-            buttons.bottomAnchor.constraint(equalTo: keyboard.topAnchor),
+            buttons.bottomAnchor.constraint(equalTo: KeyboardGuide(view: view).topAnchor),
         ])
     }
 

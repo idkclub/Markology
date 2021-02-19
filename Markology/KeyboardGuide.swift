@@ -2,24 +2,25 @@ import UIKit
 
 class KeyboardGuide: UILayoutGuide {
     var observer: NSObjectProtocol?
-    lazy var height = heightAnchor.constraint(equalToConstant: 0)
 
     init(view: UIView) {
         super.init()
-        observer = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: nil) { [weak self] notification in
-            guard let self = self, let window = view.window?.frame,
-                  let keyboard = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-                  let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
-            UIView.animate(withDuration: duration) {
-                self.height.constant = max(window.height - keyboard.minY, 0)
-                view.layoutIfNeeded()
-            }
-        }
         view.addLayoutGuide(self)
+        let height = heightAnchor.constraint(equalToConstant: 0)
         NSLayoutConstraint.activate([
             height,
-            bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
+        observer = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: nil) { notification in
+            guard let window = view.window?.frame,
+                  let keyboard = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            height.constant = max(window.height - keyboard.minY - view.safeAreaInsets.bottom, 0)
+            // TODO: Enable this code in a way that doesn't break when edge-swiping back with the keyboard open.
+//            let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0
+//            UIView.animate(withDuration: duration, animations: {
+//                view.layoutIfNeeded()
+//            })
+        }
     }
 
     @available(*, unavailable)

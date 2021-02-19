@@ -26,6 +26,7 @@
 		4E94240025DB22B100BDA7A3 /* EditController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9423FF25DB22B100BDA7A3 /* EditController.swift */; };
 		4E94240325DB230900BDA7A3 /* UIView+anchored.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E94240225DB230900BDA7A3 /* UIView+anchored.swift */; };
 		4EAEE9FE25DF42A9003A9320 /* Note+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAEE9FD25DF42A9003A9320 /* Note+Image.swift */; };
+		4EAEEA0225DFA28B003A9320 /* UINavigationController+pop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EAEEA0125DFA28B003A9320 /* UINavigationController+pop.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		4E9423FF25DB22B100BDA7A3 /* EditController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditController.swift; sourceTree = "<group>"; };
 		4E94240225DB230900BDA7A3 /* UIView+anchored.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+anchored.swift"; sourceTree = "<group>"; };
 		4EAEE9FD25DF42A9003A9320 /* Note+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Note+Image.swift"; sourceTree = "<group>"; };
+		4EAEEA0125DFA28B003A9320 /* UINavigationController+pop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+pop.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +100,7 @@
 				4E82100625DE4689004EC326 /* ResultController.swift */,
 				4E9423F425DA885900BDA7A3 /* SceneDelegate.swift */,
 				4E82100F25DEAC74004EC326 /* UIColor.swift */,
+				4EAEEA0125DFA28B003A9320 /* UINavigationController+pop.swift */,
 				4E94240225DB230900BDA7A3 /* UIView+anchored.swift */,
 				4E82100225DDEA80004EC326 /* URL+markdown.swift */,
 				4E59841525DBBF0400236B89 /* ViewController.swift */,
@@ -197,6 +200,7 @@
 				4E9423F025DA86B900BDA7A3 /* MenuController.swift in Sources */,
 				4E9423F525DA885900BDA7A3 /* SceneDelegate.swift in Sources */,
 				4E9423F925DB0F7E00BDA7A3 /* World.swift in Sources */,
+				4EAEEA0225DFA28B003A9320 /* UINavigationController+pop.swift in Sources */,
 				4EAEE9FE25DF42A9003A9320 /* Note+Image.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
