@@ -18,6 +18,7 @@ extension Note {
             textView.linkTextAttributes = [:]
             textView.delegate = self
             textView.isScrollEnabled = false
+            textView.dataDetectorTypes = .all;
         }
 
         @available(*, unavailable)
