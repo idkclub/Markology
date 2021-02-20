@@ -1,7 +1,7 @@
 import UIKit
 
-class ErrorAlert: UIAlertController {
-    init(error: Error) {
+public class ErrorAlert: UIAlertController {
+    public init(error: Error) {
         super.init(nibName: nil, bundle: nil)
         title = "An Error Occured!"
         message = error.localizedDescription

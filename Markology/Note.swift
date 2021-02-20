@@ -1,5 +1,6 @@
 import GRDB
 import UIKit
+import Utils
 
 struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     enum Columns {
@@ -33,7 +34,7 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     }
 
     lazy var image: UIImage? = {
-        UIImage(contentsOfFile: World.shared.url(for: file).path)
+        UIImage(contentsOfFile: Container.url(for: file).path)
     }()
 }
 

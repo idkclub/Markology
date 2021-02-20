@@ -1,6 +1,6 @@
 import UIKit
 
-extension UIView {
+public extension UIView {
     @discardableResult func anchored(to view: UIView, horizontal: Bool = false, top: Bool = false, bottom: Bool = false) -> Self {
         view.addSubview(self)
         translatesAutoresizingMaskIntoConstraints = false

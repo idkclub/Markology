@@ -1,4 +1,5 @@
 import UIKit
+import Utils
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     class RootController: UISplitViewController {
@@ -43,7 +44,7 @@ extension SceneDelegate.RootController: MenuDelegate {
 
     func create(query: String) {
         present(EditController(text: EditController.body(from: query)) { [weak self] in
-            self?.navigate(to: ViewController(note: Reference(file: World.shared.local(for: $0), name: "")))
+            self?.navigate(to: ViewController(note: Reference(file: Container.local(for: $0), name: "")))
         }, animated: true)
     }
 

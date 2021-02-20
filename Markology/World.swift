@@ -2,18 +2,14 @@ import Combine
 import Down
 import Foundation
 import GRDB
+import Utils
 
 class World {
     static let shared = World()
     let loadingProgress = CurrentValueSubject<Float, Never>(1)
     let db: DatabaseWriter
     var syncing = false
-    private let container: URL
     private let query = NSMetadataQuery()
-
-    func local(for url: URL) -> String {
-        String(url.path.dropFirst(container.path.count))
-    }
 
     init() {
         do {
@@ -36,9 +32,7 @@ class World {
             db = DatabaseQueue()
         }
 
-        // TODO: Handle upgrade / downgrade.
-        if let icloud = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents") {
-            container = icloud
+        if Container.icloud {
             query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
             query.predicate = NSPredicate(value: true)
             query.operationQueue = .main
@@ -47,8 +41,6 @@ class World {
             }
             query.enableUpdates()
             query.start()
-        } else {
-            container = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Documents")
         }
         try? migrate()
         sync()
@@ -93,8 +85,8 @@ class World {
 
     private func syncSync(force: Bool = false) throws {
         let synced = try db.read { try Note.modified(db: $0) }
-        let total = Float(max(synced.count, (try? FileManager.default.contentsOfDirectory(at: container, includingPropertiesForKeys: []).count) ?? 0))
-        guard let notes = FileManager.default.enumerator(at: container, includingPropertiesForKeys: fileKeys) else { return }
+        let total = Float(max(synced.count, (try? FileManager.default.contentsOfDirectory(at: Container.current, includingPropertiesForKeys: []).count) ?? 0))
+        guard let notes = FileManager.default.enumerator(at: Container.current, includingPropertiesForKeys: fileKeys) else { return }
         _ = try db.write { db in
             var seen: [String] = []
             var links: [Note.Link] = []
@@ -111,13 +103,13 @@ class World {
                       let date = attrs.contentModificationDate else { return }
                 if path.pathComponents.contains(where: { $0.first == "." }) {
                     if path.pathExtension == "icloud" {
-                        let missing = String(path.deletingLastPathComponent().path.dropFirst(container.path.count) + "/" + path.lastPathComponent.dropLast(7).dropFirst())
-                        try FileManager.default.startDownloadingUbiquitousItem(at: url(for: missing))
+                        let missing = String(path.deletingLastPathComponent().path.dropFirst(Container.current.path.count) + "/" + path.lastPathComponent.dropLast(7).dropFirst())
+                        try FileManager.default.startDownloadingUbiquitousItem(at: Container.url(for: missing))
                         seen.append(missing)
                     }
                     return
                 }
-                let local = self.local(for: path)
+                let local = Container.local(for: path)
                 seen.append(local)
                 if !force, let last = synced[local], Calendar.current.compare(last, to: date, toGranularity: .second) == .orderedSame { return }
                 var nsError: NSError?
@@ -163,13 +155,6 @@ class World {
         }
         loadingProgress.send(1)
         syncing = false
-    }
-
-    func url(for name: String?) -> URL {
-        guard let name = name else {
-            return container.appendingPathComponent(Int(Date().timeIntervalSince1970).description).appendingPathExtension("md")
-        }
-        return container.appendingPathComponent(name)
     }
 
     private func open(url: URL, for operation: (URL) throws -> Void) {

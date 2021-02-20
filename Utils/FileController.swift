@@ -1,23 +1,17 @@
 import UIKit
 
-class FileController: UIViewController {
-    let files: [File]
-    let onSave: (([URL]) -> Void)?
+open class FileController: UIViewController {
+    var files: [File] = []
+    var onSave: (([URL]) -> Void)?
     var saveButton: UIBarButtonItem?
 
-    init(files: [UIImage], onSave: (([URL]) -> Void)? = nil) {
+    @discardableResult public func with(files: [UIImage], onSave: (([URL]) -> Void)? = nil) -> Self {
         self.files = files.map { File(image: $0, name: "") }
         self.onSave = onSave
-
-        super.init(nibName: nil, bundle: nil)
+        return self
     }
 
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func viewDidLoad() {
+    override open func viewDidLoad() {
         saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(save))
         let tableView = UITableView(frame: .zero, style: .grouped).anchored(to: view, horizontal: true, top: true)
         tableView.delegate = self
@@ -53,6 +47,7 @@ class FileController: UIViewController {
 
     @objc private func cancel() {
         dismiss(animated: true)
+        onSave?([])
     }
 
     private func validate() {
@@ -61,21 +56,21 @@ class FileController: UIViewController {
 }
 
 extension FileController: UITableViewDelegate {
-    func tableView(_: UITableView, titleForHeaderInSection _: Int) -> String? {
+    public func tableView(_: UITableView, titleForHeaderInSection _: Int) -> String? {
         return "Import Images"
     }
 }
 
 extension FileController: UITableViewDataSource {
-    func numberOfSections(in _: UITableView) -> Int {
+    public func numberOfSections(in _: UITableView) -> Int {
         1
     }
 
-    func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+    public func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         files.count
     }
 
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: FileController.Cell.id, for: indexPath) as! FileController.Cell
         cell.render(file: files[indexPath.row], validate: validate)
         return cell
@@ -92,7 +87,7 @@ extension FileController {
         }
 
         var url: URL {
-            World.shared.url(for: name).appendingPathExtension("png")
+            Container.url(for: name).appendingPathExtension("png")
         }
     }
 
@@ -112,7 +107,7 @@ extension FileController {
             textField.addTarget(self, action: #selector(edit), for: .editingChanged)
             NSLayoutConstraint.activate([
                 preview.widthAnchor.constraint(equalToConstant: 150),
-                preview.heightAnchor.constraint(equalToConstant: 150),
+                contentView.heightAnchor.constraint(equalToConstant: 150),
                 preview.leftAnchor.constraint(equalTo: contentView.leftAnchor),
                 textField.leftAnchor.constraint(equalTo: preview.rightAnchor, constant: 20),
             ])

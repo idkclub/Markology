@@ -1,9 +1,9 @@
 import UIKit
 
-class KeyboardGuide: UILayoutGuide {
+public class KeyboardGuide: UILayoutGuide {
     var observer: NSObjectProtocol?
 
-    init(view: UIView) {
+    public init(view: UIView) {
         super.init()
         view.addLayoutGuide(self)
         let height = heightAnchor.constraint(equalToConstant: 0)

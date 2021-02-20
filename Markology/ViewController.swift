@@ -1,5 +1,6 @@
 import GRDB
 import UIKit
+import Utils
 
 class ViewController: UITableViewController {
     let note: Reference
@@ -71,7 +72,7 @@ class ViewController: UITableViewController {
             let confirm = UIAlertController(title: "Delete \(note.name)?", message: "This operation cannot be undone.", preferredStyle: .alert)
             confirm.addAction(.init(title: "Cancel", style: .cancel))
             confirm.addAction(.init(title: "🔥", style: .destructive) { [weak self] _ in
-                World.shared.delete(url: World.shared.url(for: note.file))
+                World.shared.delete(url: Container.url(for: note.file))
                 self?.navigationController?.pop()
             })
             self?.present(confirm, animated: true)

@@ -1,4 +1,5 @@
 import UIKit
+import Utils
 
 class EditController: UIViewController {
     let textView = UITextView()
@@ -8,7 +9,7 @@ class EditController: UIViewController {
     var text: String
 
     init(path: String? = nil, text: String = "", onSave: ((URL) -> Void)? = nil) {
-        url = World.shared.url(for: path)
+        url = Container.url(for: path)
         self.text = text
         self.onSave = onSave
         super.init(nibName: nil, bundle: nil)
@@ -47,7 +48,7 @@ class EditController: UIViewController {
 
     func onImport(urls: [URL]) {
         for url in urls {
-            guard let path = World.shared.local(for: url).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { continue }
+            guard let path = Container.local(for: url).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { continue }
             textView.insertText("![](\(path))")
         }
     }
@@ -78,9 +79,9 @@ extension EditController: MenuDelegate {
     }
 
     func create(query: String) {
-        let new = World.shared.url(for: nil)
+        let new = Container.url(for: nil)
         World.shared.write(contents: EditController.body(from: query), to: new)
-        select(note: Reference(file: World.shared.local(for: new), name: query))
+        select(note: Reference(file: Container.local(for: new), name: query))
     }
 }
 
@@ -102,7 +103,7 @@ extension EditController: UIDropInteractionDelegate {
     func dropInteraction(_: UIDropInteraction, performDrop session: UIDropSession) {
         session.loadObjects(ofClass: UIImage.self) {
             guard let images = $0 as? [UIImage], images.count > 0 else { return }
-            self.present(FileController(files: images, onSave: self.onImport), animated: true)
+            self.present(FileController().with(files: images, onSave: self.onImport), animated: true)
         }
     }
 }

@@ -1,5 +1,6 @@
 import Down
 import UIKit
+import Utils
 
 extension Note {
     class Cell: UITableViewCell {
@@ -28,7 +29,7 @@ extension Note {
             self.navigate = navigate
             textView.typingAttributes = [:]
             textView.font = .monospacedSystemFont(ofSize: 16, weight: .regular)
-            guard World.shared.url(for: note.file).markdown else {
+            guard Container.url(for: note.file).markdown else {
                 textView.text = note.text
                 return
             }
@@ -81,7 +82,7 @@ private class Styler: DownStyler {
         guard let url = url else { return }
         defer { styleLink(str: str, url: url) }
         guard let path = URL(string: url), path.host == nil,
-              let image = UIImage(contentsOfFile: World.shared.url(for: path.path).path) else { return }
+              let image = UIImage(contentsOfFile: Container.url(for: path.path).path) else { return }
         let attachment = NSTextAttachment()
         attachment.image = image
         if image.size.width < image.size.height {

@@ -1,6 +1,7 @@
 import Combine
 import GRDB
 import UIKit
+import Utils
 
 class MenuController: UIViewController {
     let results: UITableView
