@@ -28,12 +28,13 @@ class EditController: UIViewController {
             UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(save)),
             UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel)),
         ]
-
         textView.anchored(to: view, horizontal: true, top: true)
         textView.textContainerInset = .init(top: 20, left: 10, bottom: 10, right: 10)
         textView.font = .systemFont(ofSize: 17)
         textView.text = text
         textView.delegate = self
+        let drop = UIDropInteraction(delegate: self)
+        textView.addInteraction(drop)
         NSLayoutConstraint.activate([
             textView.bottomAnchor.constraint(equalTo: buttons.topAnchor),
             buttons.bottomAnchor.constraint(equalTo: KeyboardGuide(view: view).topAnchor),
@@ -42,6 +43,13 @@ class EditController: UIViewController {
 
     static func body(from query: String) -> String {
         query != "" ? "# \(query)\n\n" : ""
+    }
+
+    func onImport(urls: [URL]) {
+        for url in urls {
+            guard let path = World.shared.local(for: url).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { continue }
+            textView.insertText("![](\(path))")
+        }
     }
 
     @objc private func link() {
@@ -79,5 +87,22 @@ extension EditController: MenuDelegate {
 extension EditController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         text = textView.text
+    }
+}
+
+extension EditController: UIDropInteractionDelegate {
+    func dropInteraction(_: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
+        session.canLoadObjects(ofClass: UIImage.self)
+    }
+
+    func dropInteraction(_: UIDropInteraction, sessionDidUpdate _: UIDropSession) -> UIDropProposal {
+        UIDropProposal(operation: .copy)
+    }
+
+    func dropInteraction(_: UIDropInteraction, performDrop session: UIDropSession) {
+        session.loadObjects(ofClass: UIImage.self) {
+            guard let images = $0 as? [UIImage], images.count > 0 else { return }
+            self.present(FileController(files: images, onSave: self.onImport), animated: true)
+        }
     }
 }
