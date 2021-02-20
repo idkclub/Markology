@@ -100,7 +100,7 @@ private class Styler: DownStyler {
         guard let url = url?.addingPercentEncoding(withAllowedCharacters: urlCharacters) else { return }
         str.addAttributes([
             .link: url,
-            .foregroundColor: url.contains(":") || url.contains("//") ? UIColor.idkBlue : UIColor.idkMagenta,
+            .foregroundColor: url.contains(":") || url.contains("//") ? UIColor.idkCyan : UIColor.idkMagenta,
         ], range: .init(location: 0, length: str.length))
     }
 }

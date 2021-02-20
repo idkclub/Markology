@@ -22,8 +22,11 @@ public class Container {
         if let path = FileManager.default.url(forUbiquityContainerIdentifier: "iCloud.club.idk.Markology")?.appendingPathComponent("Documents") {
             container = path
             icloud = true
+        } else if let path = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.club.idk.Markology") {
+            container = path
+            icloud = false
         } else {
-            // TODO: Make a shared container (extension has its own home).
+            // TODO: Disable import extension.
             container = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Documents")
             icloud = false
         }
