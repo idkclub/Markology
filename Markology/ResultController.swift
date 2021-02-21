@@ -47,7 +47,7 @@ class ResultController: UITableViewController {
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: Note.Cell.id, for: indexPath) as! Note.Cell
-        cell.render(note: notes[indexPath.section], navigate: navigate)
+        cell.render(note: notes[indexPath.section], delegate: self)
         return cell
     }
 }

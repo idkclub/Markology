@@ -49,6 +49,7 @@ class ViewController: UITableViewController {
         self.entry = entry
         guard let entry = entry, let menuButton = menuButton else {
             title = ""
+            navigationItem.setRightBarButtonItems([], animated: true)
             return
         }
         title = entry.note.name
@@ -148,7 +149,7 @@ class ViewController: UITableViewController {
             ref = entry.from[indexPath.row]
         case .note:
             let cell = tableView.dequeueReusableCell(withIdentifier: Note.Cell.id, for: indexPath) as! Note.Cell
-            cell.render(note: entry.note, navigate: navigate)
+            cell.render(note: entry.note, delegate: self)
             return cell
         case .image:
             let cell = tableView.dequeueReusableCell(withIdentifier: Note.Image.id, for: indexPath) as! Note.Image

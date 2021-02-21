@@ -7,7 +7,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         override func viewDidLoad() {
             super.viewDidLoad()
             page.navigationBar.prefersLargeTitles = true
-            page.viewControllers = [UIViewController()]
+            page.viewControllers = [ViewController(note: Reference(file: "/index.md", name: ""))]
             setViewController(MenuController(delegate: self), for: .primary)
             setViewController(page, for: .secondary)
             preferredDisplayMode = .oneBesideSecondary

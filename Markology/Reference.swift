@@ -48,9 +48,3 @@ extension Reference {
         }
     }
 }
-
-extension UIViewController {
-    func navigate(to note: Reference) {
-        show(ViewController(note: note), sender: self)
-    }
-}

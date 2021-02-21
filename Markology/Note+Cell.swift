@@ -7,7 +7,7 @@ extension Note {
         static let id = "note"
 
         let textView = UITextView(frame: .zero)
-        var navigate: ((Reference) -> Void)?
+        var delegate: NoteDelegate?
 
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -26,8 +26,8 @@ extension Note {
             fatalError("init(coder:) has not been implemented")
         }
 
-        func render(note: Note, navigate: @escaping (Reference) -> Void) {
-            self.navigate = navigate
+        func render(note: Note, delegate: NoteDelegate) {
+            self.delegate = delegate
             textView.typingAttributes = [:]
             textView.font = .monospacedSystemFont(ofSize: 16, weight: .regular)
             guard Container.url(for: note.file).markdown else {
@@ -44,12 +44,32 @@ extension Note {
 }
 
 extension Note.Cell: UITextViewDelegate {
-    func textView(_: UITextView, shouldInteractWith url: URL, in _: NSRange, interaction _: UITextItemInteraction) -> Bool {
+    func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction _: UITextItemInteraction) -> Bool {
         guard url.host == nil else { return true }
-        guard let path = url.path.removingPercentEncoding,
-              let note = World.shared.load(file: path) else { return false }
-        navigate?(note)
+        guard let path = url.path.removingPercentEncoding else { return false }
+        guard let note = World.shared.load(file: path) else {
+            guard Container.url(for: path).markdown,
+                  let name = textView.attributedText?.attributedSubstring(from: characterRange).string else { return false }
+            delegate?.create(path: path, name: name)
+            return false
+        }
+        delegate?.navigate(to: note)
         return false
+    }
+}
+
+protocol NoteDelegate {
+    func create(path: String, name: String) -> Void
+    func navigate(to note: Reference) -> Void
+}
+
+extension UIViewController: NoteDelegate {
+    func create(path: String, name: String = "") {
+        present(EditController(path: path, text: EditController.body(from: name)), animated: true)
+    }
+
+    func navigate(to note: Reference) {
+        show(ViewController(note: note), sender: self)
     }
 }
 
