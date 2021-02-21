@@ -14,6 +14,7 @@ class ViewController: UITableViewController {
         title = note.name
         entryQuery = World.shared.load(note: note, onChange: reload)
         menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
+        clearsSelectionOnViewWillAppear = true
     }
 
     @available(*, unavailable)

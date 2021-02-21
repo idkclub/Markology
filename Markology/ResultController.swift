@@ -15,6 +15,7 @@ class ResultController: UITableViewController {
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(Note.Cell.self, forCellReuseIdentifier: Note.Cell.id)
         tableView.register(Note.Image.self, forCellReuseIdentifier: Note.Image.id)
+        clearsSelectionOnViewWillAppear = true
     }
 
     @available(*, unavailable)

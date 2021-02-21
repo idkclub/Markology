@@ -68,7 +68,7 @@ class World {
                 print(error)
             }
         }
-        if Container.icloud && query == nil {
+        if Container.icloud, query == nil {
             query = NSMetadataQuery()
             guard let bound = query else { return }
             bound.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
@@ -78,7 +78,7 @@ class World {
             }
             bound.enableUpdates()
             bound.start()
-        } else if !Container.icloud && query != nil {
+        } else if !Container.icloud, query != nil {
             query?.stop()
             query = nil
         }

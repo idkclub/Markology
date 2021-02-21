@@ -11,6 +11,7 @@ class SettingsController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.allowsSelection = false
         title = "Settings"
     }
 

@@ -52,6 +52,7 @@ class MenuController: UIViewController {
         searchBar.enablesReturnKeyAutomatically = false
 
         results.anchored(to: view, horizontal: true)
+        results.keyboardDismissMode = .onDrag
         results.dataSource = self
         results.delegate = self
         results.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
@@ -61,6 +62,15 @@ class MenuController: UIViewController {
             results.bottomAnchor.constraint(equalTo: KeyboardGuide(view: view).topAnchor),
         ])
         reloadQuery()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let selected = results.indexPathForSelectedRow else { return }
+        // Jank version of clearsSelectionOnViewWillAppear.
+        UIView.animate(withDuration: 0.25, animations: {
+            self.results.deselectRow(at: selected, animated: true)
+        })
     }
 
     override func viewWillDisappear(_ animated: Bool) {

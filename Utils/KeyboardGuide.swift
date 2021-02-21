@@ -16,7 +16,7 @@ public class KeyboardGuide: UILayoutGuide {
                   let keyboardBegin = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? CGRect,
                   let keyboard = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
             if keyboard == CGRect.zero || (keyboardBegin == CGRect.zero && keyboard.width < window.width) {
-                // floating keyboard present
+                // Floating keyboard present.
                 height.constant = 0
                 return
             }
