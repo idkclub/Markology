@@ -41,7 +41,7 @@ open class FileController: UIViewController {
             dismiss(animated: true)
             onSave?(urls)
         } catch {
-            show(ErrorAlert(error: error), sender: self)
+            errorAlert(for: error)
         }
     }
 

@@ -6,10 +6,15 @@ public class Container {
     public static var current: URL { shared.current }
     public static var icloud: Bool { shared.icloud }
 
-    // TODO: Move files from source to destination on toggle.
-    public static func setCloud(enabled: Bool) {
+    public static func setCloud(enabled: Bool) throws {
+        guard shared.icloud != enabled else { return }
+        let destination = enabled ? icloudURL : localURL
+        try FileManager.default.createDirectory(at: destination, withIntermediateDirectories: true, attributes: nil)
+        for file in try FileManager.default.contentsOfDirectory(at: shared.current, includingPropertiesForKeys: nil, options: []) {
+            try FileManager.default.moveItem(at: file, to: destination.appendingPathComponent(local(for: file)))
+        }
+        shared.current = destination
         shared.icloud = enabled
-        shared.current = enabled ? icloudURL : localURL
     }
 
     public static func local(for url: URL) -> String {

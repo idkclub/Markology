@@ -15,7 +15,7 @@ import Utils
                     defer { group.leave() }
                     guard let image = image as? UIImage else {
                         guard let error = error else { return }
-                        self.present(ErrorAlert(error: error), animated: true)
+                        self.errorAlert(for: error)
                         return
                     }
                     images.append(image)

@@ -7,7 +7,7 @@ class SyncProgress: UIProgressView {
     init() {
         super.init(frame: .zero)
         progressViewStyle = .bar
-        self.progress = World.shared.loadingProgress.value
+        progress = World.shared.loadingProgress.value
         subscription = World.shared.loadingProgress.sink { current in
             DispatchQueue.main.async {
                 guard current > self.progress else {

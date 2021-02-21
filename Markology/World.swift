@@ -83,7 +83,7 @@ class World {
         }
     }
 
-    private func syncSync(force: Bool = false) throws {
+    func syncSync(force: Bool = false) throws {
         let synced = try db.read { try Note.modified(db: $0) }
         let total = Float(max(synced.count, (try? FileManager.default.contentsOfDirectory(at: Container.current, includingPropertiesForKeys: []).count) ?? 0))
         guard let notes = FileManager.default.enumerator(at: Container.current, includingPropertiesForKeys: fileKeys) else { return }

@@ -34,7 +34,7 @@
 		4EB2A9FD25E121BA0088611F /* UIView+anchored.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E94240225DB230900BDA7A3 /* UIView+anchored.swift */; };
 		4EB2AA0025E121D60088611F /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB2A9FF25E121D60088611F /* Container.swift */; };
 		4EB2AA0225E123700088611F /* KeyboardGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100C25DEAC4C004EC326 /* KeyboardGuide.swift */; };
-		4EB2AA0425E123B50088611F /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA923E25E115190094DF6A /* ErrorAlert.swift */; };
+		4EB6725525E258C500104973 /* UIViewController+errorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB6725425E258C500104973 /* UIViewController+errorAlert.swift */; };
 		4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */; };
 		4EEA924925E11B8C0094DF6A /* ImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA924825E11B8C0094DF6A /* ImportViewController.swift */; };
 		4EEA925025E11B8C0094DF6A /* Import.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4EEA924625E11B8C0094DF6A /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -128,8 +128,8 @@
 		4EB2A9CD25E120030088611F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4EB2A9F925E121970088611F /* FileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileController.swift; sourceTree = "<group>"; };
 		4EB2A9FF25E121D60088611F /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
+		4EB6725425E258C500104973 /* UIViewController+errorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+errorAlert.swift"; sourceTree = "<group>"; };
 		4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncProgress.swift; sourceTree = "<group>"; };
-		4EEA923E25E115190094DF6A /* ErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
 		4EEA924625E11B8C0094DF6A /* Import.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Import.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EEA924825E11B8C0094DF6A /* ImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewController.swift; sourceTree = "<group>"; };
 		4EEA924D25E11B8C0094DF6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -217,10 +217,10 @@
 			children = (
 				4EB2A9CD25E120030088611F /* Info.plist */,
 				4EB2A9FF25E121D60088611F /* Container.swift */,
-				4EEA923E25E115190094DF6A /* ErrorAlert.swift */,
 				4EB2A9F925E121970088611F /* FileController.swift */,
 				4E82100C25DEAC4C004EC326 /* KeyboardGuide.swift */,
 				4E94240225DB230900BDA7A3 /* UIView+anchored.swift */,
+				4EB6725425E258C500104973 /* UIViewController+errorAlert.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -416,8 +416,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EB6725525E258C500104973 /* UIViewController+errorAlert.swift in Sources */,
 				4EB2A9FD25E121BA0088611F /* UIView+anchored.swift in Sources */,
-				4EB2AA0425E123B50088611F /* ErrorAlert.swift in Sources */,
 				4EB2AA0225E123700088611F /* KeyboardGuide.swift in Sources */,
 				4EB2AA0025E121D60088611F /* Container.swift in Sources */,
 				4EB2A9FA25E121970088611F /* FileController.swift in Sources */,

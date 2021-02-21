@@ -41,7 +41,13 @@ class SettingsController: UITableViewController {
     }
 
     @objc private func icloud() {
-        Container.setCloud(enabled: toggle.isOn)
+        do {
+            try World.shared.syncSync(force: true)
+            try Container.setCloud(enabled: toggle.isOn)
+        } catch {
+            navigationController?.splitViewController?.errorAlert(for: error)
+        }
+        toggle.isOn = Container.icloud
         World.shared.sync()
     }
 
