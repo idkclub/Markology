@@ -60,6 +60,11 @@ class MenuController: UIViewController {
         reloadQuery()
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        view.endEditing(true)
+    }
+
     func reloadQuery() {
         notesQuery = World.shared.search(query: query) { [weak self] (notes: [Reference]) in
             guard let self = self else { return }
