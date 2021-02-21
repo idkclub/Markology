@@ -21,6 +21,7 @@ class EditController: UIViewController {
     }
 
     override func viewDidLoad() {
+        super.viewDidLoad()
         addLink = UIBarButtonItem(title: "Add Link", style: .plain, target: self, action: #selector(link))
         let buttons = UIToolbar(frame: .infinite).anchored(to: view, horizontal: true)
         buttons.items = [

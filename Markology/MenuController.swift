@@ -39,15 +39,18 @@ class MenuController: UIViewController {
     }
 
     override func viewDidLoad() {
+        super.viewDidLoad()
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Markology"
         view.backgroundColor = .systemGroupedBackground
         navigationItem.setRightBarButton(.init(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings)), animated: true)
         let progress = SyncProgress().anchored(to: view, horizontal: true, top: true)
+
         let searchBar = UISearchBar().anchored(to: view, horizontal: true)
         searchBar.placeholder = "Search"
         searchBar.delegate = self
         searchBar.enablesReturnKeyAutomatically = false
+
         results.anchored(to: view, horizontal: true)
         results.dataSource = self
         results.delegate = self

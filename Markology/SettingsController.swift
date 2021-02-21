@@ -10,6 +10,7 @@ class SettingsController: UITableViewController {
     private let toggle = UISwitch()
 
     override func viewDidLoad() {
+        super.viewDidLoad()
         title = "Settings"
     }
 
