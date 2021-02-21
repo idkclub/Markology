@@ -35,6 +35,7 @@
 		4EB2AA0025E121D60088611F /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB2A9FF25E121D60088611F /* Container.swift */; };
 		4EB2AA0225E123700088611F /* KeyboardGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100C25DEAC4C004EC326 /* KeyboardGuide.swift */; };
 		4EB2AA0425E123B50088611F /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA923E25E115190094DF6A /* ErrorAlert.swift */; };
+		4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */; };
 		4EEA924925E11B8C0094DF6A /* ImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA924825E11B8C0094DF6A /* ImportViewController.swift */; };
 		4EEA925025E11B8C0094DF6A /* Import.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4EEA924625E11B8C0094DF6A /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -127,6 +128,7 @@
 		4EB2A9CD25E120030088611F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4EB2A9F925E121970088611F /* FileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileController.swift; sourceTree = "<group>"; };
 		4EB2A9FF25E121D60088611F /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
+		4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncProgress.swift; sourceTree = "<group>"; };
 		4EEA923E25E115190094DF6A /* ErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
 		4EEA924625E11B8C0094DF6A /* Import.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Import.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EEA924825E11B8C0094DF6A /* ImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewController.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 				4E82100625DE4689004EC326 /* ResultController.swift */,
 				4E9423F425DA885900BDA7A3 /* SceneDelegate.swift */,
 				4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */,
+				4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */,
 				4E82100F25DEAC74004EC326 /* UIColor.swift */,
 				4EAEEA0125DFA28B003A9320 /* UINavigationController+pop.swift */,
 				4E82100225DDEA80004EC326 /* URL+markdown.swift */,
@@ -398,6 +401,7 @@
 				4E82100325DDEA80004EC326 /* URL+markdown.swift in Sources */,
 				4E82100725DE4689004EC326 /* ResultController.swift in Sources */,
 				4E59842C25DC781700236B89 /* Note+Cell.swift in Sources */,
+				4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */,
 				4E59842825DBE9C300236B89 /* Node+iterate.swift in Sources */,
 				4E4DCE2625E1E8C90009BCCB /* SettingsController.swift in Sources */,
 				4E9423F025DA86B900BDA7A3 /* MenuController.swift in Sources */,

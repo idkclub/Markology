@@ -3,10 +3,10 @@ import Utils
 
 class SettingsController: UITableViewController {
     private enum Section: Int {
-        case cloud, sync
+        case cloud, progress, sync
     }
 
-    private let sections: [Section] = [.cloud, .sync]
+    private let sections: [Section] = [.cloud, .progress, .sync]
     private let toggle = UISwitch()
 
     override func viewDidLoad() {
@@ -30,6 +30,8 @@ class SettingsController: UITableViewController {
             toggle.addTarget(self, action: #selector(icloud), for: .valueChanged)
             cell.textLabel?.text = toggle.isEnabled ? "Use iCloud Sync" : "Sign in to iCloud to Sync"
             cell.accessoryView = toggle
+        case .progress:
+            SyncProgress().anchored(to: cell.contentView, horizontal: true, top: true, bottom: true)
         case .sync:
             let button = UIButton(type: .system).anchored(to: cell.contentView, horizontal: true, top: true, bottom: true)
             button.setTitle("Force Sync", for: .normal)

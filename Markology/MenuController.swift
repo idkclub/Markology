@@ -10,7 +10,6 @@ class MenuController: UIViewController {
     var query: String = ""
     var notes: [Reference] = []
     var notesQuery: DatabaseCancellable?
-    var progressSubscription: AnyCancellable?
 
     init(style: UITableView.Style = .insetGrouped, emptyCreate: Bool = true, delegate: MenuDelegate) {
         self.delegate = delegate
@@ -44,19 +43,7 @@ class MenuController: UIViewController {
         title = "Markology"
         view.backgroundColor = .systemGroupedBackground
         navigationItem.setRightBarButton(.init(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings)), animated: true)
-        let progress = UIProgressView().anchored(to: view, horizontal: true, top: true)
-        progress.progressViewStyle = .bar
-        progress.isUserInteractionEnabled = true
-        progress.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(sync)))
-        progressSubscription = World.shared.loadingProgress.sink { current in
-            DispatchQueue.main.async {
-                guard current > progress.progress else {
-                    progress.progress = current
-                    return
-                }
-                progress.setProgress(current, animated: true)
-            }
-        }
+        let progress = SyncProgress().anchored(to: view, horizontal: true, top: true)
         let searchBar = UISearchBar().anchored(to: view, horizontal: true)
         searchBar.placeholder = "Search"
         searchBar.delegate = self
@@ -82,7 +69,7 @@ class MenuController: UIViewController {
     }
 
     @objc private func settings() {
-        show(SettingsController(style: .grouped), sender: self)
+        show(SettingsController(style: .insetGrouped), sender: self)
     }
 
     @objc private func sync() {
