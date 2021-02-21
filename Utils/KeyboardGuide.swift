@@ -13,7 +13,13 @@ public class KeyboardGuide: UILayoutGuide {
         ])
         observer = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: nil) { notification in
             guard let window = view.window?.frame,
+                  let keyboardBegin = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? CGRect,
                   let keyboard = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            if keyboard == CGRect.zero || (keyboardBegin == CGRect.zero && keyboard.width < window.width) {
+                // floating keyboard present
+                height.constant = 0
+                return
+            }
             height.constant = max(window.height - keyboard.minY - view.safeAreaInsets.bottom, 0)
             // TODO: Enable this code in a way that doesn't break when edge-swiping back with the keyboard open.
 //            let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0
