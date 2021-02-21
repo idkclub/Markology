@@ -8,6 +8,7 @@ extension Note {
 
         let textView = UITextView(frame: .zero)
         var delegate: NoteDelegate?
+        var note: Note?
 
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -27,6 +28,7 @@ extension Note {
         }
 
         func render(note: Note, delegate: NoteDelegate) {
+            self.note = note
             self.delegate = delegate
             textView.typingAttributes = [:]
             textView.font = .monospacedSystemFont(ofSize: 16, weight: .regular)
@@ -46,11 +48,12 @@ extension Note {
 extension Note.Cell: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction _: UITextItemInteraction) -> Bool {
         guard url.host == nil else { return true }
-        guard let path = url.path.removingPercentEncoding else { return false }
-        guard let note = World.shared.load(file: path) else {
-            guard Container.url(for: path).markdown,
+        guard let path = url.path.removingPercentEncoding,
+              let relative = URL(string: path, relativeTo: URL(string:note?.file ?? "/"))?.path else { return false }
+        guard let note = World.shared.load(file: relative) else {
+            guard Container.url(for: relative).markdown,
                   let name = textView.attributedText?.attributedSubstring(from: characterRange).string else { return false }
-            delegate?.create(path: path, name: name)
+            delegate?.create(path: relative, name: name)
             return false
         }
         delegate?.navigate(to: note)
