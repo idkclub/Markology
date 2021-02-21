@@ -10,7 +10,6 @@ import Utils
             guard let attachments = item.attachments else { continue }
             for provider in attachments {
                 group.enter()
-                // TODO: The file “IMG_1422.jpg” couldn’t be opened because there is no such file.
                 provider.loadObject(ofClass: UIImage.self) { image, error in
                     defer { group.leave() }
                     guard let image = image as? UIImage else {
