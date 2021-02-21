@@ -9,7 +9,7 @@ class World {
     let loadingProgress = CurrentValueSubject<Float, Never>(1)
     let db: DatabaseWriter
     var syncing = false
-    private let query = NSMetadataQuery()
+    private var query: NSMetadataQuery?
 
     init() {
         do {
@@ -30,17 +30,6 @@ class World {
             #endif
         } catch {
             db = DatabaseQueue()
-        }
-
-        if Container.icloud {
-            query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
-            query.predicate = NSPredicate(value: true)
-            query.operationQueue = .main
-            NotificationCenter.default.addObserver(forName: NSNotification.Name.NSMetadataQueryDidUpdate, object: query, queue: query.operationQueue) { [weak self] _ in
-                self?.sync()
-            }
-            query.enableUpdates()
-            query.start()
         }
         try? migrate()
         sync()
@@ -72,8 +61,6 @@ class World {
     ]
 
     func sync(force: Bool = false) {
-        guard !syncing else { return }
-        syncing = true
         DispatchQueue.global(qos: .background).async {
             do {
                 try self.syncSync(force: force)
@@ -81,9 +68,26 @@ class World {
                 print(error)
             }
         }
+        if Container.icloud && query == nil {
+            query = NSMetadataQuery()
+            guard let bound = query else { return }
+            bound.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
+            bound.predicate = NSPredicate(value: true)
+            NotificationCenter.default.addObserver(forName: NSNotification.Name.NSMetadataQueryDidUpdate, object: query, queue: bound.operationQueue) { [weak self] _ in
+                self?.sync()
+            }
+            bound.enableUpdates()
+            bound.start()
+        } else if !Container.icloud && query != nil {
+            query?.stop()
+            query = nil
+        }
     }
 
     func syncSync(force: Bool = false) throws {
+        guard !syncing else { return }
+        syncing = true
+        defer { syncing = false }
         let synced = try db.read { try Note.modified(db: $0) }
         let total = Float(max(synced.count, (try? FileManager.default.contentsOfDirectory(at: Container.current, includingPropertiesForKeys: []).count) ?? 0))
         guard let notes = FileManager.default.enumerator(at: Container.current, includingPropertiesForKeys: fileKeys) else { return }
@@ -154,7 +158,6 @@ class World {
             }
         }
         loadingProgress.send(1)
-        syncing = false
     }
 
     private func open(url: URL, for operation: (URL) throws -> Void) {
