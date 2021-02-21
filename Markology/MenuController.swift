@@ -51,7 +51,7 @@ class MenuController: UIViewController {
         searchBar.delegate = self
         searchBar.enablesReturnKeyAutomatically = false
 
-        results.anchored(to: view, horizontal: true)
+        results.anchored(to: view, horizontal: true, bottom: true)
         results.keyboardDismissMode = .onDrag
         results.dataSource = self
         results.delegate = self
@@ -59,7 +59,6 @@ class MenuController: UIViewController {
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
             results.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
-            results.bottomAnchor.constraint(equalTo: KeyboardGuide(view: view).topAnchor),
         ])
         reloadQuery()
     }
