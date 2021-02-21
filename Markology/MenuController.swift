@@ -43,6 +43,7 @@ class MenuController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Markology"
         view.backgroundColor = .systemGroupedBackground
+        navigationItem.setRightBarButton(.init(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings)), animated: true)
         let progress = UIProgressView().anchored(to: view, horizontal: true, top: true)
         progress.progressViewStyle = .bar
         progress.isUserInteractionEnabled = true
@@ -78,6 +79,10 @@ class MenuController: UIViewController {
             self.notes = notes
             self.results.reloadData()
         }
+    }
+
+    @objc private func settings() {
+        show(SettingsController(style: .grouped), sender: self)
     }
 
     @objc private func sync() {

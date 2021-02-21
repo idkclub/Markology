@@ -21,7 +21,7 @@ class ViewController: UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private enum Section: Int, CaseIterable {
+    private enum Section: Int {
         case from, to, note, image
     }
 
