@@ -10,6 +10,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             page.viewControllers = [UIViewController()]
             setViewController(MenuController(delegate: self), for: .primary)
             setViewController(page, for: .secondary)
+            preferredDisplayMode = .oneBesideSecondary
             delegate = self
         }
     }
