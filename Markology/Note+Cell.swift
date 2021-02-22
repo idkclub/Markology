@@ -49,7 +49,7 @@ extension Note.Cell: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction _: UITextItemInteraction) -> Bool {
         guard url.host == nil else { return true }
         guard let path = url.path.removingPercentEncoding,
-              let relative = URL(string: path, relativeTo: URL(string:note?.file ?? "/"))?.path else { return false }
+              let relative = URL(string: path, relativeTo: URL(string: note?.file ?? "/"))?.path else { return false }
         guard let note = World.shared.load(file: relative) else {
             guard Container.url(for: relative).markdown,
                   let name = textView.attributedText?.attributedSubstring(from: characterRange).string else { return false }

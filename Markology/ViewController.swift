@@ -75,7 +75,9 @@ class ViewController: UITableViewController {
             let confirm = UIAlertController(title: "Delete \(note.name)?", message: "This operation cannot be undone.", preferredStyle: .alert)
             confirm.addAction(.init(title: "Cancel", style: .cancel))
             confirm.addAction(.init(title: "🔥", style: .destructive) { [weak self] _ in
-                World.shared.delete(url: Container.url(for: note.file))
+                do {
+                    try World.shared.delete(url: Container.url(for: note.file))
+                } catch { self?.errorAlert(for: error) }
                 self?.navigationController?.pop()
             })
             self?.present(confirm, animated: true)

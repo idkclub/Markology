@@ -46,6 +46,13 @@ public class Container {
     }
 
     init() {
+        #if DEBUG
+            if let dir = ProcessInfo.processInfo.environment["MARKOLOGY_DIR"] {
+                icloud = false
+                current = URL(fileURLWithPath: dir)
+                return
+            }
+        #endif
         guard !defaults.bool(forKey: disableCloud), Container.icloudEnabled else {
             defaults.set(true, forKey: disableCloud)
             icloud = false

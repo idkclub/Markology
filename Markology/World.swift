@@ -160,7 +160,7 @@ class World {
         loadingProgress.send(1)
     }
 
-    private func open(url: URL, for operation: (URL) throws -> Void) {
+    private func open(url: URL, for operation: (URL) throws -> Void) throws {
         var nsError: NSError?
         var swiftError: Error?
         NSFileCoordinator().coordinate(writingItemAt: url, error: &nsError) { url in
@@ -170,20 +170,20 @@ class World {
                 swiftError = error
             }
         }
-        if let error = nsError { print(error) }
-        if let error = swiftError { print(error) }
+        if let error = nsError { throw error }
+        if let error = swiftError { throw error }
         sync()
     }
 
-    func write(contents: String, to url: URL) {
-        open(url: url) {
+    func write(contents: String, to url: URL) throws {
+        try open(url: url) {
             try FileManager.default.createDirectory(atPath: $0.deletingLastPathComponent().path, withIntermediateDirectories: true, attributes: nil)
             try contents.write(to: $0, atomically: true, encoding: .utf8)
         }
     }
 
-    func delete(url: URL) {
-        open(url: url) {
+    func delete(url: URL) throws {
+        try open(url: url) {
             try FileManager.default.removeItem(at: $0)
         }
     }

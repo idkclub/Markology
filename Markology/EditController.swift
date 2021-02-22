@@ -62,7 +62,9 @@ class EditController: UIViewController {
     }
 
     @objc private func save() {
-        World.shared.write(contents: text, to: url)
+        do {
+            try World.shared.write(contents: text, to: url)
+        } catch { errorAlert(for: error) }
         dismiss(animated: true)
         onSave?(url)
     }
@@ -81,7 +83,9 @@ extension EditController: MenuDelegate {
 
     func create(query: String) {
         let new = Container.url(for: nil)
-        World.shared.write(contents: EditController.body(from: query), to: new)
+        do {
+            try World.shared.write(contents: EditController.body(from: query), to: new)
+        } catch { errorAlert(for: error) }
         select(note: Reference(file: Container.local(for: new), name: query))
     }
 }
