@@ -18,7 +18,7 @@ public class Container {
     }
 
     public static func local(for url: URL) -> String {
-        String(url.path.dropFirst(current.path.count))
+        String(url.resolvingSymlinksInPath().path.dropFirst(current.path.count))
     }
 
     public static func url(for name: String?) -> URL {
@@ -29,11 +29,11 @@ public class Container {
     }
 
     static var icloudURL: URL {
-        FileManager.default.url(forUbiquityContainerIdentifier: "iCloud.club.idk.Markology")!.appendingPathComponent("Documents")
+        FileManager.default.url(forUbiquityContainerIdentifier: "iCloud.club.idk.Markology")!.appendingPathComponent("Documents").resolvingSymlinksInPath()
     }
 
     static var localURL: URL {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.club.idk.Markology")!.appendingPathComponent("Documents")
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.club.idk.Markology")!.appendingPathComponent("Documents").resolvingSymlinksInPath()
     }
 
     private let disableCloud = "disableCloud"

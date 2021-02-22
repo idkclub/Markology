@@ -23,11 +23,10 @@ An opionated, [Zettelkasten](/1613965013.md)-inspired note creation and linking 
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        let notes = FileManager.default.temporaryDirectory
+        let notes = FileManager.default.temporaryDirectory.resolvingSymlinksInPath()
         for file in try FileManager.default.contentsOfDirectory(atPath: notes.path) {
             try? FileManager.default.removeItem(at: URL(fileURLWithPath: file))
         }
-        print(notes)
         for file in template {
             try file.value.write(to: notes.appendingPathComponent(file.key), atomically: true, encoding: .utf8)
         }
@@ -37,10 +36,11 @@ An opionated, [Zettelkasten](/1613965013.md)-inspired note creation and linking 
     }
 
     func testScreens() throws {
+        shoot(name: "menu")
         let windowsQuery = XCUIApplication()/*@START_MENU_TOKEN@*/.windows/*[[".groups.windows",".windows"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
-        windowsQuery.tables.staticTexts["Markology"].tap()
+        windowsQuery.tables.staticTexts["What is this?"].tap()
         shoot(name: "index")
-        windowsQuery.navigationBars["Markology"].buttons["edit"].tap()
+        windowsQuery.navigationBars["What is this?"].buttons["edit"].tap()
         shoot(name: "edit")
     }
     
