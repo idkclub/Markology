@@ -94,7 +94,7 @@ class World {
         _ = try db.write { db in
             var seen: [String] = []
             var links: [Note.Link] = []
-            try notes.forEach {
+            notes.forEach {
                 defer {
                     let progress = Float(seen.count) / total
                     if abs(progress - loadingProgress.value) > 0.1 {
@@ -108,7 +108,7 @@ class World {
                 if path.pathComponents.contains(where: { $0.first == "." }) {
                     if path.pathExtension == "icloud" {
                         let missing = String(path.deletingLastPathComponent().path.dropFirst(Container.current.path.count) + "/" + path.lastPathComponent.dropLast(7).dropFirst())
-                        try FileManager.default.startDownloadingUbiquitousItem(at: Container.url(for: missing))
+                        try? FileManager.default.startDownloadingUbiquitousItem(at: Container.url(for: missing))
                         seen.append(missing)
                     }
                     return
