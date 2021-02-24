@@ -101,7 +101,7 @@ class World {
                         loadingProgress.value = progress
                     }
                 }
-                guard let path = $0 as? URL else { return }
+                guard let path = ($0 as? URL)?.resolvingSymlinksInPath() else { return }
                 guard let attrs = try? path.resourceValues(forKeys: Set(fileKeys)),
                       let dir = attrs.isDirectory, !dir,
                       let date = attrs.contentModificationDate else { return }
