@@ -51,15 +51,19 @@ class UITests: XCTestCase {
     }
 
     func testScreens() throws {
-        sleep(3)
-        shoot(name: "0-menu")
         let windowsQuery = XCUIApplication()/*@START_MENU_TOKEN@*/ .windows/*[[".groups.windows",".windows"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
+        sleep(4)
+        shoot(name: "0-initial")
         windowsQuery.tables.staticTexts["What is this?"].tap()
-        sleep(3)
+        sleep(2)
         shoot(name: "1-view")
         windowsQuery.navigationBars["What is this?"].buttons["edit"].tap()
-        sleep(3)
+        sleep(2)
         shoot(name: "2-edit")
+        app.toolbars["Toolbar"].buttons["Cancel"].tap()
+        windowsQuery.navigationBars["What is this?"].buttons["Markology"].tap()
+        sleep(2)
+        shoot(name: "3-menu")
     }
 
     private func shoot(name: String) {
