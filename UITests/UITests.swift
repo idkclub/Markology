@@ -6,7 +6,7 @@ class UITests: XCTestCase {
         "1613951724.md": """
         # What is this?
 
-        An opionated, [Zettelkasten](/1613965013.md)-inspired note creation and linking tool.
+        An opinionated, [Zettelkasten](/1613965013.md)-inspired note creation and linking tool.
 
         ## Supports:
 
