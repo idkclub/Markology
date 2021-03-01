@@ -37,8 +37,8 @@ class UITests: XCTestCase {
         for file in try! FileManager.default.contentsOfDirectory(atPath: notes.path) {
             try? FileManager.default.removeItem(at: URL(fileURLWithPath: file))
         }
-        for file in template {
-            try! file.value.write(to: notes.appendingPathComponent(file.key), atomically: true, encoding: .utf8)
+        for file in template.keys.sorted() {
+            try! template[file]!.write(to: notes.appendingPathComponent(file), atomically: true, encoding: .utf8)
         }
         return notes
     }()
