@@ -10,7 +10,7 @@ class UITests: XCTestCase {
 
         ## Supports:
 
-        - [Markdown](/1613952665.md) (via [Down](https://github.com/johnxnguyen/Down))
+        - [Markdown](/1613952665.md) (via [Down](https://github.com/johnxnguyen/Down)).
         - Offline usage and search (via [GRDB](https://github.com/groue/GRDB.swift)).
         - iCloud syncing.
 
@@ -62,9 +62,9 @@ class UITests: XCTestCase {
         shoot(name: "2-edit")
         app.toolbars["Toolbar"].buttons["Cancel"].tap()
         #if targetEnvironment(simulator)
-        windowsQuery.navigationBars["What is this?"].buttons["Markology"].tap()
-        sleep(2)
-        shoot(name: "3-menu")
+            windowsQuery.navigationBars["What is this?"].buttons["Markology"].tap()
+            sleep(2)
+            shoot(name: "3-menu")
         #endif
     }
 
