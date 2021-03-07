@@ -37,7 +37,7 @@
 		4EB6725525E258C500104973 /* UIViewController+errorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB6725425E258C500104973 /* UIViewController+errorAlert.swift */; };
 		4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */; };
 		4EEA924925E11B8C0094DF6A /* ImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA924825E11B8C0094DF6A /* ImportViewController.swift */; };
-		4EEA925025E11B8C0094DF6A /* Import.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4EEA924625E11B8C0094DF6A /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4EEA925025E11B8C0094DF6A /* Import.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4EEA924625E11B8C0094DF6A /* Import.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -498,6 +498,7 @@
 		};
 		4EEA924F25E11B8C0094DF6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = 4EEA924525E11B8C0094DF6A /* Import */;
 			targetProxy = 4EEA924E25E11B8C0094DF6A /* PBXContainerItemProxy */;
 		};
@@ -794,7 +795,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = club.idk.Markology.Import;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -818,7 +819,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = club.idk.Markology.Import;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
