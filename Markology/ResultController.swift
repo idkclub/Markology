@@ -13,8 +13,8 @@ class ResultController: UITableViewController {
             self?.tableView.reloadData()
         }
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
-        tableView.register(Note.Cell.self, forCellReuseIdentifier: Note.Cell.id)
-        tableView.register(Note.Image.self, forCellReuseIdentifier: Note.Image.id)
+        tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
+        tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
         clearsSelectionOnViewWillAppear = true
     }
 
@@ -43,11 +43,11 @@ class ResultController: UITableViewController {
             return cell
         }
         guard !notes[indexPath.section].binary else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: Note.Image.id, for: indexPath) as! Note.Image
+            let cell = tableView.dequeueReusableCell(withIdentifier: ImageCell.id, for: indexPath) as! ImageCell
             cell.render(image: notes[indexPath.section].image)
             return cell
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: Note.Cell.id, for: indexPath) as! Note.Cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: NoteCell.id, for: indexPath) as! NoteCell
         cell.render(note: notes[indexPath.section], delegate: self)
         return cell
     }
