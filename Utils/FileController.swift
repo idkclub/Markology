@@ -105,9 +105,11 @@ extension FileController {
             textField.anchored(to: contentView, top: true, bottom: true)
             textField.placeholder = "Name"
             textField.addTarget(self, action: #selector(edit), for: .editingChanged)
+            let heightConstraint = preview.heightAnchor.constraint(equalToConstant: 150)
+            heightConstraint.priority = UILayoutPriority(999)
             NSLayoutConstraint.activate([
                 preview.widthAnchor.constraint(equalToConstant: 150),
-                contentView.heightAnchor.constraint(equalToConstant: 150),
+                heightConstraint,
                 preview.leftAnchor.constraint(equalTo: contentView.leftAnchor),
                 textField.leftAnchor.constraint(equalTo: preview.rightAnchor, constant: 20),
             ])
