@@ -9,15 +9,28 @@ import Utils
         for item in items {
             guard let attachments = item.attachments else { continue }
             for provider in attachments {
-                group.enter()
-                provider.loadObject(ofClass: UIImage.self) { image, error in
-                    defer { group.leave() }
-                    guard let image = image as? UIImage else {
-                        guard let error = error else { return }
-                        self.errorAlert(for: error)
-                        return
+                if provider.canLoadObject(ofClass: UIImage.self) {
+                    group.enter()
+                    provider.loadObject(ofClass: UIImage.self) { image, error in
+                        defer { group.leave() }
+                        guard let image = image as? UIImage else {
+                            guard let error = error else { return }
+                            self.errorAlert(for: error)
+                            return
+                        }
+                        images.append(image)
                     }
-                    images.append(image)
+                } else if provider.hasItemConformingToTypeIdentifier("public.image") {
+                    group.enter()
+                    provider.loadItem(forTypeIdentifier: "public.image") { image, error in
+                        defer { group.leave() }
+                        guard let image = image as? UIImage else {
+                            guard let error = error else { return }
+                            self.errorAlert(for: error)
+                            return
+                        }
+                        images.append(image)
+                    }
                 }
             }
         }
