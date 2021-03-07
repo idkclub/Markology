@@ -91,13 +91,14 @@ class World {
         let synced = try db.read { try Note.modified(db: $0) }
         let total = Float(max(synced.count, (try? FileManager.default.contentsOfDirectory(at: Container.current, includingPropertiesForKeys: []).count) ?? 0))
         guard let notes = FileManager.default.enumerator(at: Container.current, includingPropertiesForKeys: fileKeys) else { return }
+        var skipping = true
         _ = try db.write { db in
             var seen: [String] = []
             var links: [Note.Link] = []
             notes.forEach {
                 defer {
                     let progress = Float(seen.count) / total
-                    if abs(progress - loadingProgress.value) > 0.1 {
+                    if !skipping, abs(progress - loadingProgress.value) > 0.1 {
                         loadingProgress.value = progress
                     }
                 }
@@ -116,6 +117,7 @@ class World {
                 let local = Container.local(for: path)
                 seen.append(local)
                 if !force, let last = synced[local], Calendar.current.compare(last, to: date, toGranularity: .second) == .orderedSame { return }
+                skipping = false
                 var nsError: NSError?
                 NSFileCoordinator().coordinate(readingItemAt: path, error: &nsError) { path in
                     do {
