@@ -6,7 +6,7 @@ extension Note {
     class Cell: UITableViewCell {
         static let id = "note"
 
-        let textView = UITextView(frame: .zero)
+        let textView = DownTextView(frame: .zero, styler: Styler.shared)
         var delegate: NoteDelegate?
         var note: Note?
 
@@ -30,17 +30,14 @@ extension Note {
         func render(note: Note, delegate: NoteDelegate) {
             self.note = note
             self.delegate = delegate
-            textView.typingAttributes = [:]
-            textView.font = .monospacedSystemFont(ofSize: 16, weight: .regular)
             guard Container.url(for: note.file).markdown else {
-                textView.text = note.text
+                textView.attributedText = NSAttributedString(string: note.text, attributes: [
+                    .foregroundColor: UIColor.label,
+                    .font: UIFont.monospacedSystemFont(ofSize: 16, weight: .regular),
+                ])
                 return
             }
-            do {
-                textView.attributedText = try Down(markdownString: note.text).toAttributedString(styler: Styler.shared)
-            } catch {
-                textView.text = note.text
-            }
+            textView.text = note.text
         }
     }
 }
@@ -90,11 +87,24 @@ private class Styler: DownStyler {
             code: .label,
             link: .systemBlue,
             quote: .secondaryLabel,
-            quoteStripe: .secondaryLabel,
-            thematicBreak: .secondaryLabel,
+            quoteStripe: .systemFill,
+            thematicBreak: .label,
             listItemPrefix: .label,
             codeBlockBackground: .systemGroupedBackground
         )))
+    }
+
+    override func style(heading str: NSMutableAttributedString, level: Int) {
+        str.enumerateAttribute(.font, in: .init(location: 0, length: str.length), options: []) { value, range, _ in
+            if let value = value as? DownFont {
+                var traits = value.fontDescriptor.symbolicTraits
+                traits.insert(.traitBold)
+                str.addAttribute(.font, value: UIFont(descriptor: value.fontDescriptor.withSymbolicTraits(traits) ?? value.fontDescriptor, size: headingSize(for: level)), range: range)
+            }
+        }
+        str.addAttributes([
+            .paragraphStyle: paragraphStyles.heading1,
+        ], range: .init(location: 0, length: str.length))
     }
 
     override func style(link str: NSMutableAttributedString, title _: String?, url: String?) {
@@ -125,5 +135,17 @@ private class Styler: DownStyler {
             .link: url,
             .foregroundColor: url.contains(":") || url.contains("//") ? UIColor.idkCyan : UIColor.idkMagenta,
         ], range: .init(location: 0, length: str.length))
+    }
+
+    private func headingSize(for level: Int) -> CGFloat {
+        switch level {
+        case 1: return fonts.heading1.pointSize
+        case 2: return fonts.heading2.pointSize
+        case 3: return fonts.heading3.pointSize
+        case 4: return fonts.heading4.pointSize
+        case 5: return fonts.heading5.pointSize
+        case 6: return fonts.heading6.pointSize
+        default: return fonts.heading1.pointSize
+        }
     }
 }
