@@ -45,6 +45,9 @@ class UITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            XCUIDevice.shared.orientation = .landscapeLeft
+        }
         app = XCUIApplication()
         app.launchEnvironment["MARKOLOGY_DIR"] = directory.path
         app.launch()
@@ -61,11 +64,6 @@ class UITests: XCTestCase {
         sleep(2)
         shoot(name: "2-edit")
         app.toolbars["Toolbar"].buttons["Cancel"].tap()
-        #if targetEnvironment(simulator)
-            windowsQuery.navigationBars["What is this?"].buttons["Markology"].tap()
-            sleep(2)
-            shoot(name: "3-menu")
-        #endif
     }
 
     private func shoot(name: String) {
