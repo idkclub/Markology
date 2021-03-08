@@ -2,19 +2,6 @@ import UIKit
 import Utils
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    class RootController: UISplitViewController {
-        let page = UINavigationController()
-        override func viewDidLoad() {
-            super.viewDidLoad()
-            page.navigationBar.prefersLargeTitles = true
-            page.viewControllers = [ViewController(note: Reference(file: "/index.md", name: ""))]
-            setViewController(MenuController(delegate: self), for: .primary)
-            setViewController(page, for: .secondary)
-            preferredDisplayMode = .oneBesideSecondary
-            delegate = self
-        }
-    }
-
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
@@ -26,13 +13,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 }
 
-extension SceneDelegate.RootController: UISplitViewControllerDelegate {
+private class RootController: UISplitViewController {
+    let page = UINavigationController()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        page.navigationBar.prefersLargeTitles = true
+        page.viewControllers = [ViewController(note: Reference(file: "/index.md", name: ""))]
+        setViewController(MenuController(delegate: self), for: .primary)
+        setViewController(page, for: .secondary)
+        preferredDisplayMode = .oneBesideSecondary
+        delegate = self
+    }
+}
+
+extension RootController: UISplitViewControllerDelegate {
     func splitViewController(_: UISplitViewController, topColumnForCollapsingToProposedTopColumn _: UISplitViewController.Column) -> UISplitViewController.Column {
         .primary
     }
 }
 
-extension SceneDelegate.RootController: MenuDelegate {
+extension RootController: MenuDelegate {
     private func navigate(to controller: UIViewController) {
         page.viewControllers[0] = controller
         page.popToRootViewController(animated: true)

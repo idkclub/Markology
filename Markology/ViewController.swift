@@ -64,8 +64,8 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
-        tableView.register(Note.Cell.self, forCellReuseIdentifier: Note.Cell.id)
-        tableView.register(Note.Image.self, forCellReuseIdentifier: Note.Image.id)
+        tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
+        tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
     }
 
     @objc private func menu() {
@@ -152,11 +152,11 @@ class ViewController: UITableViewController {
         case .from:
             ref = entry.from[indexPath.row]
         case .note:
-            let cell = tableView.dequeueReusableCell(withIdentifier: Note.Cell.id, for: indexPath) as! Note.Cell
+            let cell = tableView.dequeueReusableCell(withIdentifier: NoteCell.id, for: indexPath) as! NoteCell
             cell.render(note: entry.note, delegate: self)
             return cell
         case .image:
-            let cell = tableView.dequeueReusableCell(withIdentifier: Note.Image.id, for: indexPath) as! Note.Image
+            let cell = tableView.dequeueReusableCell(withIdentifier: ImageCell.id, for: indexPath) as! ImageCell
             cell.render(image: self.entry?.note.image)
             return cell
         }

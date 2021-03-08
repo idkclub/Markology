@@ -45,9 +45,11 @@ class UITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            XCUIDevice.shared.orientation = .landscapeLeft
-        }
+        #if targetEnvironment(simulator)
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                XCUIDevice.shared.orientation = .landscapeLeft
+            }
+        #endif
         app = XCUIApplication()
         app.launchEnvironment["MARKOLOGY_DIR"] = directory.path
         app.launch()

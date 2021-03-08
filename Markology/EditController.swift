@@ -77,7 +77,11 @@ class EditController: UIViewController {
 extension EditController: MenuDelegate {
     func select(note: Reference) {
         guard let url = note.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
-        textView.insertText("[\(note.name)](\(url))")
+        if ["tiff", "tif", "png", "jpg", "jpeg", "jp2", "heic", "gif", "bmp"].contains(where: {(url as NSString).pathExtension == $0}) {
+            textView.insertText("![](\(url))")
+        } else {
+            textView.insertText("[\(note.name)](\(url))")
+        }
         dismiss(animated: true)
     }
 
