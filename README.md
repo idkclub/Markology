@@ -1,5 +1,7 @@
 # Markology [![Download on the App Store](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-US?size=250x83)](https://apps.apple.com/us/app/markology/id1553649446?itsct=apps_box)
 
+![Markology on macOS and iOS](https://idk.club/assets/markology.png)
+
 An opinionated, zettelkasten-inspired note creation and linking tool.
 
 ## Supports:
