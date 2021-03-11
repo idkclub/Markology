@@ -114,41 +114,17 @@ class World {
                     }
                     return
                 }
-                let local = Container.local(for: path)
-                seen.append(local)
-                if !force, let last = synced[local], Calendar.current.compare(last, to: date, toGranularity: .second) == .orderedSame { return }
+                let localPath = Container.local(for: path)
+                seen.append(localPath)
+                if !force, let last = synced[localPath], Calendar.current.compare(last, to: date, toGranularity: .second) == .orderedSame { return }
                 skipping = false
                 var nsError: NSError?
                 NSFileCoordinator().coordinate(readingItemAt: path, error: &nsError) { path in
                     do {
-                        guard let text = try? String(contentsOf: path) else {
-                            try Note(file: local, name: String(local.dropFirst(1)), text: "", modified: date, binary: true).save(db)
-                            return
-                        }
-                        guard path.isMarkdown else {
-                            try Note(file: local, name: String(local.dropFirst(1)), text: text, modified: date, binary: false).save(db)
-                            return
-                        }
-                        let document = try Down(markdownString: text).toDocument()
-                        let name = document.name()
-                        try Note(
-                            file: local,
-                            name: name != "" ? name : String(local.dropFirst(1)),
-                            text: text,
-                            modified: date,
-                            binary: false
-                        ).save(db)
-                        try Note.Link.filter(Note.Link.Columns.from == local).deleteAll(db)
-                        for link in document.links(relative: true, includeImage: true) {
-                            guard let relative = URL(
-                                string: link,
-                                relativeTo: URL(string: local)
-                            ) else { continue }
-                            links.append(Note.Link(
-                                from: local,
-                                to: relative.path
-                            ))
-                        }
+                        guard let document = try saveNote(at: path, with: localPath, in: db, modifiedDate: date)
+                            else { return }
+
+                        links.append(contentsOf: try processLinksForSync(from: document, at: localPath, in: db))
                     } catch {
                         print("sync fail", error)
                     }
@@ -160,6 +136,55 @@ class World {
             }
         }
         loadingProgress.send(1)
+    }
+
+    /**
+     Processes a note file at the URL `path` and saves it in the provided `Database`. If the file contains a markdown `Document`, it is returned.
+     This function should be called in the context of a database write update, and an `NSFileCoordinator.coordinate` call.
+     */
+    private func saveNote(at path: URL, with localPath: String, in db: Database, modifiedDate: Date) throws -> Document? {
+        let defaultName = String(localPath.dropFirst(1))
+
+        guard let text = try? String(contentsOf: path) else {
+            try Note(file: localPath, name: defaultName, text: "", modified: modifiedDate, binary: true).save(db)
+            return nil
+        }
+
+        guard path.isMarkdown, let document = try? Down(markdownString: text).toDocument() else {
+            try Note(file: localPath, name: defaultName, text: text, modified: modifiedDate, binary: false).save(db)
+            return nil
+        }
+
+        let name = document.name()
+        try Note(
+            file: localPath,
+            name: name != "" ? name : defaultName,
+            text: text,
+            modified: modifiedDate,
+            binary: false
+        ).save(db)
+
+        return document
+    }
+
+    /**
+     Deletes all the old links from the `Document` in the `Database` and returns the current links from the `Document`.
+     This function should be called in the context of a database write update.
+     */
+    private func processLinksForSync(from document: Document, at localPath: String, in db: Database) throws -> [Note.Link] {
+        try Note.Link.filter(Note.Link.Columns.from == localPath).deleteAll(db)
+
+        var links: [Note.Link] = []
+        for link in document.links(relative: true, includeImage: true) {
+            guard let resolvedLink = URL(
+                    string: link,
+                    relativeTo: URL(string: localPath)
+            ) else { continue }
+            links.append(
+                Note.Link(from: localPath, to: resolvedLink.path)
+            )
+        }
+        return links
     }
 
     private func open(url: URL, for operation: (URL) throws -> Void) throws {
