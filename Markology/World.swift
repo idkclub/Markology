@@ -125,7 +125,7 @@ class World {
                             try Note(file: local, name: String(local.dropFirst(1)), text: "", modified: date, binary: true).save(db)
                             return
                         }
-                        guard path.markdown else {
+                        guard path.isMarkdown else {
                             try Note(file: local, name: String(local.dropFirst(1)), text: text, modified: date, binary: false).save(db)
                             return
                         }

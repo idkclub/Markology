@@ -1,7 +1,7 @@
 import Foundation
 
 extension URL {
-    var markdown: Bool {
+    var isMarkdown: Bool {
         pathExtension == "md"
     }
 }
