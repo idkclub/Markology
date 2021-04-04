@@ -15,6 +15,7 @@
 		4E59842525DBE94400236B89 /* Down in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59842425DBE94400236B89 /* Down */; };
 		4E59842825DBE9C300236B89 /* Node+iterate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59842725DBE9C300236B89 /* Node+iterate.swift */; };
 		4E59842C25DC781700236B89 /* NoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59842B25DC781700236B89 /* NoteCell.swift */; };
+		4E6BB4872619AC4700439121 /* RelatedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6BB4862619AC4700439121 /* RelatedController.swift */; };
 		4E82100325DDEA80004EC326 /* URL+markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100225DDEA80004EC326 /* URL+markdown.swift */; };
 		4E82100725DE4689004EC326 /* ResultController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100625DE4689004EC326 /* ResultController.swift */; };
 		4E82101025DEAC74004EC326 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100F25DEAC74004EC326 /* UIColor.swift */; };
@@ -103,6 +104,7 @@
 		4E59841525DBBF0400236B89 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		4E59842725DBE9C300236B89 /* Node+iterate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+iterate.swift"; sourceTree = "<group>"; };
 		4E59842B25DC781700236B89 /* NoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCell.swift; sourceTree = "<group>"; };
+		4E6BB4862619AC4700439121 /* RelatedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedController.swift; sourceTree = "<group>"; };
 		4E82100225DDEA80004EC326 /* URL+markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+markdown.swift"; sourceTree = "<group>"; };
 		4E82100625DE4689004EC326 /* ResultController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultController.swift; sourceTree = "<group>"; };
 		4E82100C25DEAC4C004EC326 /* KeyboardGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGuide.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 				4E59840C25DBAABE00236B89 /* Note.swift */,
 				4E59842B25DC781700236B89 /* NoteCell.swift */,
 				4E59841125DBB06C00236B89 /* Reference.swift */,
+				4E6BB4862619AC4700439121 /* RelatedController.swift */,
 				4E82100625DE4689004EC326 /* ResultController.swift */,
 				4E9423F425DA885900BDA7A3 /* SceneDelegate.swift */,
 				4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */,
@@ -437,6 +440,7 @@
 				4E59840D25DBAABE00236B89 /* Note.swift in Sources */,
 				4E9423D225DA78F900BDA7A3 /* AppDelegate.swift in Sources */,
 				4E82100325DDEA80004EC326 /* URL+markdown.swift in Sources */,
+				4E6BB4872619AC4700439121 /* RelatedController.swift in Sources */,
 				4E82100725DE4689004EC326 /* ResultController.swift in Sources */,
 				4E59842C25DC781700236B89 /* NoteCell.swift in Sources */,
 				4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */,

@@ -45,7 +45,7 @@ class ViewController: UITableViewController {
         return sections
     }
 
-    func reload(entry: Note.Entry?) {
+    func reload(with entry: Note.Entry?) {
         defer { tableView.reloadData() }
         self.entry = entry
         guard let entry = entry, let menuButton = menuButton else {
@@ -55,6 +55,9 @@ class ViewController: UITableViewController {
         }
         title = entry.note.name
         var buttons: [UIBarButtonItem] = [menuButton]
+        if entry.to.count > 0 || entry.from.count > 0 {
+            buttons.append(.init(image: UIImage(systemName: "dot.radiowaves.left.and.right"), style: .plain, target: self, action: #selector(related)))
+        }
         if !entry.note.binary {
             buttons.append(.init(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(edit)))
         }
@@ -66,6 +69,14 @@ class ViewController: UITableViewController {
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
+    }
+
+    @objc private func related() {
+        guard let entry = entry else { return }
+        present(RelatedController(to: entry) {
+            guard $0 != self.entry else { return }
+            self.navigate(to: $0.note.reference())
+        }, animated: true)
     }
 
     @objc private func menu() {
@@ -116,13 +127,13 @@ class ViewController: UITableViewController {
     }
 
     override func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
+        guard let entry = entry else { return nil }
         switch sections[section] {
         case .from:
-            return "Linked From"
+            return "Linked From\(entry.from.count > 5 ? " (\(entry.from.count - 5) hidden)" : "")"
         case .to:
-            return "Linked To"
+            return "Linked To\(entry.to.count > 5 ? " (\(entry.to.count - 5) hidden)" : "")"
         case .note, .image:
-            guard let entry = entry else { return nil }
             return "Last Modified \(date.string(from: entry.note.modified))"
         }
     }
@@ -135,9 +146,9 @@ class ViewController: UITableViewController {
         guard let entry = entry else { return 0 }
         switch sections[section] {
         case .from:
-            return entry.from.count
+            return min(entry.from.count, 5)
         case .to:
-            return entry.to.count
+            return min(entry.to.count, 5)
         case .note, .image:
             return 1
         }
