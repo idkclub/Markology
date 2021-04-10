@@ -3,10 +3,13 @@ import UIKit
 import Utils
 
 class ViewController: UITableViewController {
+    let header = "header"
     let note: Reference
     var entryQuery: DatabaseCancellable?
     var entry: Note.Entry?
     var menuButton: UIBarButtonItem?
+    var expandFrom = false
+    var expandTo = false
 
     init(note: Reference) {
         self.note = note
@@ -66,6 +69,7 @@ class ViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: header)
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
@@ -111,6 +115,31 @@ class ViewController: UITableViewController {
         return date
     }
 
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: header) else { return nil }
+        switch sections[section] {
+        case .note, .image:
+            break
+        case .from:
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleFrom))
+            header.addGestureRecognizer(tapGesture)
+        case .to:
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleTo))
+            header.addGestureRecognizer(tapGesture)
+        }
+        return header
+    }
+
+    @objc private func toggleFrom() {
+        expandFrom = !expandFrom
+        tableView.reloadData()
+    }
+
+    @objc private func toggleTo() {
+        expandTo = !expandTo
+        tableView.reloadData()
+    }
+
     override func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         guard let entry = entry else { return nil }
         let ref: Reference
@@ -130,9 +159,9 @@ class ViewController: UITableViewController {
         guard let entry = entry else { return nil }
         switch sections[section] {
         case .from:
-            return "Linked From\(entry.from.count > 5 ? " (\(entry.from.count - 5) hidden)" : "")"
+            return "Linked From\(entry.from.count > 5 && !expandFrom ? " (\(entry.from.count - 5) hidden)" : "")"
         case .to:
-            return "Linked To\(entry.to.count > 5 ? " (\(entry.to.count - 5) hidden)" : "")"
+            return "Linked To\(entry.to.count > 5 && !expandTo ? " (\(entry.to.count - 5) hidden)" : "")"
         case .note, .image:
             return "Last Modified \(date.string(from: entry.note.modified))"
         }
@@ -146,9 +175,9 @@ class ViewController: UITableViewController {
         guard let entry = entry else { return 0 }
         switch sections[section] {
         case .from:
-            return min(entry.from.count, 5)
+            return expandFrom ? entry.from.count : min(entry.from.count, 5)
         case .to:
-            return min(entry.to.count, 5)
+            return expandTo ? entry.to.count : min(entry.to.count, 5)
         case .note, .image:
             return 1
         }
