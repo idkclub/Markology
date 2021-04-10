@@ -3,7 +3,6 @@ import UIKit
 import Utils
 
 class ViewController: UITableViewController {
-    let headerIdentifier = "header"
     let note: Reference
     var entryQuery: DatabaseCancellable?
     var entry: Note.Entry?
@@ -69,7 +68,7 @@ class ViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: headerIdentifier)
+        tableView.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
@@ -116,28 +115,22 @@ class ViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: headerIdentifier) else { return nil }
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TappableHeader.id) as? TappableHeader else { return nil }
         switch sections[section] {
         case .note, .image:
             break
         case .from:
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleFrom))
-            header.addGestureRecognizer(tapGesture)
+            header.onTap = {
+                self.expandFrom = !self.expandFrom
+                tableView.reloadData()
+            }
         case .to:
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleTo))
-            header.addGestureRecognizer(tapGesture)
+            header.onTap = {
+                self.expandTo = !self.expandTo
+                tableView.reloadData()
+            }
         }
         return header
-    }
-
-    @objc private func toggleFrom() {
-        expandFrom = !expandFrom
-        tableView.reloadData()
-    }
-
-    @objc private func toggleTo() {
-        expandTo = !expandTo
-        tableView.reloadData()
     }
 
     override func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
