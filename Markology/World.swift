@@ -84,58 +84,84 @@ class World {
         }
     }
 
+    // sync stuff from iCloud (or Documents folder if iCloud disabled) to SQL
     func syncSync(force: Bool = false) throws {
         guard !syncing else { return }
         syncing = true
         defer { syncing = false }
-        let synced = try db.read { try Note.modified(db: $0) }
-        let total = Float(max(synced.count, (try? FileManager.default.contentsOfDirectory(at: Container.current, includingPropertiesForKeys: []).count) ?? 0))
+
         guard let notes = FileManager.default.enumerator(at: Container.current, includingPropertiesForKeys: fileKeys) else { return }
-        var skipping = true
+        let lastSyncedTimes = try db.read { try Note.getAllModifiedTimes(db: $0) }
+
+        let totalFiles = Float(max(lastSyncedTimes.count, (try? FileManager.default.contentsOfDirectory(at: Container.current, includingPropertiesForKeys: []).count) ?? 0))
+        var skippingSyncedFiles = true
+
         _ = try db.write { db in
-            var seen: [String] = []
-            var links: [Note.Link] = []
+            var seenFiles: [String] = []
+            var linksToSave: [Note.Link] = []
             notes.forEach {
                 defer {
-                    let progress = Float(seen.count) / total
-                    if !skipping, abs(progress - loadingProgress.value) > 0.1 {
+                    let progress = Float(seenFiles.count) / totalFiles
+                    if !skippingSyncedFiles, abs(progress - loadingProgress.value) > 0.1 {
                         loadingProgress.value = progress
                     }
                 }
-                guard let path = ($0 as? URL)?.resolvingSymlinksInPath() else { return }
-                guard let attrs = try? path.resourceValues(forKeys: Set(fileKeys)),
-                      let dir = attrs.isDirectory, !dir,
+
+                // skip symlinks and directories
+                guard let path = ($0 as? URL)?.resolvingSymlinksInPath(),
+                      let attrs = try? path.resourceValues(forKeys: Set(fileKeys)),
+                      let isDir = attrs.isDirectory, !isDir,
                       let date = attrs.contentModificationDate else { return }
+
                 if path.pathComponents.contains(where: { $0.first == "." }) {
-                    if path.pathExtension == "icloud" {
-                        let missing = String(path.deletingLastPathComponent().path.dropFirst(Container.current.path.count) + "/" + path.lastPathComponent.dropLast(7).dropFirst())
-                        try? FileManager.default.startDownloadingUbiquitousItem(at: Container.url(for: missing))
-                        seen.append(missing)
+                    if let iCloudPath = checkForICloud(at: path) {
+                        seenFiles.append(iCloudPath)
                     }
                     return
                 }
+
                 let localPath = Container.local(for: path)
-                seen.append(localPath)
-                if !force, let last = synced[localPath], Calendar.current.compare(last, to: date, toGranularity: .second) == .orderedSame { return }
-                skipping = false
+                seenFiles.append(localPath)
+
+                if !force, let last = lastSyncedTimes[localPath], Calendar.current.compare(last, to: date, toGranularity: .second) == .orderedSame { return }
+                skippingSyncedFiles = false
                 var nsError: NSError?
                 NSFileCoordinator().coordinate(readingItemAt: path, error: &nsError) { path in
                     do {
                         guard let document = try saveNote(at: path, with: localPath, in: db, modifiedDate: date)
                             else { return }
 
-                        links.append(contentsOf: try processLinksForSync(from: document, at: localPath, in: db))
+                        linksToSave.append(contentsOf: try processLinksForSync(from: document, at: localPath, in: db))
                     } catch {
                         print("sync fail", error)
                     }
                 }
+                if let error = nsError {
+                    print("error reading file", error)
+                }
             }
-            try Note.filter(!seen.contains(Note.Columns.file)).deleteAll(db)
-            for link in links {
+
+            try Note.filter(!seenFiles.contains(Note.Columns.file)).deleteAll(db)
+            for link in linksToSave {
                 try? link.insert(db)
             }
         }
         loadingProgress.send(1)
+    }
+
+    /**
+     Checks if the provided `path` is an iCloud file. If it is, makes sure it is downloaded locally, and returns the canonical file path string.
+     */
+    private func checkForICloud(at path: URL) -> String? {
+        let iCloudExt = "icloud"
+        if path.pathExtension == iCloudExt {
+            let folderPath = path.deletingLastPathComponent().path.dropFirst(Container.current.path.count)
+            let realFile = path.lastPathComponent.dropLast(iCloudExt.count + 1).dropFirst()
+            let cloudPath = "\(folderPath)/\(realFile)"
+            try? FileManager.default.startDownloadingUbiquitousItem(at: Container.url(for: cloudPath))
+            return cloudPath
+        }
+        return nil
     }
 
     /**

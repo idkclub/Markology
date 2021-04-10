@@ -45,7 +45,7 @@ extension Note {
         let modified: Date
     }
 
-    static func modified(db: Database) throws -> [String: Date] {
+    static func getAllModifiedTimes(db: Database) throws -> [String: Date] {
         return try File.fetchAll(db, File.query).reduce(into: [:]) {
             $0[$1.file] = $1.modified
         }
