@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E4C8BDA26225B2E00833B5A /* TappableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4C8BD926225B2E00833B5A /* TappableHeader.swift */; };
 		4E4DCE2625E1E8C90009BCCB /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */; };
 		4E59840A25DBA88300236B89 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59840925DBA88300236B89 /* GRDB */; };
 		4E59840D25DBAABE00236B89 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59840C25DBAABE00236B89 /* Note.swift */; };
@@ -97,6 +98,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4E4C8BD926225B2E00833B5A /* TappableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableHeader.swift; sourceTree = "<group>"; };
 		4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		4E59840C25DBAABE00236B89 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		4E59841125DBB06C00236B89 /* Reference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reference.swift; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 				4E9423F425DA885900BDA7A3 /* SceneDelegate.swift */,
 				4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */,
 				4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */,
+				4E4C8BD926225B2E00833B5A /* TappableHeader.swift */,
 				4E82100F25DEAC74004EC326 /* UIColor.swift */,
 				4EAEEA0125DFA28B003A9320 /* UINavigationController+pop.swift */,
 				4E82100225DDEA80004EC326 /* URL+markdown.swift */,
@@ -440,6 +443,7 @@
 				4E82100725DE4689004EC326 /* ResultController.swift in Sources */,
 				4E59842C25DC781700236B89 /* NoteCell.swift in Sources */,
 				4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */,
+				4E4C8BDA26225B2E00833B5A /* TappableHeader.swift in Sources */,
 				4E59842825DBE9C300236B89 /* Node+iterate.swift in Sources */,
 				4E4DCE2625E1E8C90009BCCB /* SettingsController.swift in Sources */,
 				4E9423F025DA86B900BDA7A3 /* MenuController.swift in Sources */,

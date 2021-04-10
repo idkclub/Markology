@@ -4,7 +4,6 @@ import UIKit
 import Utils
 
 class MenuController: UIViewController {
-    let header = "header"
     let results: UITableView
     let emptyCreate: Bool
     let delegate: MenuDelegate
@@ -57,7 +56,7 @@ class MenuController: UIViewController {
         results.keyboardDismissMode = .onDrag
         results.dataSource = self
         results.delegate = self
-        results.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: header)
+        results.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
         results.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
@@ -154,20 +153,17 @@ extension MenuController: UITableViewDataSource {
     }
 
     func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = results.dequeueReusableHeaderFooterView(withIdentifier: header) else { return nil }
+        guard let header = results.dequeueReusableHeaderFooterView(withIdentifier: TappableHeader.id) as? TappableHeader else { return nil }
         switch sections[section] {
         case .recent:
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleQuery))
-            header.addGestureRecognizer(tapGesture)
+            header.onTap = {
+                self.includeAll = !self.includeAll
+                self.reloadQuery()
+            }
         case .new:
             break
         }
         return header
-    }
-
-    @objc private func toggleQuery() {
-        includeAll = !includeAll
-        reloadQuery()
     }
 }
 
