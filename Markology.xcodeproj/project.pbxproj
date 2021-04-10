@@ -11,12 +11,12 @@
 		4E59840A25DBA88300236B89 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59840925DBA88300236B89 /* GRDB */; };
 		4E59840D25DBAABE00236B89 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59840C25DBAABE00236B89 /* Note.swift */; };
 		4E59841225DBB06C00236B89 /* Reference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59841125DBB06C00236B89 /* Reference.swift */; };
-		4E59841625DBBF0400236B89 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59841525DBBF0400236B89 /* ViewController.swift */; };
+		4E59841625DBBF0400236B89 /* NoteDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59841525DBBF0400236B89 /* NoteDetailController.swift */; };
 		4E59842525DBE94400236B89 /* Down in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59842425DBE94400236B89 /* Down */; };
 		4E59842825DBE9C300236B89 /* Node+iterate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59842725DBE9C300236B89 /* Node+iterate.swift */; };
 		4E59842C25DC781700236B89 /* NoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E59842B25DC781700236B89 /* NoteCell.swift */; };
 		4E82100325DDEA80004EC326 /* URL+markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100225DDEA80004EC326 /* URL+markdown.swift */; };
-		4E82100725DE4689004EC326 /* ResultController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100625DE4689004EC326 /* ResultController.swift */; };
+		4E82100725DE4689004EC326 /* SearchResultController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100625DE4689004EC326 /* SearchResultController.swift */; };
 		4E82101025DEAC74004EC326 /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100F25DEAC74004EC326 /* UIColor.swift */; };
 		4E9423D225DA78F900BDA7A3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9423D125DA78F900BDA7A3 /* AppDelegate.swift */; };
 		4E9423DB25DA78FA00BDA7A3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E9423DA25DA78FA00BDA7A3 /* Assets.xcassets */; };
@@ -100,11 +100,11 @@
 		4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		4E59840C25DBAABE00236B89 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		4E59841125DBB06C00236B89 /* Reference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reference.swift; sourceTree = "<group>"; };
-		4E59841525DBBF0400236B89 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4E59841525DBBF0400236B89 /* NoteDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailController.swift; sourceTree = "<group>"; };
 		4E59842725DBE9C300236B89 /* Node+iterate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Node+iterate.swift"; sourceTree = "<group>"; };
 		4E59842B25DC781700236B89 /* NoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCell.swift; sourceTree = "<group>"; };
 		4E82100225DDEA80004EC326 /* URL+markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+markdown.swift"; sourceTree = "<group>"; };
-		4E82100625DE4689004EC326 /* ResultController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultController.swift; sourceTree = "<group>"; };
+		4E82100625DE4689004EC326 /* SearchResultController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultController.swift; sourceTree = "<group>"; };
 		4E82100C25DEAC4C004EC326 /* KeyboardGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardGuide.swift; sourceTree = "<group>"; };
 		4E82100F25DEAC74004EC326 /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		4E9423CE25DA78F900BDA7A3 /* Markology.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markology.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -205,14 +205,14 @@
 				4E59840C25DBAABE00236B89 /* Note.swift */,
 				4E59842B25DC781700236B89 /* NoteCell.swift */,
 				4E59841125DBB06C00236B89 /* Reference.swift */,
-				4E82100625DE4689004EC326 /* ResultController.swift */,
+				4E82100625DE4689004EC326 /* SearchResultController.swift */,
 				4E9423F425DA885900BDA7A3 /* SceneDelegate.swift */,
 				4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */,
 				4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */,
 				4E82100F25DEAC74004EC326 /* UIColor.swift */,
 				4EAEEA0125DFA28B003A9320 /* UINavigationController+pop.swift */,
 				4E82100225DDEA80004EC326 /* URL+markdown.swift */,
-				4E59841525DBBF0400236B89 /* ViewController.swift */,
+				4E59841525DBBF0400236B89 /* NoteDetailController.swift */,
 				4E9423F825DB0F7E00BDA7A3 /* World.swift */,
 				4E9423DA25DA78FA00BDA7A3 /* Assets.xcassets */,
 			);
@@ -432,12 +432,12 @@
 			files = (
 				4E59841225DBB06C00236B89 /* Reference.swift in Sources */,
 				4E94240025DB22B100BDA7A3 /* EditController.swift in Sources */,
-				4E59841625DBBF0400236B89 /* ViewController.swift in Sources */,
+				4E59841625DBBF0400236B89 /* NoteDetailController.swift in Sources */,
 				4E82101025DEAC74004EC326 /* UIColor.swift in Sources */,
 				4E59840D25DBAABE00236B89 /* Note.swift in Sources */,
 				4E9423D225DA78F900BDA7A3 /* AppDelegate.swift in Sources */,
 				4E82100325DDEA80004EC326 /* URL+markdown.swift in Sources */,
-				4E82100725DE4689004EC326 /* ResultController.swift in Sources */,
+				4E82100725DE4689004EC326 /* SearchResultController.swift in Sources */,
 				4E59842C25DC781700236B89 /* NoteCell.swift in Sources */,
 				4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */,
 				4E59842825DBE9C300236B89 /* Node+iterate.swift in Sources */,

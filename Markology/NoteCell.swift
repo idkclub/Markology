@@ -66,7 +66,7 @@ extension UIViewController: NoteDelegate {
     }
 
     func navigate(to note: Reference) {
-        show(ViewController(note: note), sender: self)
+        show(NoteDetailController(note: note), sender: self)
     }
 }
 
