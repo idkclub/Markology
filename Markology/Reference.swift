@@ -10,11 +10,15 @@ struct Reference: Codable, Equatable, FetchableRecord {
 }
 
 extension World {
-    func search(query: String, limit: Int = 10, onChange: @escaping ([Reference]) -> Void) -> DatabaseCancellable {
+    func search(query: String, recent: Bool = true, limit: Int = 10, onChange: @escaping ([Reference]) -> Void) -> DatabaseCancellable {
         ValueObservation.tracking { db -> [Reference] in
             let wildcard = "%\(query.replacingOccurrences(of: " ", with: "%"))%"
-            let request = Reference.query.filter(Note.Columns.name.like(wildcard))
-                .order(Note.Columns.modified.desc).limit(limit)
+            var request = Reference.query.filter(Note.Columns.name.like(wildcard))
+            if recent {
+                request = request.order(Note.Columns.modified.desc).limit(limit)
+            } else {
+                request = request.order(Note.Columns.name.asc)
+            }
             return try Reference.fetchAll(db, request)
         }.start(in: db, onError: { _ in }, onChange: onChange)
     }

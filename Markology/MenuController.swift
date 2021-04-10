@@ -4,12 +4,14 @@ import UIKit
 import Utils
 
 class MenuController: UIViewController {
+    let header = "header"
     let results: UITableView
     let emptyCreate: Bool
     let delegate: MenuDelegate
     var query: String = ""
     var notes: [Reference] = []
     var notesQuery: DatabaseCancellable?
+    var includeAll = false
 
     init(style: UITableView.Style = .insetGrouped, emptyCreate: Bool = true, delegate: MenuDelegate) {
         self.delegate = delegate
@@ -55,6 +57,7 @@ class MenuController: UIViewController {
         results.keyboardDismissMode = .onDrag
         results.dataSource = self
         results.delegate = self
+        results.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: header)
         results.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
@@ -78,7 +81,7 @@ class MenuController: UIViewController {
     }
 
     func reloadQuery() {
-        notesQuery = World.shared.search(query: query) { [weak self] (notes: [Reference]) in
+        notesQuery = World.shared.search(query: query, recent: !includeAll) { [weak self] (notes: [Reference]) in
             guard let self = self else { return }
             self.notes = notes
             self.results.reloadData()
@@ -109,7 +112,7 @@ extension MenuController: UITableViewDelegate {
     func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch sections[section] {
         case .recent:
-            return "Most Recent"
+            return includeAll ? "All" : "Most Recent"
         case .new:
             return "New"
         }
@@ -148,6 +151,23 @@ extension MenuController: UITableViewDataSource {
             cell.render(name: query)
         }
         return cell
+    }
+
+    func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = results.dequeueReusableHeaderFooterView(withIdentifier: header) else { return nil }
+        switch sections[section] {
+        case .recent:
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleQuery))
+            header.addGestureRecognizer(tapGesture)
+        case .new:
+            break
+        }
+        return header
+    }
+
+    @objc private func toggleQuery() {
+        includeAll = !includeAll
+        reloadQuery()
     }
 }
 
