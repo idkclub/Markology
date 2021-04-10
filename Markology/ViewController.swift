@@ -3,7 +3,7 @@ import UIKit
 import Utils
 
 class ViewController: UITableViewController {
-    let header = "header"
+    let headerIdentifier = "header"
     let note: Reference
     var entryQuery: DatabaseCancellable?
     var entry: Note.Entry?
@@ -69,7 +69,7 @@ class ViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: header)
+        tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: headerIdentifier)
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
@@ -116,7 +116,7 @@ class ViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: header) else { return nil }
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: headerIdentifier) else { return nil }
         switch sections[section] {
         case .note, .image:
             break
