@@ -125,12 +125,14 @@ class ViewController: UITableViewController {
         case .note, .image:
             break
         case .from:
-            header.onTap = {
+            header.onTap = { [weak self] in
+                guard let self = self else { return }
                 self.expandFrom = !self.expandFrom
                 tableView.reloadData()
             }
         case .to:
-            header.onTap = {
+            header.onTap = { [weak self] in
+                guard let self = self else { return }
                 self.expandTo = !self.expandTo
                 tableView.reloadData()
             }

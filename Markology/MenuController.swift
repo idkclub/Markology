@@ -156,7 +156,8 @@ extension MenuController: UITableViewDataSource {
         guard let header = results.dequeueReusableHeaderFooterView(withIdentifier: TappableHeader.id) as? TappableHeader else { return nil }
         switch sections[section] {
         case .recent:
-            header.onTap = {
+            header.onTap = { [weak self] in
+                guard let self = self else { return }
                 self.includeAll = !self.includeAll
                 self.reloadQuery()
             }
