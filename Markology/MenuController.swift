@@ -10,6 +10,7 @@ class MenuController: UIViewController {
     var query: String = ""
     var notes: [Reference] = []
     var notesQuery: DatabaseCancellable?
+    var includeAll = false
 
     init(style: UITableView.Style = .insetGrouped, emptyCreate: Bool = true, delegate: MenuDelegate) {
         self.delegate = delegate
@@ -55,6 +56,7 @@ class MenuController: UIViewController {
         table.keyboardDismissMode = .onDrag
         table.dataSource = self
         table.delegate = self
+        table.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
         table.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
@@ -78,7 +80,7 @@ class MenuController: UIViewController {
     }
 
     func reloadQuery() {
-        notesQuery = World.shared.search(query: query) { [weak self] (notes: [Reference]) in
+        notesQuery = World.shared.search(query: query, recent: !includeAll) { [weak self] (notes: [Reference]) in
             guard let self = self else { return }
             self.notes = notes
             self.table.reloadData()
@@ -109,7 +111,7 @@ extension MenuController: UITableViewDelegate {
     func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch sections[section] {
         case .recent:
-            return "Most Recent"
+            return includeAll ? "All" : "Most Recent"
         case .new:
             return "New"
         }
@@ -148,6 +150,20 @@ extension MenuController: UITableViewDataSource {
             cell.render(name: query)
         }
         return cell
+    }
+
+    func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = results.dequeueReusableHeaderFooterView(withIdentifier: TappableHeader.id) as? TappableHeader else { return nil }
+        switch sections[section] {
+        case .recent:
+            header.onTap = {
+                self.includeAll = !self.includeAll
+                self.reloadQuery()
+            }
+        case .new:
+            break
+        }
+        return header
     }
 }
 

@@ -8,6 +8,8 @@ class NoteDetailController: UITableViewController {
     var entry: Note.Entry?
     var menuButton: UIBarButtonItem?
 
+    var noteContent: Any? { return entry?.note.image ?? entry?.note.text }
+
     init(note: Reference) {
         self.note = note
         super.init(style: .insetGrouped)
@@ -70,6 +72,9 @@ class NoteDetailController: UITableViewController {
 
     @objc private func menu() {
         let menu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        if noteContent != nil {
+            menu.addAction(UIAlertAction(title: "Share", style: .default) { [weak self] _ in self?.share() })
+        }
         menu.addAction(UIAlertAction(title: "Delete Note", style: .destructive) { [weak self] _ in
             guard let note = self?.note else { return }
             let confirm = UIAlertController(title: "Delete \(note.name)?", message: "This operation cannot be undone.", preferredStyle: .alert)
@@ -91,6 +96,13 @@ class NoteDetailController: UITableViewController {
     @objc private func edit() {
         guard let entry = entry else { return }
         present(EditController(path: entry.note.file, text: entry.note.text), animated: true)
+    }
+
+    private func share() {
+        guard let content = noteContent else { return }
+        let activityVc = UIActivityViewController(activityItems: [content], applicationActivities: nil)
+        activityVc.popoverPresentationController?.barButtonItem = menuButton
+        present(activityVc, animated: true)
     }
 
     var date: DateFormatter {
