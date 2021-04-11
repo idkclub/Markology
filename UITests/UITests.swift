@@ -38,6 +38,7 @@ class UITests: XCTestCase {
             try? FileManager.default.removeItem(at: URL(fileURLWithPath: file))
         }
         for file in template.keys.sorted() {
+            sleep(1)
             try! template[file]!.write(to: notes.appendingPathComponent(file), atomically: true, encoding: .utf8)
         }
         return notes
@@ -67,7 +68,7 @@ class UITests: XCTestCase {
         shoot(name: "2-edit")
         app.toolbars["Toolbar"].buttons["Cancel"].tap()
         windowsQuery.navigationBars["What is this?"].buttons["radio"].tap()
-        sleep(2)
+        sleep(3)
         shoot(name: "3-related")
     }
 
