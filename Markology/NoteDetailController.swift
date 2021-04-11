@@ -2,7 +2,7 @@ import GRDB
 import UIKit
 import Utils
 
-class ViewController: UITableViewController {
+class NoteDetailController: UITableViewController {
     let note: Reference
     var entryQuery: DatabaseCancellable?
     var entry: Note.Entry?

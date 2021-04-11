@@ -1,7 +1,7 @@
 import GRDB
 import UIKit
 
-class ResultController: UITableViewController {
+class SearchResultController: UITableViewController {
     var resultsQuery: DatabaseCancellable?
     var notes: [Note] = []
 

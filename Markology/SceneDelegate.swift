@@ -18,7 +18,7 @@ private class RootController: UISplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         page.navigationBar.prefersLargeTitles = true
-        page.viewControllers = [ViewController(note: Reference(file: "/index.md", name: ""))]
+        page.viewControllers = [NoteDetailController(note: Reference(file: "/index.md", name: ""))]
         setViewController(MenuController(delegate: self), for: .primary)
         setViewController(page, for: .secondary)
         preferredDisplayMode = .oneBesideSecondary
@@ -40,16 +40,16 @@ extension RootController: MenuDelegate {
     }
 
     func select(note: Reference) {
-        navigate(to: ViewController(note: note))
+        navigate(to: NoteDetailController(note: note))
     }
 
     func create(query: String) {
         present(EditController(text: EditController.body(from: query)) { [weak self] in
-            self?.navigate(to: ViewController(note: Reference(file: Container.local(for: $0), name: "")))
+            self?.navigate(to: NoteDetailController(note: Reference(file: Container.local(for: $0), name: "")))
         }, animated: true)
     }
 
     func search(query: String) {
-        navigate(to: ResultController(query: query))
+        navigate(to: SearchResultController(query: query))
     }
 }

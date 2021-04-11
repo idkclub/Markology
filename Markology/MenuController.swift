@@ -4,7 +4,7 @@ import UIKit
 import Utils
 
 class MenuController: UIViewController {
-    let results: UITableView
+    let table: UITableView
     let emptyCreate: Bool
     let delegate: MenuDelegate
     var query: String = ""
@@ -15,7 +15,7 @@ class MenuController: UIViewController {
     init(style: UITableView.Style = .insetGrouped, emptyCreate: Bool = true, delegate: MenuDelegate) {
         self.delegate = delegate
         self.emptyCreate = emptyCreate
-        results = UITableView(frame: .zero, style: style)
+        table = UITableView(frame: .zero, style: style)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -52,25 +52,25 @@ class MenuController: UIViewController {
         searchBar.delegate = self
         searchBar.enablesReturnKeyAutomatically = false
 
-        results.anchored(to: view, horizontal: true, bottom: true)
-        results.keyboardDismissMode = .onDrag
-        results.dataSource = self
-        results.delegate = self
-        results.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
-        results.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
+        table.anchored(to: view, horizontal: true, bottom: true)
+        table.keyboardDismissMode = .onDrag
+        table.dataSource = self
+        table.delegate = self
+        table.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
+        table.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
-            results.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            table.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
         ])
         reloadQuery()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard let selected = results.indexPathForSelectedRow else { return }
+        guard let selected = table.indexPathForSelectedRow else { return }
         // Jank version of clearsSelectionOnViewWillAppear.
         UIView.animate(withDuration: 0.25, animations: {
-            self.results.deselectRow(at: selected, animated: true)
+            self.table.deselectRow(at: selected, animated: true)
         })
     }
 
@@ -83,7 +83,7 @@ class MenuController: UIViewController {
         notesQuery = World.shared.search(query: query, recent: !includeAll) { [weak self] (notes: [Reference]) in
             guard let self = self else { return }
             self.notes = notes
-            self.results.reloadData()
+            self.table.reloadData()
         }
     }
 
