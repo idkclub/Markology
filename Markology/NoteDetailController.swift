@@ -6,7 +6,10 @@ class NoteDetailController: UITableViewController {
     let note: Reference
     var entryQuery: DatabaseCancellable?
     var entry: Note.Entry?
+    var relatedButton: UIBarButtonItem?
     var menuButton: UIBarButtonItem?
+    var expandFrom = false
+    var expandTo = false
 
     var noteContent: Any? { return entry?.note.image ?? entry?.note.text }
 
@@ -15,6 +18,7 @@ class NoteDetailController: UITableViewController {
         super.init(style: .insetGrouped)
         title = note.name
         entryQuery = World.shared.load(note: note, onChange: reload)
+        relatedButton = UIBarButtonItem(image: UIImage(systemName: "dot.radiowaves.left.and.right"), style: .plain, target: self, action: #selector(related))
         menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
         clearsSelectionOnViewWillAppear = true
     }
@@ -47,16 +51,19 @@ class NoteDetailController: UITableViewController {
         return sections
     }
 
-    func reload(entry: Note.Entry?) {
+    func reload(with entry: Note.Entry?) {
         defer { tableView.reloadData() }
         self.entry = entry
-        guard let entry = entry, let menuButton = menuButton else {
+        guard let entry = entry, let menuButton = menuButton, let relatedButton = relatedButton else {
             title = ""
             navigationItem.setRightBarButtonItems([], animated: true)
             return
         }
         title = entry.note.name
         var buttons: [UIBarButtonItem] = [menuButton]
+        if entry.to.count > 0 || entry.from.count > 0 {
+            buttons.append(relatedButton)
+        }
         if !entry.note.binary {
             buttons.append(.init(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(edit)))
         }
@@ -65,9 +72,20 @@ class NoteDetailController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
         tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
+    }
+
+    @objc private func related() {
+        guard let current = entry?.note.reference() else { return }
+        let related = RelatedController(to: current) {
+            self.navigate(to: $0)
+        }
+        related.modalPresentationStyle = .popover
+        related.popoverPresentationController?.barButtonItem = relatedButton
+        present(related, animated: true)
     }
 
     @objc private func menu() {
@@ -112,6 +130,27 @@ class NoteDetailController: UITableViewController {
         return date
     }
 
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TappableHeader.id) as? TappableHeader else { return nil }
+        switch sections[section] {
+        case .note, .image:
+            break
+        case .from:
+            header.onTap = { [weak self] in
+                guard let self = self else { return }
+                self.expandFrom = !self.expandFrom
+                tableView.reloadData()
+            }
+        case .to:
+            header.onTap = { [weak self] in
+                guard let self = self else { return }
+                self.expandTo = !self.expandTo
+                tableView.reloadData()
+            }
+        }
+        return header
+    }
+
     override func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         guard let entry = entry else { return nil }
         let ref: Reference
@@ -128,13 +167,13 @@ class NoteDetailController: UITableViewController {
     }
 
     override func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
+        guard let entry = entry else { return nil }
         switch sections[section] {
         case .from:
-            return "Linked From"
+            return "Linked From\(entry.from.count > 5 && !expandFrom ? " (\(entry.from.count - 5) hidden)" : "")"
         case .to:
-            return "Linked To"
+            return "Linked To\(entry.to.count > 5 && !expandTo ? " (\(entry.to.count - 5) hidden)" : "")"
         case .note, .image:
-            guard let entry = entry else { return nil }
             return "Last Modified \(date.string(from: entry.note.modified))"
         }
     }
@@ -147,9 +186,9 @@ class NoteDetailController: UITableViewController {
         guard let entry = entry else { return 0 }
         switch sections[section] {
         case .from:
-            return entry.from.count
+            return expandFrom ? entry.from.count : min(entry.from.count, 5)
         case .to:
-            return entry.to.count
+            return expandTo ? entry.to.count : min(entry.to.count, 5)
         case .note, .image:
             return 1
         }

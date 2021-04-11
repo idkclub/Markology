@@ -23,6 +23,15 @@ extension World {
         }.start(in: db, onError: { _ in }, onChange: onChange)
     }
 
+    func connections(of refs: [Reference], excluding: [Reference] = []) -> [Reference] {
+        let files = refs.map { $0.file }
+        let exclusions = excluding.map { $0.file }
+        let request = Reference.query.filter(!exclusions.contains(Note.Columns.file)).having(
+            !Note.to.filter(keys: files).isEmpty || !Note.from.filter(keys: files).isEmpty
+        ).distinct().order(Note.Columns.name)
+        return try! db.read { try Reference.fetchAll($0, request) }
+    }
+
     func load(file: String) -> Reference? {
         try? db.read {
             try Reference.fetchOne($0, Reference.query.filter(key: file))
