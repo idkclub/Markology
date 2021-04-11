@@ -22,7 +22,7 @@ class UITests: XCTestCase {
         - To track new knowledge, in a way that makes it easy to build on.
         """,
         "1613965013.md": "Zettelkasten",
-        "1613965047.md": "# idk Club\n[Markology](/1613951724.md)",
+        "1613965047.md": "# idk Club\n[Markology](/1613951724.md)\n[Ideas](/1608879969.md)",
         "1613975039.md": "To File",
         "1613981442.md": "Arcologies",
         "1613952665.md": "Markdown",
@@ -66,6 +66,9 @@ class UITests: XCTestCase {
         sleep(2)
         shoot(name: "2-edit")
         app.toolbars["Toolbar"].buttons["Cancel"].tap()
+        windowsQuery.navigationBars["What is this?"].buttons["radio"].tap()
+        sleep(2)
+        shoot(name: "3-related")
     }
 
     private func shoot(name: String) {
