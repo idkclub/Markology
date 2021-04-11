@@ -6,6 +6,7 @@ class ViewController: UITableViewController {
     let note: Reference
     var entryQuery: DatabaseCancellable?
     var entry: Note.Entry?
+    var relatedButton: UIBarButtonItem?
     var menuButton: UIBarButtonItem?
     var expandFrom = false
     var expandTo = false
@@ -15,6 +16,7 @@ class ViewController: UITableViewController {
         super.init(style: .insetGrouped)
         title = note.name
         entryQuery = World.shared.load(note: note, onChange: reload)
+        relatedButton = UIBarButtonItem(image: UIImage(systemName: "dot.radiowaves.left.and.right"), style: .plain, target: self, action: #selector(related))
         menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
         clearsSelectionOnViewWillAppear = true
     }
@@ -50,7 +52,7 @@ class ViewController: UITableViewController {
     func reload(with entry: Note.Entry?) {
         defer { tableView.reloadData() }
         self.entry = entry
-        guard let entry = entry, let menuButton = menuButton else {
+        guard let entry = entry, let menuButton = menuButton, let relatedButton = relatedButton else {
             title = ""
             navigationItem.setRightBarButtonItems([], animated: true)
             return
@@ -58,7 +60,7 @@ class ViewController: UITableViewController {
         title = entry.note.name
         var buttons: [UIBarButtonItem] = [menuButton]
         if entry.to.count > 0 || entry.from.count > 0 {
-            buttons.append(.init(image: UIImage(systemName: "dot.radiowaves.left.and.right"), style: .plain, target: self, action: #selector(related)))
+            buttons.append(relatedButton)
         }
         if !entry.note.binary {
             buttons.append(.init(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(edit)))
@@ -76,10 +78,13 @@ class ViewController: UITableViewController {
 
     @objc private func related() {
         guard let entry = entry else { return }
-        present(RelatedController(to: entry) {
+        let related = RelatedController(to: entry) {
             guard $0 != self.entry else { return }
             self.navigate(to: $0.note.reference())
-        }, animated: true)
+        }
+        related.modalPresentationStyle = .popover
+        related.popoverPresentationController?.barButtonItem = relatedButton
+        present(related, animated: true)
     }
 
     @objc private func menu() {
