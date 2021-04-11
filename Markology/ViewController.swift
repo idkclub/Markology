@@ -77,10 +77,9 @@ class ViewController: UITableViewController {
     }
 
     @objc private func related() {
-        guard let entry = entry else { return }
-        let related = RelatedController(to: entry) {
-            guard $0 != self.entry else { return }
-            self.navigate(to: $0.note.reference())
+        guard let current = entry?.note.reference() else { return }
+        let related = RelatedController(to: current) {
+            self.navigate(to: $0)
         }
         related.modalPresentationStyle = .popover
         related.popoverPresentationController?.barButtonItem = relatedButton
