@@ -29,7 +29,7 @@ class NoteCell: UITableViewCell {
     func render(note: Note, delegate: NoteDelegate) {
         self.note = note
         self.delegate = delegate
-        guard Container.url(for: note.file).markdown else {
+        guard Container.url(for: note.file).isMarkdown else {
             textView.attributedText = NSAttributedString(string: note.text, attributes: [
                 .foregroundColor: UIColor.label,
                 .font: UIFont.monospacedSystemFont(ofSize: 16, weight: .regular),
@@ -45,7 +45,7 @@ extension NoteCell: UITextViewDelegate {
         guard url.host == nil else { return true }
         guard let relative = URL(string: url.path, relativeTo: URL(string: note?.file ?? "/"))?.path.removingPercentEncoding else { return false }
         guard let note = World.shared.load(file: relative) else {
-            guard Container.url(for: relative).markdown,
+            guard Container.url(for: relative).isMarkdown,
                   let name = textView.attributedText?.attributedSubstring(from: characterRange).string else { return false }
             delegate?.create(path: relative, name: name)
             return false
@@ -66,7 +66,7 @@ extension UIViewController: NoteDelegate {
     }
 
     func navigate(to note: Reference) {
-        show(ViewController(note: note), sender: self)
+        show(NoteDetailController(note: note), sender: self)
     }
 }
 
