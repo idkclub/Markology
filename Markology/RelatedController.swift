@@ -41,7 +41,7 @@ class RelatedController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
+        tableView.register(ReferenceCell.self, forCellReuseIdentifier: ReferenceCell.id)
     }
 
     override func numberOfSections(in _: UITableView) -> Int {
@@ -60,7 +60,7 @@ class RelatedController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Reference.Cell.id, for: indexPath) as! Reference.Cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ReferenceCell.id, for: indexPath) as! ReferenceCell
         cell.render(name: connections[indexPath.section][indexPath.row].name)
         return cell
     }

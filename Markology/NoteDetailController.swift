@@ -73,7 +73,7 @@ class NoteDetailController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
-        tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
+        tableView.register(ReferenceCell.self, forCellReuseIdentifier: ReferenceCell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
     }
@@ -211,7 +211,7 @@ class NoteDetailController: UITableViewController {
             cell.render(image: self.entry?.note.image)
             return cell
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: Reference.Cell.id, for: indexPath) as! Reference.Cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ReferenceCell.id, for: indexPath) as! ReferenceCell
         cell.render(name: ref.name)
         return cell
     }

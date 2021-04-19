@@ -37,6 +37,7 @@
 		4EB2AA0025E121D60088611F /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB2A9FF25E121D60088611F /* Container.swift */; };
 		4EB2AA0225E123700088611F /* KeyboardGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E82100C25DEAC4C004EC326 /* KeyboardGuide.swift */; };
 		4EB6725525E258C500104973 /* UIViewController+errorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB6725425E258C500104973 /* UIViewController+errorAlert.swift */; };
+		4EDDC8ED262DF41200479EC2 /* ReferenceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EDDC8EC262DF41200479EC2 /* ReferenceCell.swift */; };
 		4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */; };
 		4EEA924925E11B8C0094DF6A /* ImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA924825E11B8C0094DF6A /* ImportViewController.swift */; };
 		4EEA925025E11B8C0094DF6A /* Import.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4EEA924625E11B8C0094DF6A /* Import.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -132,6 +133,7 @@
 		4EB2A9F925E121970088611F /* FileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileController.swift; sourceTree = "<group>"; };
 		4EB2A9FF25E121D60088611F /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		4EB6725425E258C500104973 /* UIViewController+errorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+errorAlert.swift"; sourceTree = "<group>"; };
+		4EDDC8EC262DF41200479EC2 /* ReferenceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceCell.swift; sourceTree = "<group>"; };
 		4EE7EE1625E1FA3E00677BFC /* SyncProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncProgress.swift; sourceTree = "<group>"; };
 		4EEA924625E11B8C0094DF6A /* Import.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Import.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4EEA924825E11B8C0094DF6A /* ImportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportViewController.swift; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				4E59842B25DC781700236B89 /* NoteCell.swift */,
 				4E59841525DBBF0400236B89 /* NoteDetailController.swift */,
 				4E59841125DBB06C00236B89 /* Reference.swift */,
+				4EDDC8EC262DF41200479EC2 /* ReferenceCell.swift */,
 				4E6BB4862619AC4700439121 /* RelatedController.swift */,
 				4E9423F425DA885900BDA7A3 /* SceneDelegate.swift */,
 				4E82100625DE4689004EC326 /* SearchResultController.swift */,
@@ -449,6 +452,7 @@
 				4EE7EE1725E1FA3E00677BFC /* SyncProgress.swift in Sources */,
 				4E4C8BDA26225B2E00833B5A /* TappableHeader.swift in Sources */,
 				4E59842825DBE9C300236B89 /* Node+iterate.swift in Sources */,
+				4EDDC8ED262DF41200479EC2 /* ReferenceCell.swift in Sources */,
 				4E4DCE2625E1E8C90009BCCB /* SettingsController.swift in Sources */,
 				4E9423F025DA86B900BDA7A3 /* MenuController.swift in Sources */,
 				4E9423F525DA885900BDA7A3 /* SceneDelegate.swift in Sources */,
