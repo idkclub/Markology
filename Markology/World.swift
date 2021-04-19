@@ -24,7 +24,7 @@ class World {
                 config.prepareDatabase { db in
                     db.trace { print($0) }
                 }
-                dbWriter = try DatabasePool(path: cache.path, configuration: config)
+                db = try DatabasePool(path: cache.path, configuration: config)
             #else
                 db = try DatabasePool(path: cache.path)
             #endif
@@ -129,7 +129,7 @@ class World {
                 NSFileCoordinator().coordinate(readingItemAt: path, error: &nsError) { path in
                     do {
                         guard let document = try saveNote(at: path, with: localPath, in: db, modifiedDate: date)
-                            else { return }
+                        else { return }
 
                         linksToSave.append(contentsOf: try processLinksForSync(from: document, at: localPath, in: db))
                     } catch {
@@ -203,8 +203,8 @@ class World {
         var links: [Note.Link] = []
         for link in document.links(relative: true, includeImage: true) {
             guard let resolvedLink = URL(
-                    string: link,
-                    relativeTo: URL(string: localPath)
+                string: link,
+                relativeTo: URL(string: localPath)
             ) else { continue }
             links.append(
                 Note.Link(from: localPath, to: resolvedLink.path)
