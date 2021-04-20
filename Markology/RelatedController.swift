@@ -2,8 +2,14 @@ import GRDB
 import UIKit
 
 class RelatedController: UITableViewController {
-    let current: Reference
     let onSelect: (Reference) -> Void
+    var current: Reference {
+        didSet {
+            connections = []
+            loading = false
+        }
+    }
+
     var connections: [[Reference.Entry]] = []
     var loading = false
     var showPaths = false
@@ -74,8 +80,10 @@ class RelatedController: UITableViewController {
     }
 
     override func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        onSelect(connections[indexPath.section][indexPath.row].reference)
-        dismiss(animated: true)
+        let ref = connections[indexPath.section][indexPath.row].reference
+        onSelect(ref)
+        current = ref
+        loadMore()
         return nil
     }
 
