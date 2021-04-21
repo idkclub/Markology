@@ -7,6 +7,7 @@ import Utils
 class World {
     static let shared = World()
     let loadingProgress = CurrentValueSubject<Float, Never>(1)
+    let updatePeriod = DispatchTimeInterval.milliseconds(20)
     let db: DatabaseWriter
     var syncing = false
     private var query: NSMetadataQuery?
@@ -95,15 +96,17 @@ class World {
 
         let totalFiles = Float(max(lastSyncedTimes.count, (try? FileManager.default.contentsOfDirectory(at: Container.current, includingPropertiesForKeys: []).count) ?? 0))
         var skippingSyncedFiles = true
+        var updateAt = DispatchTime.now() + updatePeriod
 
         _ = try db.write { db in
             var seenFiles: [String] = []
             var linksToSave: [Note.Link] = []
             notes.forEach {
                 defer {
-                    let progress = Float(seenFiles.count) / totalFiles
-                    if !skippingSyncedFiles, abs(progress - loadingProgress.value) > 0.1 {
-                        loadingProgress.value = progress
+                    let now = DispatchTime.now()
+                    if !skippingSyncedFiles, now > updateAt  {
+                        updateAt = now + updatePeriod
+                        loadingProgress.value = Float(seenFiles.count) / totalFiles
                     }
                 }
 
