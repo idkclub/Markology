@@ -13,10 +13,11 @@ class MenuController: UIViewController {
     var notesQuery: DatabaseCancellable?
     var includeAll = false
 
-    init(style: UITableView.Style = .insetGrouped, showCancel: Bool = false, showCreateEmpty: Bool = true, delegate: MenuDelegate) {
+    init(style: UITableView.Style = .insetGrouped, initial: String = "", showCancel: Bool = false, showCreateEmpty: Bool = true, delegate: MenuDelegate) {
         self.showCancel = showCancel
         self.showCreateEmpty = showCreateEmpty
         self.delegate = delegate
+        query = initial
         table = UITableView(frame: .zero, style: style)
         super.init(nibName: nil, bundle: nil)
     }
@@ -50,6 +51,7 @@ class MenuController: UIViewController {
         let progress = SyncProgress().anchored(to: view, horizontal: true, top: true)
 
         let searchBar = UISearchBar().anchored(to: view, horizontal: true)
+        searchBar.text = query
         searchBar.placeholder = "Search"
         searchBar.delegate = self
         searchBar.enablesReturnKeyAutomatically = false
