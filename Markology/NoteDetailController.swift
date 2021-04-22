@@ -80,8 +80,13 @@ class NoteDetailController: UITableViewController {
 
     @objc private func related() {
         guard let current = entry?.note.reference() else { return }
-        let related = RelatedController(to: current) {
-            self.navigate(to: $0)
+        var related: UIViewController!
+        related = RelatedController.withTitle(to: current) {
+            let controller = NoteDetailController(note: $0)
+            self.show(controller, sender: self)
+            if let button = controller.relatedButton, let related = related {
+                related.popoverPresentationController?.barButtonItem = button
+            }
         }
         related.modalPresentationStyle = .popover
         related.popoverPresentationController?.barButtonItem = relatedButton

@@ -7,6 +7,7 @@ class RelatedController: UITableViewController {
         didSet {
             connections = []
             loading = false
+            title = current.name
         }
     }
 
@@ -24,6 +25,10 @@ class RelatedController: UITableViewController {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    static func withTitle(to note: Reference, onSelect: @escaping ((Reference) -> Void)) -> UIViewController {
+        UINavigationController(rootViewController: RelatedController(to: note, onSelect: onSelect))
     }
 
     func loadMore() {
@@ -46,11 +51,23 @@ class RelatedController: UITableViewController {
         }
     }
 
+    @objc private func close() {
+        dismiss(animated: true)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
         tableView.register(ReferenceCell.self, forCellReuseIdentifier: ReferenceCell.id)
         tableView.register(Cell.self, forCellReuseIdentifier: Cell.id)
+        navigationItem.setRightBarButtonItems([
+            UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(close)),
+        ], animated: true)
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        navigationController?.navigationBar.isHidden = presentingViewController?.traitCollection.horizontalSizeClass == .regular && traitCollection.horizontalSizeClass == .compact
     }
 
     override func numberOfSections(in _: UITableView) -> Int {

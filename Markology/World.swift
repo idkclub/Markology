@@ -104,7 +104,7 @@ class World {
             notes.forEach {
                 defer {
                     let now = DispatchTime.now()
-                    if !skippingSyncedFiles, now > updateAt  {
+                    if !skippingSyncedFiles, now > updateAt {
                         updateAt = now + updatePeriod
                         loadingProgress.value = Float(seenFiles.count) / totalFiles
                     }
