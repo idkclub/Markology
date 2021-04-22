@@ -55,7 +55,7 @@ class EditController: UIViewController {
     }
 
     @objc private func link() {
-        let menu = MenuController(style: .grouped, emptyCreate: false, delegate: self)
+        let menu = MenuController(style: .grouped, showCancel: true, showCreateEmpty: false, delegate: self)
         menu.modalPresentationStyle = .popover
         menu.popoverPresentationController?.barButtonItem = addLink
         present(menu, animated: true)
