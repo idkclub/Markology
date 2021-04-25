@@ -131,8 +131,7 @@ class World {
                 var nsError: NSError?
                 NSFileCoordinator().coordinate(readingItemAt: path, error: &nsError) { path in
                     do {
-                        guard let document = try saveNote(at: path, with: localPath, in: db, modifiedDate: date)
-                        else { return }
+                        guard let document = try saveNote(at: path, with: localPath, in: db, modifiedDate: date) else { return }
 
                         linksToSave.append(contentsOf: try processLinksForSync(from: document, at: localPath, in: db))
                     } catch {

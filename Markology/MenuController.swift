@@ -5,16 +5,19 @@ import Utils
 
 class MenuController: UIViewController {
     let table: UITableView
-    let emptyCreate: Bool
+    let showCancel: Bool
+    let showCreateEmpty: Bool
     let delegate: MenuDelegate
     var query: String = ""
     var notes: [Reference] = []
     var notesQuery: DatabaseCancellable?
     var includeAll = false
 
-    init(style: UITableView.Style = .insetGrouped, emptyCreate: Bool = true, delegate: MenuDelegate) {
+    init(style: UITableView.Style = .insetGrouped, initial: String = "", showCancel: Bool = false, showCreateEmpty: Bool = true, delegate: MenuDelegate) {
+        self.showCancel = showCancel
+        self.showCreateEmpty = showCreateEmpty
         self.delegate = delegate
-        self.emptyCreate = emptyCreate
+        query = initial
         table = UITableView(frame: .zero, style: style)
         super.init(nibName: nil, bundle: nil)
     }
@@ -33,7 +36,7 @@ class MenuController: UIViewController {
         if notes.count > 0 {
             sections.append(.recent)
         }
-        if emptyCreate || query != "" {
+        if showCreateEmpty || query != "" {
             sections.append(.new)
         }
         return sections
@@ -48,9 +51,13 @@ class MenuController: UIViewController {
         let progress = SyncProgress().anchored(to: view, horizontal: true, top: true)
 
         let searchBar = UISearchBar().anchored(to: view, horizontal: true)
+        searchBar.text = query
         searchBar.placeholder = "Search"
         searchBar.delegate = self
         searchBar.enablesReturnKeyAutomatically = false
+        #if !targetEnvironment(macCatalyst)
+            searchBar.showsCancelButton = showCancel
+        #endif
 
         table.anchored(to: view, horizontal: true, bottom: true)
         table.keyboardDismissMode = .onDrag
@@ -105,6 +112,13 @@ extension MenuController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         delegate.search(query: searchBar.text ?? "")
     }
+
+    // https://stackoverflow.com/questions/58468235/uisearchcontroller-uisearchbar-behaves-differently-under-macos-than-ios
+    #if !targetEnvironment(macCatalyst)
+        func searchBarCancelButtonClicked(_: UISearchBar) {
+            dismiss(animated: true)
+        }
+    #endif
 }
 
 extension MenuController: UITableViewDelegate {
