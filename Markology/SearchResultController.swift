@@ -12,7 +12,7 @@ class SearchResultController: UITableViewController {
             self?.notes = notes
             self?.tableView.reloadData()
         }
-        tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
+        tableView.register(ReferenceCell.self, forCellReuseIdentifier: ReferenceCell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
         clearsSelectionOnViewWillAppear = true
@@ -38,7 +38,7 @@ class SearchResultController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard indexPath.row > 0 else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: Reference.Cell.id, for: indexPath) as! Reference.Cell
+            let cell = tableView.dequeueReusableCell(withIdentifier: ReferenceCell.id, for: indexPath) as! ReferenceCell
             cell.render(name: notes[indexPath.section].name)
             return cell
         }
