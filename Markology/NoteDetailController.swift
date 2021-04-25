@@ -73,15 +73,20 @@ class NoteDetailController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
-        tableView.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
+        tableView.register(ReferenceCell.self, forCellReuseIdentifier: ReferenceCell.id)
         tableView.register(NoteCell.self, forCellReuseIdentifier: NoteCell.id)
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
     }
 
     @objc private func related() {
         guard let current = entry?.note.reference() else { return }
-        let related = RelatedController(to: current) {
-            self.navigate(to: $0)
+        var related: UIViewController!
+        related = RelatedController.withTitle(to: current) { [weak related] in
+            let controller = NoteDetailController(note: $0)
+            self.show(controller, sender: self)
+            if let button = controller.relatedButton, let related = related {
+                related.popoverPresentationController?.barButtonItem = button
+            }
         }
         related.modalPresentationStyle = .popover
         related.popoverPresentationController?.barButtonItem = relatedButton
@@ -211,7 +216,7 @@ class NoteDetailController: UITableViewController {
             cell.render(image: self.entry?.note.image)
             return cell
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: Reference.Cell.id, for: indexPath) as! Reference.Cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ReferenceCell.id, for: indexPath) as! ReferenceCell
         cell.render(name: ref.name)
         return cell
     }

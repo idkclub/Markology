@@ -64,7 +64,7 @@ class MenuController: UIViewController {
         table.dataSource = self
         table.delegate = self
         table.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
-        table.register(Reference.Cell.self, forCellReuseIdentifier: Reference.Cell.id)
+        table.register(ReferenceCell.self, forCellReuseIdentifier: ReferenceCell.id)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
             table.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
@@ -156,7 +156,7 @@ extension MenuController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Reference.Cell.id, for: indexPath) as! Reference.Cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: ReferenceCell.id, for: indexPath) as! ReferenceCell
         switch sections[indexPath.section] {
         case .recent:
             cell.render(name: notes[indexPath.row].name)

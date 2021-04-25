@@ -25,7 +25,7 @@ class World {
                 config.prepareDatabase { db in
                     db.trace { print($0) }
                 }
-                dbWriter = try DatabasePool(path: cache.path, configuration: config)
+                db = try DatabasePool(path: cache.path, configuration: config)
             #else
                 db = try DatabasePool(path: cache.path)
             #endif
