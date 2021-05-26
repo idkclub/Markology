@@ -103,7 +103,7 @@ extension EditController: UITextViewDelegate {
 
 extension EditController: UIDropInteractionDelegate {
     func dropInteraction(_: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
-        session.canLoadObjects(ofClass: UIImage.self)
+        session.hasItemsConforming(toTypeIdentifiers: ["public.image"])
     }
 
     func dropInteraction(_: UIDropInteraction, sessionDidUpdate _: UIDropSession) -> UIDropProposal {
@@ -111,9 +111,6 @@ extension EditController: UIDropInteractionDelegate {
     }
 
     func dropInteraction(_: UIDropInteraction, performDrop session: UIDropSession) {
-        session.loadObjects(ofClass: UIImage.self) {
-            guard let images = $0 as? [UIImage], images.count > 0 else { return }
-            self.present(FileController().with(files: images, onSave: self.onImport), animated: true)
-        }
+        present(FileController().with(providers: session.items.map { $0.itemProvider }, onSave: onImport), animated: true)
     }
 }
