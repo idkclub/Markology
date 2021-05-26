@@ -52,7 +52,7 @@ class MenuController: UIViewController {
 
         let searchBar = UISearchBar().anchored(to: view, horizontal: true)
         searchBar.text = query
-        searchBar.placeholder = "Search"
+        searchBar.placeholder = "Search or Create"
         searchBar.delegate = self
         searchBar.enablesReturnKeyAutomatically = false
         #if !targetEnvironment(macCatalyst)
