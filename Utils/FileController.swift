@@ -6,7 +6,7 @@ open class FileController: UIViewController {
     var saveButton: UIBarButtonItem?
     var tableView: UITableView?
 
-    @discardableResult public func with(providers: [NSItemProvider], onSave: (([URL]) -> Void)? = nil) -> Self {
+    @discardableResult public func use(providers: [NSItemProvider], onSave: (([URL]) -> Void)? = nil) -> Self {
         self.onSave = onSave
         let group = DispatchGroup()
         for provider in providers {
