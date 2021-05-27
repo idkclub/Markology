@@ -111,6 +111,6 @@ extension EditController: UIDropInteractionDelegate {
     }
 
     func dropInteraction(_: UIDropInteraction, performDrop session: UIDropSession) {
-        present(FileController().with(providers: session.items.map { $0.itemProvider }, onSave: onImport), animated: true)
+        present(FileController().use(providers: session.items.map { $0.itemProvider }, onSave: onImport), animated: true)
     }
 }
