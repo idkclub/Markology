@@ -43,6 +43,7 @@ class SettingsController: UITableViewController {
     }
 
     @objc private func icloud() {
+        toggle.isEnabled = false
         do {
             try World.shared.syncSync(force: true)
             try Container.setCloud(enabled: toggle.isOn)
@@ -51,6 +52,7 @@ class SettingsController: UITableViewController {
         }
         toggle.isOn = Container.icloud
         World.shared.sync()
+        toggle.isEnabled = Container.icloudEnabled
     }
 
     @objc private func sync() {
