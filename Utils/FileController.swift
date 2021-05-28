@@ -129,7 +129,7 @@ extension FileController {
             source = temp
             image = UIImage(contentsOfFile: temp.path)
             name = url.deletingPathExtension().lastPathComponent
-            ext = url.pathExtension
+            ext = url.pathExtension.lowercased()
         }
 
         init(image: UIImage, name: String) {
