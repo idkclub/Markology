@@ -81,7 +81,7 @@ class NoteDetailController: UITableViewController {
     @objc private func related() {
         guard let current = entry?.note.reference() else { return }
         var related: UIViewController!
-        related = RelatedController.withTitle(to: current) { [weak related] in
+        related = RelatedController.withTitle(to: current) {
             let controller = NoteDetailController(note: $0)
             self.show(controller, sender: self)
             if let button = controller.relatedButton, let related = related {
