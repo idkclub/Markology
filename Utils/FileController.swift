@@ -64,7 +64,7 @@ open class FileController: UIViewController {
         ]
         NSLayoutConstraint.activate([
             tableView.bottomAnchor.constraint(equalTo: buttons.topAnchor),
-            buttons.bottomAnchor.constraint(equalTo: KeyboardGuide(view: view).topAnchor),
+            buttons.bottomAnchor.constraint(equalTo: KeyboardGuide(view: view, useSafeArea: false).topAnchor),
         ])
         validate()
     }
