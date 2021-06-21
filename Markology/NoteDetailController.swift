@@ -10,6 +10,7 @@ class NoteDetailController: UITableViewController {
     var menuButton: UIBarButtonItem?
     var expandFrom = false
     var expandTo = false
+    var relatedController: UIViewController?
 
     var noteContent: Any? { return entry?.note.image ?? entry?.note.text }
 
@@ -78,15 +79,20 @@ class NoteDetailController: UITableViewController {
         tableView.register(ImageCell.self, forCellReuseIdentifier: ImageCell.id)
     }
 
+    override func viewDidAppear(_: Bool) {
+        if let related = relatedController {
+            // Seems to prevent a crash if backgrounded with the related controller open.
+            related.popoverPresentationController?.sourceView = view
+        }
+    }
+
     @objc private func related() {
         guard let current = entry?.note.reference() else { return }
-        var related: UIViewController!
-        related = RelatedController.withTitle(to: current) { [weak related] in
-            let controller = NoteDetailController(note: $0)
-            self.show(controller, sender: self)
-            if let button = controller.relatedButton, let related = related {
-                related.popoverPresentationController?.barButtonItem = button
-            }
+        let related = RelatedController.withTitle(to: current) { [weak self] related, ref in
+            let controller = NoteDetailController(note: ref)
+            controller.relatedController = related
+            self?.show(controller, sender: self)
+            related.popoverPresentationController?.barButtonItem = controller.relatedButton
         }
         related.modalPresentationStyle = .popover
         related.popoverPresentationController?.barButtonItem = relatedButton
