@@ -66,9 +66,9 @@ class EditController: UIViewController {
     @objc private func save() {
         do {
             try World.shared.write(contents: text, to: url)
+            dismiss(animated: true)
+            onSave?(url)
         } catch { errorAlert(for: error) }
-        dismiss(animated: true)
-        onSave?(url)
     }
 
     @objc private func cancel() {
