@@ -2,7 +2,7 @@ import GRDB
 import UIKit
 
 class RelatedController: UITableViewController {
-    let onSelect: (Reference) -> Void
+    let onSelect: (RelatedController, Reference) -> Void
     var current: Reference {
         didSet {
             connections = []
@@ -11,10 +11,12 @@ class RelatedController: UITableViewController {
         }
     }
 
+    var button: UIBarButtonItem?
+
     var connections: [[Reference.Entry]] = []
     var loading = false
     var showPaths = false
-    init(to note: Reference, onSelect: @escaping ((Reference) -> Void)) {
+    init(to note: Reference, onSelect: @escaping ((RelatedController, Reference) -> Void)) {
         self.onSelect = onSelect
         current = note
         super.init(style: .insetGrouped)
@@ -27,7 +29,7 @@ class RelatedController: UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    static func withTitle(to note: Reference, onSelect: @escaping ((Reference) -> Void)) -> UIViewController {
+    static func withTitle(to note: Reference, onSelect: @escaping ((RelatedController, Reference) -> Void)) -> UIViewController {
         UINavigationController(rootViewController: RelatedController(to: note, onSelect: onSelect))
     }
 
@@ -98,7 +100,7 @@ class RelatedController: UITableViewController {
 
     override func tableView(_: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         let ref = connections[indexPath.section][indexPath.row].reference
-        onSelect(ref)
+        onSelect(self, ref)
         current = ref
         loadMore()
         return nil
