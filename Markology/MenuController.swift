@@ -176,7 +176,7 @@ extension MenuController: UITableViewDataSource {
                 self.reloadQuery()
             }
         case .new:
-            break
+            header.onTap = nil
         }
         return header
     }
