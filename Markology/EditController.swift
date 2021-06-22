@@ -60,6 +60,7 @@ class EditController: UIViewController {
         menu.modalPresentationStyle = .popover
         menu.popoverPresentationController?.barButtonItem = addLink
         present(menu, animated: true)
+        textView.resignFirstResponder()
     }
 
     @objc private func save() {
@@ -84,6 +85,7 @@ extension EditController: MenuDelegate {
             textView.insertText("[\(note.name)](\(url))")
         }
         dismiss(animated: true)
+        textView.becomeFirstResponder()
     }
 
     func create(query: String) {
