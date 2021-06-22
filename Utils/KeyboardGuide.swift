@@ -1,9 +1,12 @@
 import UIKit
 
 public class KeyboardGuide: UILayoutGuide {
-    var observer: NSObjectProtocol?
+    var hideObserver: NSObjectProtocol?
+    var showObserver: NSObjectProtocol?
+    let view: UIView
 
     public init(view: UIView) {
+        self.view = view
         super.init()
         view.addLayoutGuide(self)
         let height = heightAnchor.constraint(equalToConstant: 0)
@@ -11,21 +14,24 @@ public class KeyboardGuide: UILayoutGuide {
             height,
             bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
-        observer = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillChangeFrameNotification, object: nil, queue: nil) { notification in
-            guard let window = view.window?.frame,
-                  let keyboardBegin = notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? CGRect,
-                  let keyboard = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-            if keyboard == CGRect.zero || (keyboardBegin == CGRect.zero && keyboard.width < window.width) {
-                // Floating keyboard present.
-                height.constant = 0
-                return
-            }
-            height.constant = max(window.height - keyboard.minY - view.safeAreaInsets.bottom, 0)
-            let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0
-            UIView.animate(withDuration: duration, animations: {
-                view.layoutIfNeeded()
-            })
-        }
+        hideObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil, using: { [weak self] notification in
+            height.constant = 0
+            self?.animate(notification: notification)
+        })
+        showObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil, using: { [weak self] notification in
+            guard let keyboard = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+                  let window = view.window else { return }
+            let frame = window.convert(keyboard, from: UIScreen.main.coordinateSpace)
+            height.constant = max(window.bounds.maxY - frame.minY - view.safeAreaInsets.bottom, 0)
+            self?.animate(notification: notification)
+        })
+    }
+
+    func animate(notification: Notification) {
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0
+        UIView.animate(withDuration: duration, animations: {
+            self.view.layoutIfNeeded()
+        })
     }
 
     @available(*, unavailable)
@@ -34,7 +40,11 @@ public class KeyboardGuide: UILayoutGuide {
     }
 
     deinit {
-        guard let observer = observer else { return }
-        NotificationCenter.default.removeObserver(observer)
+        if let hideObserver = hideObserver {
+            NotificationCenter.default.removeObserver(hideObserver)
+        }
+        if let showObserver = showObserver {
+            NotificationCenter.default.removeObserver(showObserver)
+        }
     }
 }
