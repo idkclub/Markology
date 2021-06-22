@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E47394C2682267600FEADB6 /* Notes in Resources */ = {isa = PBXBuildFile; fileRef = 4E47394B2682267600FEADB6 /* Notes */; };
 		4E4C8BDA26225B2E00833B5A /* TappableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4C8BD926225B2E00833B5A /* TappableHeader.swift */; };
 		4E4DCE2625E1E8C90009BCCB /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */; };
 		4E59840A25DBA88300236B89 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59840925DBA88300236B89 /* GRDB */; };
@@ -100,6 +101,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4E47394B2682267600FEADB6 /* Notes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Notes; sourceTree = "<group>"; };
 		4E4C8BD926225B2E00833B5A /* TappableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableHeader.swift; sourceTree = "<group>"; };
 		4E4DCE2525E1E8C90009BCCB /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		4E59840C25DBAABE00236B89 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 		4EAC80D925E3A6F700A884B0 /* UITests */ = {
 			isa = PBXGroup;
 			children = (
+				4E47394B2682267600FEADB6 /* Notes */,
 				4EAC80DC25E3A6F700A884B0 /* Info.plist */,
 				4EAC80DA25E3A6F700A884B0 /* UITests.swift */,
 			);
@@ -415,6 +418,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E47394C2682267600FEADB6 /* Notes in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
