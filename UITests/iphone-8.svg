@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 3926 2208">
+  <style>
+.text {
+  fill: #fff;
+  font: 180px Helvetica;
+  font-weight: bold;
+}
+  </style>
+  <defs>
+    <filter id="shadow" x="-100%" y="-100%" width="300%" height="300%">
+      <feOffset result="offset" in="SourceAlpha" dx="8" dy="8"/>
+      <feGaussianBlur result="blurOut" in="offset" stdDeviation="30"/>
+      <feBlend in="SourceGraphic" mode="normal"/>
+    </filter>
+    <clipPath id="mac">
+      <rect width="2367" height="1860" rx="40"/>
+    </clipPath>
+  </defs>
+  <rect fill="#258bdc" width="1242" height="2208"/>
+  <rect fill="#25dcdc" width="1242" height="2208" x="1342"/>
+  <rect fill="#25dc8b" width="1242" height="2208" x="2684"/>
+  <g transform="rotate(344)">
+    <g filter="url(#shadow)" transform="translate(-330 800)">
+      <image xlink:href="iPhone 8 Plus/1-view-light.png" width="1242" height="2208"/>
+    </g>
+    <g filter="url(#shadow)" transform="translate(850 -80)">
+      <image xlink:href="iPhone 8 Plus/2-edit-dark.png" width="1242" height="2208"/>
+    </g>
+    <text class="text" x="-40" y="450">Capture
+      <tspan x="-30" dy="1.2em">Ideas</tspan>
+    </text>
+    <text class="text" x="1150" y="2320">Connect
+      <tspan x="1050" dy="1.2em">Concepts</tspan>
+    </text>
+  </g>
+  <g filter="url(#shadow)" transform="translate(3330 770) rotate(-120)">
+    <image xlink:href="MacBook Pro/1-view-dark.png" width="2367" height="1860" clip-path="url(#mac)"/>
+  </g>
+  <image transform="rotate(-80)" xlink:href="iPad Pro (12.9-inch) (5th generation)/1-view-light.png" width="2048" height="2732" x="-2800" y="3260" filter="url(#shadow)"/>
+  <text class="text" x="2730" y="1050">Cross Device</text>
+  <rect fill="#fff" width="100" height="2208" x="1242"/>
+  <rect fill="#fff" width="100" height="2208" x="2584"/>
+</svg>
