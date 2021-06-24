@@ -17,7 +17,7 @@ class UITests: XCTestCase {
 
     func testScreens() throws {
         let windowsQuery = XCUIApplication()/*@START_MENU_TOKEN@*/ .windows/*[[".groups.windows",".windows"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
-        sleep(1)
+        sleep(3)
         shoot(name: "0-initial")
         windowsQuery.tables.staticTexts["Overview"].tap()
         sleep(1)
@@ -25,6 +25,9 @@ class UITests: XCTestCase {
         windowsQuery.navigationBars["Overview"].buttons["edit"].tap()
         sleep(1)
         shoot(name: "2-edit")
+        windowsQuery.buttons["Add Link"].tap()
+        sleep(1)
+        shoot(name: "3-link")
     }
 
     private func shoot(name: String) {
