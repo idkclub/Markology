@@ -4,8 +4,10 @@ import UIKit
 class SearchResultController: UITableViewController {
     var resultsQuery: DatabaseCancellable?
     var notes: [Note] = []
+    var query: String
 
     init(query: String) {
+        self.query = query
         super.init(style: .insetGrouped)
         title = "Results for \"\(query)\""
         resultsQuery = World.shared.search(query: query) { [weak self] (notes: [Note]) in
@@ -49,6 +51,7 @@ class SearchResultController: UITableViewController {
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: NoteCell.id, for: indexPath) as! NoteCell
         cell.render(note: notes[indexPath.section], delegate: self)
+        cell.highlight(search: query)
         return cell
     }
 }

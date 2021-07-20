@@ -15,7 +15,6 @@ class NoteCell: UITableViewCell {
         textView.isEditable = false
         textView.backgroundColor = .secondarySystemGroupedBackground
         textView.textContainerInset = .init(top: 15, left: 10, bottom: 15, right: 10)
-        textView.linkTextAttributes = [:]
         textView.delegate = self
         textView.isScrollEnabled = false
         textView.dataDetectorTypes = .all
@@ -37,6 +36,23 @@ class NoteCell: UITableViewCell {
             return
         }
         textView.text = note.text
+    }
+
+    func highlight(search: String) {
+        guard search != "" else { return }
+        var query = search
+        for ch in #"\[](){}*+?|^$."# {
+            query = query.replacingOccurrences(of: String(ch), with: "\\\(ch)", options: .literal)
+        }
+        let pattern = "(\(query.split(separator: " ").joined(separator: ").*?(")))"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators]) else { return }
+        let text = NSMutableAttributedString(attributedString: textView.attributedText)
+        for match in regex.matches(in: text.string, options: [], range: NSRange(location: 0, length: text.length)) {
+            for i in 1 ..< match.numberOfRanges {
+                text.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.idkYellow, range: match.range(at: i))
+            }
+        }
+        textView.attributedText = text
     }
 }
 
