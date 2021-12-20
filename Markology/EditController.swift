@@ -34,6 +34,7 @@ class EditController: UIViewController {
         textView.textContainerInset = .init(top: 20, left: 10, bottom: 10, right: 10)
         textView.font = .systemFont(ofSize: 17)
         textView.text = text
+        textView.smartDashesType = .no
         textView.delegate = self
         let drop = UIDropInteraction(delegate: self)
         textView.addInteraction(drop)
