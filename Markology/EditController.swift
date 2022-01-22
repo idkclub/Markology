@@ -42,6 +42,7 @@ class EditController: UIViewController {
             textView.bottomAnchor.constraint(equalTo: buttons.topAnchor),
             buttons.bottomAnchor.constraint(equalTo: KeyboardGuide(view: view).topAnchor),
         ])
+        textView.becomeFirstResponder()
     }
 
     static func body(from query: String) -> String {
