@@ -108,7 +108,7 @@ class NoteDetailController: UITableViewController {
             guard let note = self?.note else { return }
             let confirm = UIAlertController(title: "Delete \(note.name)?", message: "This operation cannot be undone.", preferredStyle: .alert)
             confirm.addAction(.init(title: "Cancel", style: .cancel))
-            confirm.addAction(.init(title: "🔥", style: .destructive) { [weak self] _ in
+            confirm.addAction(.init(title: "Delete", style: .destructive) { [weak self] _ in
                 do {
                     try World.shared.delete(url: Container.url(for: note.file))
                 } catch { self?.errorAlert(for: error) }
