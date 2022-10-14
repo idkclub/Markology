@@ -20,6 +20,7 @@
 		4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; };
 		4E77771C28F7330600DAEF80 /* GRDB-dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4E77771E28F74AC100DAEF80 /* UIColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771D28F74AC100DAEF80 /* UIColor+.swift */; };
+		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,6 +50,7 @@
 		4E77770F28F5350A00DAEF80 /* UITableView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+.swift"; sourceTree = "<group>"; };
 		4E77771128F6237800DAEF80 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
 		4E77771D28F74AC100DAEF80 /* UIColor+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+.swift"; sourceTree = "<group>"; };
+		4E77771F28F9B42000DAEF80 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +92,7 @@
 				4E77770128F481F700DAEF80 /* Note.swift */,
 				4E77770528F5008C00DAEF80 /* NoteController.swift */,
 				4E77771128F6237800DAEF80 /* NoteView.swift */,
+				4E77771F28F9B42000DAEF80 /* SearchController.swift */,
 				4E77771D28F74AC100DAEF80 /* UIColor+.swift */,
 				4E77770F28F5350A00DAEF80 /* UITableView+.swift */,
 				4E77770728F500C600DAEF80 /* UIView+.swift */,
@@ -177,6 +180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E77770828F500C600DAEF80 /* UIView+.swift in Sources */,
+				4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */,
 				4E77771228F6237800DAEF80 /* NoteView.swift in Sources */,
 				4E77770428F486E900DAEF80 /* MenuController.swift in Sources */,
 				4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */,

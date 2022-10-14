@@ -34,6 +34,22 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
         }
     }
 
+    struct Search: Query {
+        let query: String
+
+        func fetch(db: Database) throws -> [Note] {
+            if let pattern = FTS5Pattern(matchingAllPrefixesIn: query) {
+                return try Note.fetchAll(db, sql: """
+                select note.* from note
+                join note_search on note.rowid = note_search.rowid
+                    and note_search match ?
+                order by rank
+                """, arguments: [pattern])
+            }
+            return try Note.order(Note.Columns.name.asc).fetchAll(db)
+        }
+    }
+
     class Cell: UITableViewCell, TableCell {
         lazy var markdown = {
             let markdown = NoteView().pinned(to: contentView)

@@ -2,8 +2,9 @@ import Markdown
 import UIKit
 
 class NoteView: UITextView {
-    var tableView: UITableView?
+    weak var tableView: UITableView?
     var previous: UITextRange?
+    var editing: Bool = false
     var note: Note? {
         didSet {
             render(editable: false)
@@ -29,10 +30,6 @@ class NoteView: UITextView {
     }
 
     func render(editable: Bool) {
-        defer {
-            tableView?.beginUpdates()
-            tableView?.endUpdates()
-        }
         guard let note = note else {
             attributedText = "".body
             return
@@ -47,17 +44,23 @@ class NoteView: UITextView {
             text = visitor.visit(doc)
         }
         attributedText = text.setMissing(key: .foregroundColor, value: UIColor.label)
+        editing = editable
     }
 }
 
 extension NoteView: UITextViewDelegate {
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        tableView?.beginUpdates()
         render(editable: true)
+        tableView?.endUpdates()
         return true
     }
 
-    func textViewDidEndEditing(_ textView: UITextView) {
+    func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
+        tableView?.beginUpdates()
         render(editable: false)
+        tableView?.endUpdates()
+        return true
     }
 
     func textViewDidChange(_ textView: UITextView) {
@@ -65,23 +68,23 @@ extension NoteView: UITextViewDelegate {
         let string = attributedText.string
         let doc = Document(parsing: string)
         var visitor = EditVisitor(text: string)
+        tableView?.beginUpdates()
         attributedText = visitor.visit(doc)
             .setMissing(key: .foregroundColor, value: UIColor.label)
         selectedRange = select
-        tableView?.beginUpdates()
         tableView?.endUpdates()
     }
 
     func textViewDidChangeSelection(_ textView: UITextView) {
+        guard editing else { return }
         var position = selectedTextRange?.end
         if selectedTextRange?.end == previous?.end,
            let start = selectedTextRange?.start
         {
             position = start
         }
-        if let position = position,
-           let rect = tableView?.convert(caretRect(for: position), to: tableView)
-        {
+        if let position = position {
+            let rect = convert(caretRect(for: position), to: tableView)
             tableView?.scrollRectToVisible(rect, animated: false)
         }
         previous = selectedTextRange

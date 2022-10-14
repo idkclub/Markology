@@ -40,6 +40,13 @@ extension MenuController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         searchSink = Engine.subscribe(with(\.ids), to: Note.ID.Search(text: searchText))
     }
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let nav = splitViewController?.viewController(for: .secondary) as? UINavigationController else { return }
+        let controller = SearchController()
+        nav.viewControllers = [controller]
+        controller.query = searchBar.text ?? ""
+    }
 }
 
 extension MenuController: UITableViewDataSource {
