@@ -33,7 +33,7 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
             try Note.fetchOne(db, key: id.file)
         }
     }
-    
+
     class Cell: UITableViewCell, TableCell {
         lazy var markdown = {
             let markdown = NoteView().pinned(to: contentView)

@@ -112,7 +112,7 @@ class Engine {
                 var error: NSError?
                 coordinator.coordinate(readingItemAt: url, error: &error) {
                     guard let text = try? String(contentsOf: $0)
-                            .replacingOccurrences(of: "\r\n", with: "\n")else { return }
+                        .replacingOccurrences(of: "\r\n", with: "\n") else { return }
                     let doc = Document(parsing: text)
                     var walk = NoteWalker()
                     walk.visit(doc)
