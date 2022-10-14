@@ -345,10 +345,12 @@ extension NoteView {
     class LayoutManager: NSLayoutManager {
         override func drawGlyphs(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
             super.drawGlyphs(forGlyphRange: glyphsToShow, at: origin)
-            guard let context = UIGraphicsGetCurrentContext() else { return }
+            guard let context = UIGraphicsGetCurrentContext(),
+                  let textStorage = textStorage else { return }
+            let range = characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
             UIGraphicsPushContext(context)
             context.setFillColor(UIColor.label.cgColor)
-            textStorage?.enumerateAttribute(.horizontalRule, in: glyphsToShow) { value, range, _ in
+            textStorage.enumerateAttribute(.horizontalRule, in: range) { value, range, _ in
                 guard value != nil else { return }
                 let glyph = glyphIndexForCharacter(at: range.lowerBound)
                 let rect = lineFragmentRect(forGlyphAt: glyph, effectiveRange: nil)
@@ -358,7 +360,7 @@ extension NoteView {
                 context.fill(CGRect(x: x, y: rect.minY + origin.y, width: rect.maxX - x + origin.x - padding, height: 1))
             }
             context.setFillColor(UIColor.secondaryLabel.cgColor)
-            textStorage?.enumerateAttribute(.verticalRule, in: glyphsToShow) { value, range, _ in
+            textStorage.enumerateAttribute(.verticalRule, in: range) { value, range, _ in
                 guard let value = value as? [Indent] else { return }
                 var x = 0.0
                 var y = 0.0
