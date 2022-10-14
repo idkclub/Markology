@@ -36,6 +36,7 @@ class SplitController: UISplitViewController {
         setViewController(MenuController(), for: .primary)
         setViewController(history, for: .secondary)
         history.viewControllers = [NoteController()]
+        primaryBackgroundStyle = .sidebar
         delegate = self
     }
 }

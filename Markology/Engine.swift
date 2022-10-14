@@ -125,16 +125,31 @@ class Engine {
     }
 
     struct NoteWalker: MarkupWalker {
-        var name = ""
+        var fallback = ""
+        var header = ""
         var links: [Markdown.Link] = []
-        mutating func visitHeading(_ heading: Heading) {
-            if name == "" {
-                name = heading.plainText
+
+        var name: String {
+            if header != "" {
+                return header
             }
+            return fallback
+        }
+
+        mutating func visitHeading(_ heading: Heading) {
+            defaultVisit(heading)
+            guard header == "" else { return }
+            header = heading.plainText
         }
 
         mutating func visitLink(_ link: Markdown.Link) {
             links.append(link)
+        }
+
+        mutating func visitParagraph(_ paragraph: Paragraph) {
+            defaultVisit(paragraph)
+            guard fallback == "" else { return }
+            fallback = paragraph.inlineChildren.map { $0.plainText }.joined()
         }
     }
 }

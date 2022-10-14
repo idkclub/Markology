@@ -37,6 +37,6 @@ protocol TableCell<Value>: UITableViewCell {
 
 extension TableCell {
     static var reuse: String {
-        className()
+        NSStringFromClass(self)
     }
 }

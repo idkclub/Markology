@@ -15,6 +15,11 @@ class MenuController: UIViewController, Bindable {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        let search = UISearchBar()
+        search.placeholder = "Search or Create"
+        search.enablesReturnKeyAutomatically = false
+        search.searchBarStyle = .minimal
+        search.delegate = self
         searchSink = Engine.subscribe(with(\.ids), to: Note.ID.Search(text: ""))
 
         let progress = UIProgressView(progressViewStyle: .bar)
@@ -22,15 +27,11 @@ class MenuController: UIViewController, Bindable {
             progress.progress = $0
         }
 
-        let search = UISearchBar()
-        search.placeholder = "Search or Create"
-        search.delegate = self
-
         table.dataSource = self
         table.delegate = self
         table.register(Note.ID.self)
 
-        let stack = UIStackView(arrangedSubviews: [progress, search, table])
+        let stack = UIStackView(arrangedSubviews: [search, progress, table])
             .pinned(to: view)
         stack.axis = .vertical
     }
@@ -42,10 +43,12 @@ extension MenuController: UISearchBarDelegate {
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let nav = splitViewController?.viewController(for: .secondary) as? UINavigationController else { return }
+        guard let split = splitViewController,
+              let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
         let controller = SearchController()
         nav.viewControllers = [controller]
         controller.query = searchBar.text ?? ""
+        split.show(.secondary)
     }
 }
 
@@ -65,9 +68,11 @@ extension MenuController: UITableViewDataSource {
 
 extension MenuController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let nav = splitViewController?.viewController(for: .secondary) as? UINavigationController else { return }
+        guard let split = splitViewController,
+              let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
         let controller = NoteController()
         nav.viewControllers = [controller]
         controller.id = ids[indexPath.row]
+        split.show(.secondary)
     }
 }
