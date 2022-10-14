@@ -84,7 +84,10 @@ extension NoteView: UITextViewDelegate {
             position = start
         }
         if let position = position {
-            let rect = convert(caretRect(for: position), to: tableView)
+            var rect = convert(caretRect(for: position), to: tableView)
+            if rect.origin.y == .infinity {
+                rect = convert(bounds, to: tableView)
+            }
             tableView?.scrollRectToVisible(rect, animated: false)
         }
         previous = selectedTextRange
