@@ -15,7 +15,7 @@ class NoteController: UITableViewController, Bindable {
             title = entry?.name
             sections = []
             guard let entry = entry else { return }
-            sections.append(.note)
+            sections.append(edit ? .edit : .note)
             if entry.from.count > 0 {
                 sections.append(.from)
             }
@@ -122,6 +122,7 @@ class NoteController: UITableViewController, Bindable {
         guard let split = splitViewController,
               let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
         let controller = NoteController()
+        controller.edit = edit
         controller.id = dest
         nav.show(controller, sender: self)
         split.show(.secondary)
