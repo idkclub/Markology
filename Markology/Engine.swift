@@ -21,7 +21,9 @@ class Engine {
             appropriateFor: nil,
             create: true
         ).appendingPathComponent("club.idk.note.db")
-        db = try DatabasePool(path: cache.path)
+        var config = Configuration()
+        config.foreignKeysEnabled = false
+        db = try DatabasePool(path: cache.path, configuration: config)
         try migrate()
         try subscribe()
     }
@@ -36,7 +38,9 @@ class Engine {
             .removeDuplicates()
             .publisher(in: shared.db)
             // TODO: Handle error.
-            .sink(receiveCompletion: { _ in }, receiveValue: action)
+            .sink(receiveCompletion: {
+                print($0)
+            }, receiveValue: action)
     }
 
     private func migrate() throws {
@@ -59,7 +63,8 @@ class Engine {
             try db.create(table: "link") { t in
                 t.column("from", .text).references("note", onDelete: .cascade)
                 t.column("to", .text).references("note")
-                t.uniqueKey(["from", "to"], onConflict: .ignore)
+                t.column("text")
+                t.uniqueKey(["from", "to", "text"], onConflict: .ignore)
             }
         }
         try migrator.migrate(db)
@@ -105,7 +110,7 @@ class Engine {
                   attrs.isDirectory == false,
                   attrs.isHidden == false,
                   let modified = attrs.contentModificationDate else { continue }
-            if let last = times?[url.path],
+            if let last = times?[url.lastPathComponent],
                Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
             if url.pathExtension == "md" {
                 let coordinator = NSFileCoordinator()
@@ -113,11 +118,18 @@ class Engine {
                 coordinator.coordinate(readingItemAt: url, error: &error) {
                     guard let text = try? String(contentsOf: $0)
                         .replacingOccurrences(of: "\r\n", with: "\n") else { return }
+                    let file = url.lastPathComponent
                     let doc = Document(parsing: text)
-                    var walk = NoteWalker()
+                    var walk = NoteWalker(file: file)
                     walk.visit(doc)
-                    try? db.write {
-                        try Note(file: url.path, name: walk.name, text: text, modified: modified).save($0)
+                    do {
+                        try db.write { db in
+                            try Note.Link.filter(Note.Link.Columns.from == file).deleteAll(db)
+                            try Note(file: file, name: walk.name, text: text, modified: modified).save(db)
+                            try walk.links.forEach { try $0.save(db) }
+                        }
+                    } catch {
+                        print(error)
                     }
                 }
             }
@@ -125,9 +137,11 @@ class Engine {
     }
 
     struct NoteWalker: MarkupWalker {
+        var file: String
+        var context = ""
         var fallback = ""
         var header = ""
-        var links: [Markdown.Link] = []
+        var links: [Note.Link] = []
 
         var name: String {
             if header != "" {
@@ -137,19 +151,25 @@ class Engine {
         }
 
         mutating func visitHeading(_ heading: Heading) {
+            context = heading.plainText
             defaultVisit(heading)
             guard header == "" else { return }
-            header = heading.plainText
+            header = context
         }
 
         mutating func visitLink(_ link: Markdown.Link) {
-            links.append(link)
+            guard let destination = link.destination,
+                  !destination.contains(":"),
+                  !destination.contains("//"),
+                  let to = URL(string: destination)?.lastPathComponent else { return }
+            links.append(Note.Link(from: file, to: to, text: context))
         }
 
         mutating func visitParagraph(_ paragraph: Paragraph) {
+            context = paragraph.plainText
             defaultVisit(paragraph)
             guard fallback == "" else { return }
-            fallback = paragraph.inlineChildren.map { $0.plainText }.joined()
+            fallback = context
         }
     }
 }

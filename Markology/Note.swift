@@ -9,6 +9,9 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
         static let modified = Column(CodingKeys.modified)
     }
 
+    static let from = hasMany(Link.self, using: Link.toKey).forKey("fromLink")
+    static let to = hasMany(Link.self, using: Link.fromKey).forKey("toLink")
+
     let file: String
     let name: String
     let text: String
@@ -23,14 +26,6 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
 
         return try File.fetchAll(db, File.query).reduce(into: [:]) {
             $0[$1.file] = $1.modified
-        }
-    }
-
-    struct Load: Query {
-        let id: ID
-
-        func fetch(db: Database) throws -> Note? {
-            try Note.fetchOne(db, key: id.file)
         }
     }
 
@@ -60,6 +55,62 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
 
         func render(_ note: Note) {
             markdown.note = note
+        }
+    }
+}
+
+extension Note {
+    @dynamicMemberLookup
+    struct Entry: Codable, Equatable, FetchableRecord {
+        static let query = Note.all()
+            .including(all: Note.to.select(Note.Link.Columns.text)
+                .including(required: Note.Link.to
+                    .select(Note.Columns.name, Note.Columns.file)
+                    .order(Note.Columns.name.asc))
+                .forKey("to"))
+            .including(all: Note.from.select(Note.Link.Columns.text)
+                .including(required: Note.Link.from
+                    .select(Note.Columns.name, Note.Columns.file)
+                    .order(Note.Columns.name.asc))
+                .forKey("from"))
+        let note: Note
+        let to: [Link]
+        let from: [Link]
+
+        subscript<T>(dynamicMember keyPath: KeyPath<Note, T>) -> T {
+            note[keyPath: keyPath]
+        }
+
+        struct Load: Query {
+            let id: ID
+
+            func fetch(db: Database) throws -> Entry? {
+                try Entry.fetchOne(db, Entry.query.filter(key: id.file))
+            }
+        }
+
+        struct Link: Codable, Equatable, Renderable {
+            let text: String
+            let note: ID
+
+            class Cell: UITableViewCell, ConfigCell {
+                var note = ""
+
+                func config(_ note: String) {
+                    self.note = note
+                }
+
+                func render(_ link: Note.Entry.Link) {
+                    var content = UIListContentConfiguration.valueCell()
+                    content.text = link.note.name
+                    if link.note.name != link.text,
+                       note != link.text
+                    {
+                        content.secondaryText = link.text
+                    }
+                    contentConfiguration = content
+                }
+            }
         }
     }
 }
@@ -95,5 +146,24 @@ extension Note {
                 contentConfiguration = content
             }
         }
+    }
+}
+
+extension Note {
+    struct Link: Codable, Equatable, PersistableRecord {
+        enum Columns {
+            static let from = Column(CodingKeys.from)
+            static let to = Column(CodingKeys.to)
+            static let text = Column(CodingKeys.text)
+        }
+
+        static let fromKey = ForeignKey([Columns.from])
+        static let toKey = ForeignKey([Columns.to])
+        static let from = belongsTo(Note.self, using: fromKey)
+        static let to = belongsTo(Note.self, using: toKey)
+
+        let from: String
+        let to: String
+        let text: String
     }
 }

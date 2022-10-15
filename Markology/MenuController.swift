@@ -71,8 +71,8 @@ extension MenuController: UITableViewDelegate {
         guard let split = splitViewController,
               let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
         let controller = NoteController()
-        nav.viewControllers = [controller]
         controller.id = ids[indexPath.row]
+        nav.viewControllers = [controller]
         split.show(.secondary)
     }
 }

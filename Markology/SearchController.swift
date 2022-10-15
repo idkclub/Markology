@@ -28,7 +28,7 @@ class SearchController: UITableViewController, Bindable {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.render(notes[indexPath.row], for: indexPath) as! Note.Cell
+        let cell = tableView.render(notes[indexPath.row], for: indexPath)
         cell.markdown.tableView = tableView
         return cell
     }

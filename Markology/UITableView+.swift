@@ -5,12 +5,16 @@ extension UITableView {
         register(T.Cell.self, forCellReuseIdentifier: T.Cell.reuse)
     }
 
-    func render<T: Renderable>(_ value: T?, for indexPath: IndexPath) -> UITableViewCell {
+    func render<T: Renderable>(_ value: T, for indexPath: IndexPath) -> T.Cell {
         let cell = dequeueReusableCell(withIdentifier: T.Cell.reuse, for: indexPath) as! T.Cell
-        // TODO: Handle missing.
-        if let value = value {
-            cell.render(value)
-        }
+        cell.render(value)
+        return cell
+    }
+
+    func render<T: Renderable>(_ value: T, with config: T.Cell.Config, for indexPath: IndexPath) -> T.Cell where T.Cell: ConfigCell {
+        let cell = dequeueReusableCell(withIdentifier: T.Cell.reuse, for: indexPath) as! T.Cell
+        cell.config(config)
+        cell.render(value)
         return cell
     }
 }
@@ -27,6 +31,11 @@ extension Bindable {
 
 protocol Renderable {
     associatedtype Cell: TableCell<Self>
+}
+
+protocol ConfigCell<Config>: TableCell {
+    associatedtype Config
+    func config(_: Config)
 }
 
 protocol TableCell<Value>: UITableViewCell {
