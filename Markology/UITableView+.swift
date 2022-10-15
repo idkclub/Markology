@@ -17,6 +17,17 @@ extension UITableView {
         cell.render(value)
         return cell
     }
+
+    func register<T: TableCell>(_ cell: T.Type) {
+        register(T.self, forCellReuseIdentifier: T.reuse)
+    }
+
+    func render<T: ConfigCell>(_ value: T.Value, with config: T.Config, for indexPath: IndexPath) -> T {
+        let cell = dequeueReusableCell(withIdentifier: T.reuse, for: indexPath) as! T
+        cell.config(config)
+        cell.render(value)
+        return cell
+    }
 }
 
 protocol Bindable: AnyObject {}

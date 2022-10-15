@@ -1,4 +1,5 @@
 import GRDB
+import Markdown
 import UIKit
 
 struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable {
@@ -49,12 +50,16 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
         lazy var markdown = {
             let markdown = NoteView().pinned(to: contentView)
             markdown.isScrollEnabled = false
+            markdown.isEditable = false
             markdown.textContainerInset = .init(top: 15, left: 15, bottom: 15, right: 15)
             return markdown
         }()
 
         func render(_ note: Note) {
-            markdown.note = note
+            let doc = Document(parsing: note.text)
+            var visitor = NoteVisitor()
+            markdown.attributedText = visitor.visit(doc)
+                .setMissing(key: .foregroundColor, value: UIColor.label)
         }
     }
 }

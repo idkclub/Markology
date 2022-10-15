@@ -4,7 +4,7 @@ import UIKit
 
 class NoteController: UITableViewController, Bindable {
     enum Section {
-        case note, from, to
+        case note, edit, from, to
     }
 
     var sections: [Section] = []
@@ -22,11 +22,31 @@ class NoteController: UITableViewController, Bindable {
             if entry.to.count > 0 {
                 sections.append(.to)
             }
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit))
         }
+    }
+
+    var edit = false {
+        didSet {
+            defer { tableView.reloadData() }
+            sections = sections.map {
+                switch $0 {
+                case .note, .edit:
+                    return edit ? .edit : .note
+                default:
+                    return $0
+                }
+            }
+        }
+    }
+
+    @objc private func toggleEdit() {
+        edit = !edit
     }
 
     var id: Note.ID? {
         didSet {
+            navigationItem.rightBarButtonItem = nil
             entry = nil
             guard let id = id else {
                 entrySink = nil
@@ -40,6 +60,7 @@ class NoteController: UITableViewController, Bindable {
         super.viewDidLoad()
         tableView.register(Note.self)
         tableView.register(Note.Entry.Link.self)
+        tableView.register(EditCell.self)
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -55,12 +76,12 @@ class NoteController: UITableViewController, Bindable {
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch sections[section] {
+        case .note, .edit:
+            return "Last Modified \(date.string(from: entry!.note.modified))"
         case .from:
             return "Linked From"
         case .to:
             return "Linked To"
-        case .note:
-            return "Last Modified \(date.string(from: entry!.note.modified))"
         }
     }
 
@@ -68,6 +89,8 @@ class NoteController: UITableViewController, Bindable {
         switch sections[indexPath.section] {
         case .note:
             return tableView.render(entry!.note, for: indexPath)
+        case .edit:
+            return tableView.render(entry!.note, with: tableView, for: indexPath) as EditCell
         case .from:
             return tableView.render(entry!.from[indexPath.row], with: entry!.name, for: indexPath)
         case .to:
@@ -77,7 +100,7 @@ class NoteController: UITableViewController, Bindable {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch sections[section] {
-        case .note:
+        case .note, .edit:
             return 1
         case .from:
             return entry?.from.count ?? 0
