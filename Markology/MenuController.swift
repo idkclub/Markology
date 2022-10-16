@@ -15,6 +15,8 @@ class MenuController: UIViewController, Bindable {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings))
+
         let search = UISearchBar()
         search.placeholder = "Search or Create"
         search.enablesReturnKeyAutomatically = false
@@ -34,6 +36,10 @@ class MenuController: UIViewController, Bindable {
         let stack = UIStackView(arrangedSubviews: [search, progress, table])
             .pinned(to: view)
         stack.axis = .vertical
+    }
+
+    @objc func settings() {
+        show(SettingsController(), sender: self)
     }
 }
 
@@ -71,8 +77,8 @@ extension MenuController: UITableViewDelegate {
         guard let split = splitViewController,
               let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
         let controller = NoteController()
-        controller.id = ids[indexPath.row]
         nav.viewControllers = [controller]
+        controller.id = ids[indexPath.row]
         split.show(.secondary)
     }
 }

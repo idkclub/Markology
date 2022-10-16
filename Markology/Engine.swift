@@ -12,8 +12,8 @@ protocol Query {
 class Engine {
     static let shared = try! Engine()
     let progress = CurrentValueSubject<Float, Never>(1)
+    let paths = Paths(for: "club.idk.Markology")
     private let db: DatabaseWriter
-    private var query: NSMetadataQuery?
     init() throws {
         let cache = try FileManager.default.url(
             for: .cachesDirectory,
@@ -25,7 +25,7 @@ class Engine {
         config.foreignKeysEnabled = false
         db = try DatabasePool(path: cache.path, configuration: config)
         try migrate()
-        try subscribe()
+        paths.monitor = self
     }
 
     static subscript<T>(dynamicMember keyPath: KeyPath<Engine, T>) -> T {
@@ -69,75 +69,68 @@ class Engine {
         }
         try migrator.migrate(db)
     }
+}
 
-    private func subscribe() throws {
-        let query = NSMetadataQuery()
-        query.operationQueue = OperationQueue()
-        query.operationQueue?.maxConcurrentOperationCount = 1
-        query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
-        query.predicate = NSPredicate(value: true)
-        NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: query, queue: query.operationQueue, using: initial)
-        // TODO: Only process deltas.
-        NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidUpdate, object: query, queue: query.operationQueue, using: initial)
-        query.enableUpdates()
-        query.start()
-        self.query = query
-    }
-
-    private func initial(note: Notification) {
-        guard let query = query else { return }
-        query.disableUpdates()
-        if let results = query.results as? [NSMetadataItem] {
-            sync(urls: results.compactMap {
-                $0.value(forAttribute: NSMetadataItemURLKey) as? URL
-            })
+extension Engine: Monitor {
+    func sync(files: [File]) {
+        _ = try? db.write {
+            let names = files.map { $0.name }
+            try Note.filter(!names.contains(Note.Columns.file)).deleteAll($0)
+            // TODO: Remove if foreign keys enabled.
+            try Note.Link.filter(!names.contains(Note.Link.Columns.from)).deleteAll($0)
         }
-        query.enableUpdates()
+        update(files: files)
     }
 
-    private func sync(urls: [URL]) {
+    func update(files: [File]) {
         let times = try? db.read { try Note.lastModified(db: $0) }
         var completed: Float = 0.0
-        for url in urls {
+        for file in files {
             defer {
                 completed += 1
                 DispatchQueue.main.async {
-                    self.progress.value = completed / Float(urls.count)
+                    self.progress.value = completed / Float(files.count)
                 }
             }
-            guard !url.pathComponents.contains(where: { $0.hasPrefix(".") }),
-                  let attrs = try? url.resourceValues(forKeys: [.contentModificationDateKey, .isDirectoryKey, .isHiddenKey]),
+            guard !file.url.pathComponents.contains(where: { $0.hasPrefix(".") }),
+                  let attrs = try? file.url.resourceValues(forKeys: [.contentModificationDateKey, .isDirectoryKey, .isHiddenKey]),
                   attrs.isDirectory == false,
                   attrs.isHidden == false,
                   let modified = attrs.contentModificationDate else { continue }
-            if let last = times?[url.lastPathComponent],
+            if let last = times?[file.name],
                Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
-            if url.pathExtension == "md" {
+            if file.url.pathExtension == "md" {
                 let coordinator = NSFileCoordinator()
                 var error: NSError?
-                coordinator.coordinate(readingItemAt: url, error: &error) {
-                    guard let text = try? String(contentsOf: $0)
-                        .replacingOccurrences(of: "\r\n", with: "\n") else { return }
-                    let file = url.lastPathComponent
+                coordinator.coordinate(readingItemAt: file.url, error: &error) {
+                    guard let text = try? String(contentsOf: $0).replacingOccurrences(of: "\r\n", with: "\n"),
+                          let from = URL(string: file.name) else { return }
                     let doc = Document(parsing: text)
-                    var walk = NoteWalker(file: file)
+                    var walk = NoteWalker(from: from)
                     walk.visit(doc)
-                    do {
-                        try db.write { db in
-                            try Note.Link.filter(Note.Link.Columns.from == file).deleteAll(db)
-                            try Note(file: file, name: walk.name, text: text, modified: modified).save(db)
-                            try walk.links.forEach { try $0.save(db) }
-                        }
-                    } catch {
-                        print(error)
+                    _ = try? db.write { db in
+                        try Note.Link.filter(Note.Link.Columns.from == file.name).deleteAll(db)
+                        try Note(file: file.name, name: walk.name, text: text, modified: modified).save(db)
+                        try walk.links.forEach { try $0.save(db) }
                     }
                 }
             }
         }
     }
 
+    func delete(files: [File]) {
+        _ = try? db.write {
+            let names = files.map { $0.name }
+            try Note.filter(names.contains(Note.Columns.file)).deleteAll($0)
+            // TODO: Remove if foreign keys enabled.
+            try Note.Link.filter(names.contains(Note.Link.Columns.from)).deleteAll($0)
+        }
+    }
+}
+
+extension Engine {
     struct NoteWalker: MarkupWalker {
-        var file: String
+        var from: URL
         var context = ""
         var fallback = ""
         var header = ""
@@ -161,8 +154,8 @@ class Engine {
             guard let destination = link.destination,
                   !destination.contains(":"),
                   !destination.contains("//"),
-                  let to = URL(string: destination)?.lastPathComponent else { return }
-            links.append(Note.Link(from: file, to: to, text: context))
+                  let to = URL(string: destination, relativeTo: from) else { return }
+            links.append(Note.Link(from: from.path, to: to.path, text: context))
         }
 
         mutating func visitParagraph(_ paragraph: Paragraph) {

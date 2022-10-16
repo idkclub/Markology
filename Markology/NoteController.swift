@@ -40,7 +40,7 @@ class NoteController: UITableViewController, Bindable {
         }
     }
 
-    @objc private func toggleEdit() {
+    @objc func toggleEdit() {
         edit = !edit
     }
 
