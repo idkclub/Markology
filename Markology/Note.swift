@@ -45,55 +45,6 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
             return try Note.order(Note.Columns.name.asc).fetchAll(db)
         }
     }
-
-    class Cell: UITableViewCell, ConfigCell {        
-        weak var controller: Navigator?
-        lazy var markdown = {
-            let markdown = TextView().pinned(to: contentView)
-            markdown.isScrollEnabled = false
-            markdown.isEditable = false
-            markdown.textContainerInset = .init(top: 15, left: 15, bottom: 15, right: 15)
-            markdown.delegate = self
-            return markdown
-        }()
-        
-        func config(_ controller: Navigator) {
-            self.controller = controller
-        }
-
-        func render(_ text: String) {
-            let doc = Document(parsing: text)
-            var visitor = NoteVisitor()
-            markdown.attributedText = visitor.visit(doc)
-                .setMissing(key: .foregroundColor, value: UIColor.label)
-        }
-    }
-}
-
-// TODO: Dedupe with EditCell.
-extension Note.Cell: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        guard url.host == nil else { return true }
-        guard let relative = (controller?.id?.file ?? "/").use(for: url) else { return false }
-        // TODO: Extract name.
-        controller?.navigate(to: Note.ID(file: relative, name: ""))
-        return false
-    }
-}
-
-protocol Navigator: NSObject {
-    // TODO: Replace with solution for SearchController.
-    var id: Note.ID? { get }
-    func navigate(to id: Note.ID)
-}
-
-extension Navigator where Self: UIViewController {
-    func navigate(to id: Note.ID) {
-        guard let nav = navigationController else { return }
-        let controller = NoteController()
-        controller.id = id
-        nav.show(controller, sender: self)
-    }
 }
 
 extension Note {

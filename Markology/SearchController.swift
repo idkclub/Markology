@@ -2,7 +2,7 @@ import Combine
 import Markdown
 import UIKit
 
-class SearchController: UITableViewController, Bindable {
+class SearchController: UITableViewController, Bindable, Navigator {
     var noteSink: AnyCancellable?
     var notes: [Note] = [] {
         didSet {
@@ -24,11 +24,11 @@ class SearchController: UITableViewController, Bindable {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(Note.Cell.self)
+        tableView.register(NoteCell<Self>.self)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        tableView.render(notes[indexPath.row].text, for: indexPath) as Note.Cell
+        tableView.render(NoteCell.value(for: notes[indexPath.row]), with: self, for: indexPath) as NoteCell
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -114,7 +114,6 @@ extension MenuController: UITableViewDelegate {
         case .notes:
             controller.id = ids[indexPath.row]
         case .new:
-            controller.create = true
             controller.id = Note.ID.generate(for: search.text ?? "")
         }
         split.show(.secondary)

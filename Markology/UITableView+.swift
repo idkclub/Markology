@@ -36,11 +36,10 @@ protocol ConfigCell<Config>: TableCell {
 
 protocol TableCell<Value>: UITableViewCell {
     associatedtype Value
-    static var reuse: String { get }
     func render(_: Value)
 }
 
-extension TableCell {
+private extension TableCell {
     static var reuse: String {
         NSStringFromClass(self)
     }

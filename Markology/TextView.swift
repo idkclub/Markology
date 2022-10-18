@@ -2,8 +2,6 @@ import Markdown
 import UIKit
 
 class TextView: UITextView {
-    weak var controller: NoteController?
-    
     init(frame: CGRect = .infinite) {
         let layoutManager = LayoutManager()
         let textStorage = NSTextStorage()
@@ -18,16 +16,6 @@ class TextView: UITextView {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    // Prevent automatically losing focus due to tableView.reloadData()
-    override var canResignFirstResponder: Bool {
-        if let controller = controller,
-           controller.edit,
-           controller.reloading {
-            return false
-        }
-        return super.canResignFirstResponder
     }
 }
 
