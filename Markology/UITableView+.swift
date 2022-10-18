@@ -1,25 +1,14 @@
 import UIKit
 
 extension UITableView {
-    func register<T: Renderable>(_ renderable: T.Type) {
-        register(T.Cell.self, forCellReuseIdentifier: T.Cell.reuse)
-    }
-
-    func render<T: Renderable>(_ value: T, for indexPath: IndexPath) -> T.Cell {
-        let cell = dequeueReusableCell(withIdentifier: T.Cell.reuse, for: indexPath) as! T.Cell
-        cell.render(value)
-        return cell
-    }
-
-    func render<T: Renderable>(_ value: T, with config: T.Cell.Config, for indexPath: IndexPath) -> T.Cell where T.Cell: ConfigCell {
-        let cell = dequeueReusableCell(withIdentifier: T.Cell.reuse, for: indexPath) as! T.Cell
-        cell.config(config)
-        cell.render(value)
-        return cell
-    }
-
     func register<T: TableCell>(_ cell: T.Type) {
         register(T.self, forCellReuseIdentifier: T.reuse)
+    }
+
+    func render<T: TableCell>(_ value: T.Value, for indexPath: IndexPath) -> T {
+        let cell = dequeueReusableCell(withIdentifier: T.reuse, for: indexPath) as! T
+        cell.render(value)
+        return cell
     }
 
     func render<T: ConfigCell>(_ value: T.Value, with config: T.Config, for indexPath: IndexPath) -> T {
@@ -38,10 +27,6 @@ extension Bindable {
             self?[keyPath: key] = $0
         }
     }
-}
-
-protocol Renderable {
-    associatedtype Cell: TableCell<Self>
 }
 
 protocol ConfigCell<Config>: TableCell {

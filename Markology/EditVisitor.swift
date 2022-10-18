@@ -60,7 +60,7 @@ struct EditVisitor: MarkupVisitor {
         quoting = true
         defer { quoting = false }
         return defaultVisit(blockQuote)
-            .setMissing(key: .verticalRule, value: [NoteView.Indent.quote], range: range)
+            .setMissing(key: .verticalRule, value: [TextView.Indent.quote], range: range)
             .setMissing(key: .foregroundColor, value: UIColor.secondaryLabel, range: range)
             .indent(for: .quote, range: range)
     }

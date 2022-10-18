@@ -2,7 +2,7 @@ import Markdown
 import UIKit
 
 struct NoteVisitor: MarkupVisitor {
-    var indent = [NoteView.Indent]()
+    var indent = [TextView.Indent]()
 
     mutating func block(_ markup: Markdown.Markup) -> NSMutableAttributedString {
         let result = defaultVisit(markup)
@@ -51,18 +51,28 @@ struct NoteVisitor: MarkupVisitor {
 
     mutating func visitListItem(_ listItem: ListItem) -> NSMutableAttributedString {
         let body = block(listItem)
+        let box: String
+        // TODO: Clickable checkboxes.
+        switch listItem.checkbox {
+        case .checked:
+            box = "☑ "
+        case .unchecked:
+            box = "☐ "
+        case .none:
+            box = ""
+        }
         switch listItem.parent {
         case is UnorderedList:
-            return "• "
+            return "• \(box)"
                 .body
                 .appending(body)
         case is OrderedList:
             return "\(listItem.indexInParent + 1). "
                 .body
                 .apply(trait: .traitMonoSpace)
+                .appending(box.body)
                 .appending(body)
         default:
-            // TODO: Checkboxes?
             return body
         }
     }

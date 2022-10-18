@@ -72,7 +72,7 @@ class Engine {
 }
 
 extension Engine: Monitor {
-    func sync(files: [File]) {
+    func sync(files: [Paths.File]) {
         _ = try? db.write {
             let names = files.map { $0.name }
             try Note.filter(!names.contains(Note.Columns.file)).deleteAll($0)
@@ -82,7 +82,7 @@ extension Engine: Monitor {
         update(files: files)
     }
 
-    func update(files: [File]) {
+    func update(files: [Paths.File]) {
         let times = try? db.read { try Note.lastModified(db: $0) }
         var completed: Float = 0.0
         for file in files {
@@ -118,7 +118,7 @@ extension Engine: Monitor {
         }
     }
 
-    func delete(files: [File]) {
+    func delete(files: [Paths.File]) {
         _ = try? db.write {
             let names = files.map { $0.name }
             try Note.filter(names.contains(Note.Columns.file)).deleteAll($0)
@@ -164,5 +164,11 @@ extension Engine {
             guard fallback == "" else { return }
             fallback = context
         }
+    }
+}
+
+extension Paths.File.Name {
+    var url: URL {
+        Engine.paths.locate(file: self).url
     }
 }

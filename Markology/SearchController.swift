@@ -24,11 +24,11 @@ class SearchController: UITableViewController, Bindable {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(Note.self)
+        tableView.register(Note.Cell.self)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        tableView.render(notes[indexPath.row], for: indexPath)
+        tableView.render(notes[indexPath.row].text, for: indexPath) as Note.Cell
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

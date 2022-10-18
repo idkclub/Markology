@@ -24,6 +24,10 @@ class Paths {
         reset()
     }
 
+    func locate(file: File.Name) -> File {
+        File(in: documents, named: file)
+    }
+
     // TODO: Monitor changes.
     var icloudAvailable: Bool {
         FileManager.default.ubiquityIdentityToken != nil
@@ -123,25 +127,39 @@ class Paths {
     }
 }
 
-struct File {
-    let url: URL
-    let name: String
+extension Paths {
+    struct File {
+        typealias Name = String
+        let url: URL
+        let name: Name
 
-    init?(in container: URL, from item: NSMetadataItem) {
-        guard let url = item.value(forAttribute: NSMetadataItemURLKey) as? URL else { return nil }
-        self.url = url.resolvingSymlinksInPath()
-        name = String(self.url.path.dropFirst(container.path.count))
+        fileprivate init(in container: URL, named: Name) {
+            url = container.appendingPathComponent(named).standardizedFileURL
+            name = named
+        }
+
+        fileprivate init?(in container: URL, from item: NSMetadataItem) {
+            guard let url = item.value(forAttribute: NSMetadataItemURLKey) as? URL else { return nil }
+            self.url = url.resolvingSymlinksInPath()
+            name = String(self.url.path.dropFirst(container.path.count))
+        }
+
+        fileprivate init?(in container: URL, at url: Any) {
+            guard let url = url as? URL else { return nil }
+            self.url = url.resolvingSymlinksInPath()
+            name = String(self.url.path.dropFirst(container.path.count))
+        }
     }
+}
 
-    init?(in container: URL, at url: Any) {
-        guard let url = url as? URL else { return nil }
-        self.url = url.resolvingSymlinksInPath()
-        name = String(self.url.path.dropFirst(container.path.count))
+extension Paths.File.Name {
+    func use(for url: URL) -> Self? {
+        URL(string: url.path, relativeTo: URL(string: self))?.path.removingPercentEncoding
     }
 }
 
 protocol Monitor {
-    func sync(files: [File])
-    func update(files: [File])
-    func delete(files: [File])
+    func sync(files: [Paths.File])
+    func update(files: [Paths.File])
+    func delete(files: [Paths.File])
 }

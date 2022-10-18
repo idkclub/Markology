@@ -57,7 +57,7 @@ extension NSMutableAttributedString {
         appending(NSAttributedString(string: "\n"))
     }
 
-    func indent(for type: NoteView.Indent, range: NSRange? = nil) -> Self {
+    func indent(for type: TextView.Indent, range: NSRange? = nil) -> Self {
         // NOTE: This is used to avoid region collapse causing double indents.
         var processed = 0
         enumerateAttribute(.paragraphStyle, in: range ?? self.range) { value, range, _ in

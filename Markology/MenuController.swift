@@ -2,14 +2,27 @@ import Combine
 import UIKit
 
 class MenuController: UIViewController, Bindable {
+    enum Section {
+        case notes, new
+    }
+
     let table = UITableView()
+    let search = UISearchBar()
+    var sections: [Section] = []
     var progressSink: AnyCancellable?
     var searchSink: AnyCancellable?
     var query: String = ""
     var ids: [Note.ID] = [] {
-        didSet {
-            table.reloadData()
+        didSet { reload() }
+    }
+
+    func reload() {
+        sections = []
+        if ids.count > 0 {
+            sections.append(.notes)
         }
+        sections.append(.new)
+        table.reloadData()
     }
 
     override func viewDidLoad() {
@@ -17,7 +30,6 @@ class MenuController: UIViewController, Bindable {
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings))
 
-        let search = UISearchBar()
         search.placeholder = "Search or Create"
         search.enablesReturnKeyAutomatically = false
         search.searchBarStyle = .minimal
@@ -29,9 +41,10 @@ class MenuController: UIViewController, Bindable {
             progress.progress = $0
         }
 
+        table.keyboardDismissMode = .onDrag
         table.dataSource = self
         table.delegate = self
-        table.register(Note.ID.self)
+        table.register(Note.ID.Cell.self)
 
         let stack = UIStackView(arrangedSubviews: [search, progress, table])
             .pinned(to: view)
@@ -59,16 +72,35 @@ extension MenuController: UISearchBarDelegate {
 }
 
 extension MenuController: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        sections.count
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        ids.count
+        switch sections[section] {
+        case .notes:
+            return ids.count
+        case .new:
+            return 1
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        tableView.render(ids[indexPath.row], for: indexPath)
+        switch sections[indexPath.section] {
+        case .notes:
+            return tableView.render(ids[indexPath.row].name, for: indexPath) as Note.ID.Cell
+        case .new:
+            return tableView.render(search.text ?? "", for: indexPath) as Note.ID.Cell
+        }
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        "Recent"
+        switch sections[section] {
+        case .notes:
+            return "Recent"
+        case .new:
+            return "New"
+        }
     }
 }
 
@@ -78,7 +110,13 @@ extension MenuController: UITableViewDelegate {
               let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
         let controller = NoteController()
         nav.viewControllers = [controller]
-        controller.id = ids[indexPath.row]
+        switch sections[indexPath.section] {
+        case .notes:
+            controller.id = ids[indexPath.row]
+        case .new:
+            controller.create = true
+            controller.id = Note.ID.generate(for: search.text ?? "")
+        }
         split.show(.secondary)
     }
 }

@@ -1,7 +1,9 @@
 import Markdown
 import UIKit
 
-class NoteView: UITextView {
+class TextView: UITextView {
+    weak var controller: NoteController?
+    
     init(frame: CGRect = .infinite) {
         let layoutManager = LayoutManager()
         let textStorage = NSTextStorage()
@@ -17,9 +19,19 @@ class NoteView: UITextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // Prevent automatically losing focus due to tableView.reloadData()
+    override var canResignFirstResponder: Bool {
+        if let controller = controller,
+           controller.edit,
+           controller.reloading {
+            return false
+        }
+        return super.canResignFirstResponder
+    }
 }
 
-extension NoteView {
+extension TextView {
     class LayoutManager: NSLayoutManager {
         override func drawGlyphs(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
             super.drawGlyphs(forGlyphRange: glyphsToShow, at: origin)

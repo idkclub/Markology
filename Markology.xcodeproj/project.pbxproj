@@ -23,7 +23,7 @@
 		4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770528F5008C00DAEF80 /* NoteController.swift */; };
 		4E77770828F500C600DAEF80 /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770728F500C600DAEF80 /* UIView+.swift */; };
 		4E77771028F5350A00DAEF80 /* UITableView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770F28F5350A00DAEF80 /* UITableView+.swift */; };
-		4E77771228F6237800DAEF80 /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771128F6237800DAEF80 /* NoteView.swift */; };
+		4E77771228F6237800DAEF80 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771128F6237800DAEF80 /* TextView.swift */; };
 		4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; };
 		4E77771C28F7330600DAEF80 /* GRDB-dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4E77771E28F74AC100DAEF80 /* UIColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771D28F74AC100DAEF80 /* UIColor+.swift */; };
@@ -62,7 +62,7 @@
 		4E77770528F5008C00DAEF80 /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
 		4E77770728F500C600DAEF80 /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
 		4E77770F28F5350A00DAEF80 /* UITableView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+.swift"; sourceTree = "<group>"; };
-		4E77771128F6237800DAEF80 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
+		4E77771128F6237800DAEF80 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		4E77771D28F74AC100DAEF80 /* UIColor+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+.swift"; sourceTree = "<group>"; };
 		4E77771F28F9B42000DAEF80 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -108,12 +108,12 @@
 				4E77770328F486E900DAEF80 /* MenuController.swift */,
 				4E77770128F481F700DAEF80 /* Note.swift */,
 				4E77770528F5008C00DAEF80 /* NoteController.swift */,
-				4E77771128F6237800DAEF80 /* NoteView.swift */,
 				4E4583C028FA8ABD00C617BE /* NoteVisitor.swift */,
 				4E4583C528FBB93800C617BE /* Paths.swift */,
 				4E77771F28F9B42000DAEF80 /* SearchController.swift */,
 				4E4583C728FBC1CA00C617BE /* SettingsController.swift */,
 				4E4583BA28FA88CB00C617BE /* String+.swift */,
+				4E77771128F6237800DAEF80 /* TextView.swift */,
 				4E77771D28F74AC100DAEF80 /* UIColor+.swift */,
 				4E77770F28F5350A00DAEF80 /* UITableView+.swift */,
 				4E77770728F500C600DAEF80 /* UIView+.swift */,
@@ -204,7 +204,7 @@
 				4E77770828F500C600DAEF80 /* UIView+.swift in Sources */,
 				4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */,
 				4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */,
-				4E77771228F6237800DAEF80 /* NoteView.swift in Sources */,
+				4E77771228F6237800DAEF80 /* TextView.swift in Sources */,
 				4E77770428F486E900DAEF80 /* MenuController.swift in Sources */,
 				4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */,
 				4E4583C628FBB93800C617BE /* Paths.swift in Sources */,

@@ -2,7 +2,7 @@ import GRDB
 import Markdown
 import UIKit
 
-struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable {
+struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     enum Columns {
         static let file = Column(CodingKeys.file)
         static let name = Column(CodingKeys.name)
@@ -13,7 +13,7 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
     static let from = hasMany(Link.self, using: Link.toKey).forKey("fromLink")
     static let to = hasMany(Link.self, using: Link.fromKey).forKey("toLink")
 
-    let file: String
+    let file: Paths.File.Name
     let name: String
     let text: String
     let modified: Date
@@ -21,7 +21,7 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
     static func lastModified(db: Database) throws -> [String: Date] {
         struct File: Codable, FetchableRecord {
             static let query = Note.select(Note.Columns.file, Note.Columns.modified)
-            let file: String
+            let file: Paths.File.Name
             let modified: Date
         }
 
@@ -46,21 +46,53 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord, Renderable 
         }
     }
 
-    class Cell: UITableViewCell, TableCell {
+    class Cell: UITableViewCell, ConfigCell {        
+        weak var controller: Navigator?
         lazy var markdown = {
-            let markdown = NoteView().pinned(to: contentView)
+            let markdown = TextView().pinned(to: contentView)
             markdown.isScrollEnabled = false
             markdown.isEditable = false
             markdown.textContainerInset = .init(top: 15, left: 15, bottom: 15, right: 15)
+            markdown.delegate = self
             return markdown
         }()
+        
+        func config(_ controller: Navigator) {
+            self.controller = controller
+        }
 
-        func render(_ note: Note) {
-            let doc = Document(parsing: note.text)
+        func render(_ text: String) {
+            let doc = Document(parsing: text)
             var visitor = NoteVisitor()
             markdown.attributedText = visitor.visit(doc)
                 .setMissing(key: .foregroundColor, value: UIColor.label)
         }
+    }
+}
+
+// TODO: Dedupe with EditCell.
+extension Note.Cell: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        guard url.host == nil else { return true }
+        guard let relative = (controller?.id?.file ?? "/").use(for: url) else { return false }
+        // TODO: Extract name.
+        controller?.navigate(to: Note.ID(file: relative, name: ""))
+        return false
+    }
+}
+
+protocol Navigator: NSObject {
+    // TODO: Replace with solution for SearchController.
+    var id: Note.ID? { get }
+    func navigate(to id: Note.ID)
+}
+
+extension Navigator where Self: UIViewController {
+    func navigate(to id: Note.ID) {
+        guard let nav = navigationController else { return }
+        let controller = NoteController()
+        controller.id = id
+        nav.show(controller, sender: self)
     }
 }
 
@@ -94,7 +126,7 @@ extension Note {
             }
         }
 
-        struct Link: Codable, Equatable, Renderable {
+        struct Link: Codable, Equatable {
             let text: String
             let note: ID
 
@@ -121,11 +153,15 @@ extension Note {
 }
 
 extension Note {
-    struct ID: Codable, Equatable, FetchableRecord, Renderable {
+    struct ID: Codable, Equatable, FetchableRecord {
         static let query = Note.select(Note.Columns.file, Note.Columns.name)
 
-        let file: String
+        let file: Paths.File.Name
         let name: String
+
+        static func generate(for name: String) -> ID {
+            ID(file: "/\(Int(Date().timeIntervalSince1970).description).md", name: name)
+        }
 
         struct Search: Query {
             let text: String
@@ -145,9 +181,14 @@ extension Note {
         }
 
         class Cell: UITableViewCell, TableCell {
-            func render(_ id: ID) {
+            func render(_ text: String) {
                 var content = defaultContentConfiguration()
-                content.text = id.name
+                if text == "" {
+                    content.text = "Empty Note"
+                    content.textProperties.color = .placeholderText
+                } else {
+                    content.text = text
+                }
                 contentConfiguration = content
             }
         }
