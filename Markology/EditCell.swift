@@ -26,12 +26,16 @@ class EditCell: NoteCell<NoteController> {
         let line = body.lineRange(for: indexRange)
         var prefix = ""
         var empty = true
-        loop:
-            for (index, char) in body[line].enumerated() {
+        var dashCount = 0
+        loop: for (index, char) in body[line].enumerated() {
             switch char {
-            case " ", ">":
+            case " ":
                 prefix.append(char)
+            case ">":
+                prefix.append(char)
+                dashCount = 0
             case "-":
+                dashCount += 1
                 if prefix.contains(">") {
                     prefix.append(char)
                     continue
@@ -44,20 +48,25 @@ class EditCell: NoteCell<NoteController> {
                 break loop
             }
         }
+        guard dashCount < 3 else { return true }
         if prefix != "" {
             dirty = true
-            let text = textView.attributedText.mutableCopy() as! NSMutableAttributedString
-            let selected: NSRange
+            let replace: String
+            let selected: Int
+            let uiRange: UITextRange?
             if empty {
-                let range = NSRange(line.lowerBound.utf16Offset(in: body) ..< line.upperBound.utf16Offset(in: body))
-                text.replaceCharacters(in: range, with: "\n\n")
-                selected = NSRange(location: range.lowerBound + 1, length: 0)
+                let range = NSRange(line, in: body)
+                replace = line.upperBound == body.endIndex ? "\n" : "\n\n"
+                selected = range.lowerBound + 1
+                uiRange = textView.range(for: range)
             } else {
-                text.replaceCharacters(in: range, with: "\n\(prefix)")
-                selected = NSRange(location: range.upperBound + 1 + prefix.count, length: 0)
+                replace = "\n\(prefix)"
+                selected = range.upperBound + 1 + prefix.count
+                uiRange = textView.range(for: range)
             }
-            textView.attributedText = text
-            textView.selectedRange = selected
+            guard let uiRange = uiRange else { return true }
+            textView.replace(uiRange, withText: replace)
+            textView.selectedRange = NSRange(location: selected, length: 0)
             textViewDidChange(textView)
             return false
         }
