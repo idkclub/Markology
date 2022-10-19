@@ -1,22 +1,14 @@
 import Markdown
 import UIKit
 
-class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate, ConfigCell {
-    struct Value {
-        let file: Paths.File.Name
-        let text: String
-    }
-
-    static func value(for note: Note) -> Value {
-        return Value(file: note.file, text: note.text)
-    }
-
+class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
     weak var controller: N?
     lazy var markdown = {
         let markdown = TextView().pinned(to: contentView)
         markdown.isScrollEnabled = false
         markdown.isEditable = false
         markdown.textContainerInset = .init(top: 15, left: 15, bottom: 15, right: 15)
+        markdown.dataDetectorTypes = .all
         markdown.delegate = self
         return markdown
     }()
@@ -25,11 +17,6 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate, ConfigCell {
 
     func config(_ controller: N) {
         self.controller = controller
-    }
-
-    func render(_ value: Value) {
-        file = value.file
-        render(value.text)
     }
 
     func render(_ text: String) {
@@ -43,20 +30,38 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate, ConfigCell {
         guard url.host == nil else { return true }
         guard let relative = file.use(for: url) else { return false }
         var name = ""
-        if let start = textView.position(from: textView.beginningOfDocument, offset: characterRange.location),
-           let end = textView.position(from: start, offset: characterRange.length),
-           let range = textView.textRange(from: start, to: end),
+        if let range = textView.range(for: characterRange),
            let text = textView.text(in: range)
         {
             name = self.name(from: text)
         }
-        // TODO: Extract name.
         controller?.navigate(to: Note.ID(file: relative, name: name))
         return false
     }
 
     func name(from text: String) -> String {
         text
+    }
+
+    // TODO: Remove this if possible without breaking EditCell (or file bug?).
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        true
+    }
+}
+
+extension NoteCell: ConfigCell {
+    struct Value {
+        let file: Paths.File.Name
+        let text: String
+    }
+
+    static func value(for note: Note) -> Value {
+        return Value(file: note.file, text: note.text)
+    }
+
+    func render(_ value: Value) {
+        file = value.file
+        render(value.text)
     }
 }
 

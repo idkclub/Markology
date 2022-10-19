@@ -13,3 +13,12 @@ extension UIView {
         return self
     }
 }
+
+extension UITextView {
+    func range(for range: NSRange) -> UITextRange? {
+        guard let start = position(from: beginningOfDocument, offset: range.location),
+              let end = position(from: start, offset: range.length),
+              let range = textRange(from: start, to: end) else { return nil }
+        return range
+    }
+}

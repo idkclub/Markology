@@ -53,16 +53,18 @@ struct EditVisitor: MarkupVisitor {
             .adding(key: .foregroundColor, value: link.color, range: range)
     }
 
-    var quoting = false
-
+    var quoteLevel = 0
     mutating func visitBlockQuote(_ blockQuote: BlockQuote) -> NSMutableAttributedString {
         guard let range = range(for: blockQuote) else { return text }
-        quoting = true
-        defer { quoting = false }
-        return defaultVisit(blockQuote)
+        quoteLevel += 1
+        let quoted = defaultVisit(blockQuote)
             .setMissing(key: .verticalRule, value: [TextView.Indent.quote], range: range)
             .setMissing(key: .foregroundColor, value: UIColor.secondaryLabel, range: range)
-            .indent(for: .quote, range: range)
+        quoteLevel -= 1
+        if quoteLevel > 0 {
+            return quoted
+        }
+        return quoted.indent(for: .quote, range: range)
     }
 
     mutating func visitStrong(_ strong: Strong) -> NSMutableAttributedString {

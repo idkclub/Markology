@@ -3,7 +3,7 @@ import Markdown
 import UIKit
 
 class NoteController: UITableViewController, Bindable {
-    private enum Section {
+    private enum Section: Equatable {
         case note, edit
         case from(Int), to(Int)
 
@@ -26,7 +26,7 @@ class NoteController: UITableViewController, Bindable {
 
     private lazy var menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
 
-    private(set) var edit = false
+    var edit = false
     @objc func toggleEdit() {
         edit = !edit
         reload()
@@ -140,9 +140,9 @@ class NoteController: UITableViewController, Bindable {
                 } else if section.count < last[index].count {
                     self.tableView.deleteRows(at: (section.count ..< last[index].count).map { IndexPath(row: $0, section: index) }, with: .automatic)
                 }
-                if case .edit = section, case .edit = last[index] {
-                    // Avoid edit -> edit reload to keep first responder.
-                } else {
+                if section != last[index] {
+                    self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .fade)
+                } else if section != .edit {
                     self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .none)
                 }
             }

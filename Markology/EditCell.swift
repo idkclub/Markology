@@ -18,6 +18,53 @@ class EditCell: NoteCell<NoteController> {
         markdown.becomeFirstResponder()
     }
 
+    // TODO: Handle tab/shift-tab for indentation?
+    override func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        guard let body = textView.text,
+              text == "\n",
+              let indexRange = Range(range, in: body) else { return true }
+        let line = body.lineRange(for: indexRange)
+        var prefix = ""
+        var empty = true
+        loop:
+            for (index, char) in body[line].enumerated() {
+            switch char {
+            case " ", ">":
+                prefix.append(char)
+            case "-":
+                if prefix.contains(">") {
+                    prefix.append(char)
+                    continue
+                }
+                prefix = "\(String(repeating: " ", count: index))-"
+            case "\n":
+                break loop
+            default:
+                empty = false
+                break loop
+            }
+        }
+        if prefix != "" {
+            dirty = true
+            let text = textView.attributedText.mutableCopy() as! NSMutableAttributedString
+            let selected: NSRange
+            if empty {
+                let range = NSRange(line.lowerBound.utf16Offset(in: body) ..< line.upperBound.utf16Offset(in: body))
+                text.replaceCharacters(in: range, with: "\n\n")
+                selected = NSRange(location: range.lowerBound + 1, length: 0)
+            } else {
+                text.replaceCharacters(in: range, with: "\n\(prefix)")
+                selected = NSRange(location: range.upperBound + 1 + prefix.count, length: 0)
+            }
+            textView.attributedText = text
+            textView.selectedRange = selected
+            textViewDidChange(textView)
+            return false
+        }
+        return true
+    }
+
+    // @objc seems to be required: https://github.com/apple/swift/issues/45421
     @objc func textViewDidChange(_ textView: UITextView) {
         dirty = true
         let select = textView.selectedRange
