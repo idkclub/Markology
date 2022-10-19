@@ -14,8 +14,10 @@ class SettingsController: UIViewController {
         let label = UILabel()
         label.text = "Use iCloud"
         let enable = UIStackView(arrangedSubviews: [label, toggle])
-        busySink = Engine.paths.busy.sink {
-            toggle.isEnabled = Engine.paths.icloudAvailable && !$0
+        busySink = Engine.paths.busy.sink { busy in
+            DispatchQueue.main.async {
+                toggle.isEnabled = Engine.paths.icloudAvailable && !busy
+            }
         }
 
         let progress = UIProgressView(progressViewStyle: .bar)
