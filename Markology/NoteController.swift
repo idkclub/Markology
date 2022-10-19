@@ -41,11 +41,13 @@ class NoteController: UITableViewController, Bindable {
                 document = nil
             }
             guard let id = id else {
-                guard let nav = navigationController else { return }
+                guard let split = splitViewController,
+                      let nav = navigationController else { return }
                 if nav.viewControllers.count > 1 {
                     nav.popViewController(animated: true)
                 } else {
                     nav.viewControllers = [NoteController()]
+                    split.show(.primary)
                 }
                 return
             }
