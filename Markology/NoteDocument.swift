@@ -20,11 +20,4 @@ class NoteDocument: UIDocument {
         // TODO: Handle error.
         text.data(using: .utf8)!
     }
-
-    override func savePresentedItemChanges() async throws {
-        try await super.savePresentedItemChanges()
-        Task.detached {
-            await Engine.shared.update(files: [Engine.paths.locate(file: self.name)])
-        }
-    }
 }

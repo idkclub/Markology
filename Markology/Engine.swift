@@ -73,7 +73,7 @@ class Engine {
 
 extension Engine: Monitor {
     func sync(files: [Paths.File]) {
-        _ = try? db.write {
+        try? db.write {
             let names = files.map { $0.name }
             try Note.filter(!names.contains(Note.Columns.file)).deleteAll($0)
             // TODO: Remove if foreign keys enabled.
@@ -103,27 +103,31 @@ extension Engine: Monitor {
                 let coordinator = NSFileCoordinator()
                 var error: NSError?
                 coordinator.coordinate(readingItemAt: file.url, error: &error) {
-                    guard let text = try? String(contentsOf: $0).replacingOccurrences(of: "\r\n", with: "\n"),
-                          let from = URL(string: file.name) else { return }
-                    let doc = Document(parsing: text)
-                    var walk = NoteWalker(from: from)
-                    walk.visit(doc)
-                    _ = try? db.write { db in
-                        try Note.Link.filter(Note.Link.Columns.from == file.name).deleteAll(db)
-                        try Note(file: file.name, name: walk.name, text: text, modified: modified).save(db)
-                        try walk.links.forEach { try $0.save(db) }
-                    }
+                    guard let text = try? String(contentsOf: $0).replacingOccurrences(of: "\r\n", with: "\n") else { return }
+                    update(file: file.name, with: text, at: modified)
                 }
             }
         }
     }
 
     func delete(files: [Paths.File]) {
-        _ = try? db.write {
+        try? db.write {
             let names = files.map { $0.name }
             try Note.filter(names.contains(Note.Columns.file)).deleteAll($0)
             // TODO: Remove if foreign keys enabled.
             try Note.Link.filter(names.contains(Note.Link.Columns.from)).deleteAll($0)
+        }
+    }
+
+    func update(file name: Paths.File.Name, with text: String, at modified: Date = Date()) {
+        guard let from = URL(string: name) else { return }
+        let doc = Document(parsing: text)
+        var walk = NoteWalker(from: from)
+        walk.visit(doc)
+        try! db.write { db in
+            try Note.Link.filter(Note.Link.Columns.from == name).deleteAll(db)
+            try Note(file: name, name: walk.name, text: text, modified: modified).save(db)
+            try walk.links.forEach { try $0.save(db) }
         }
     }
 }

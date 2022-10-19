@@ -28,6 +28,9 @@ class NoteController: UITableViewController, Bindable {
 
     var edit = false
     @objc func toggleEdit() {
+        if edit {
+            sync()
+        }
         edit = !edit
         reload()
     }
@@ -72,6 +75,7 @@ class NoteController: UITableViewController, Bindable {
             })
             self?.present(confirm, animated: true)
         })
+        menu.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         menu.modalPresentationStyle = .popover
         menu.popoverPresentationController?.barButtonItem = menuButton
         present(menu, animated: true)
@@ -85,11 +89,17 @@ class NoteController: UITableViewController, Bindable {
         tableView.register(Note.Entry.Link.Cell.self)
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        guard let document = document,
-              document.hasUnsavedChanges else { return }
-        Task.detached {
-            try await document.savePresentedItemChanges()
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        sync()
+    }
+
+    private func sync() {
+        if let id = id,
+           let document = document,
+           document.hasUnsavedChanges
+        {
+            Engine.shared.update(file: id.file, with: text)
         }
     }
 
@@ -104,12 +114,10 @@ class NoteController: UITableViewController, Bindable {
                     guard await document.open() else { return }
                 } else {
                     try? FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-                    document.text = "# \(id.name)"
+                    document.text = id.name == "" ? "" : "# \(id.name)\n\n"
                     guard await document.save(to: document.fileURL, for: .forCreating) else { return }
                 }
                 self.document = document
-            } else {
-                try await document?.savePresentedItemChanges()
             }
             var sections: [Section] = [edit ? .edit : .note]
             if let count = entry?.from.count, count > 0 {
@@ -164,10 +172,8 @@ class NoteController: UITableViewController, Bindable {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard let entry = entry else { return nil }
         switch sections[section] {
-        case .edit:
-            return "Last Saved \(date.string(from: entry.note.modified))"
-        case .note:
-            return "Last Modified \(date.string(from: entry.note.modified))"
+        case .edit, .note:
+            return "Last Updated \(date.string(from: entry.note.modified))"
         case .from:
             return "Linked From"
         case .to:
