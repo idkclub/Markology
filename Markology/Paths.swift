@@ -153,8 +153,9 @@ extension Paths {
 }
 
 extension Paths.File.Name {
-    func use(for url: URL) -> Self? {
-        URL(string: url.path, relativeTo: URL(string: self))?.path.removingPercentEncoding
+    func use(for destination: Paths.File.Name) -> Self? {
+        guard let path = destination.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
+        return URL(string: path, relativeTo: URL(string: self))?.path
     }
 }
 

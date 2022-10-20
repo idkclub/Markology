@@ -10,9 +10,10 @@ protocol Query {
 
 @dynamicMemberLookup
 class Engine {
+    static let bundle = Bundle.main.bundleIdentifier!
     static let shared = try! Engine()
     let progress = CurrentValueSubject<Float, Never>(1)
-    let paths = Paths(for: "club.idk.Markology")
+    let paths = Paths(for: bundle)
     private let db: DatabaseWriter
     init() throws {
         let cache = try FileManager.default.url(
@@ -20,7 +21,7 @@ class Engine {
             in: .userDomainMask,
             appropriateFor: nil,
             create: true
-        ).appendingPathComponent("club.idk.note.db")
+        ).appendingPathComponent("note.db")
         var config = Configuration()
         config.foreignKeysEnabled = false
         db = try DatabasePool(path: cache.path, configuration: config)
@@ -100,9 +101,8 @@ extension Engine: Monitor {
             if let last = times?[file.name],
                Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
             if file.url.pathExtension == "md" {
-                let coordinator = NSFileCoordinator()
                 var error: NSError?
-                coordinator.coordinate(readingItemAt: file.url, error: &error) {
+                NSFileCoordinator().coordinate(readingItemAt: file.url, error: &error) {
                     guard let text = try? String(contentsOf: $0).replacingOccurrences(of: "\r\n", with: "\n") else { return }
                     update(file: file.name, with: text, at: modified)
                 }
@@ -120,9 +120,8 @@ extension Engine: Monitor {
     }
 
     func update(file name: Paths.File.Name, with text: String, at modified: Date = Date()) {
-        guard let from = URL(string: name) else { return }
         let doc = Document(parsing: text)
-        var walk = NoteWalker(from: from)
+        var walk = NoteWalker(from: name)
         walk.visit(doc)
         try! db.write { db in
             try Note.Link.filter(Note.Link.Columns.from == name).deleteAll(db)
@@ -134,7 +133,7 @@ extension Engine: Monitor {
 
 extension Engine {
     struct NoteWalker: MarkupWalker {
-        var from: URL
+        var from: Paths.File.Name
         var context = ""
         var fallback = ""
         var header = ""
@@ -156,10 +155,9 @@ extension Engine {
 
         mutating func visitLink(_ link: Markdown.Link) {
             guard let destination = link.destination,
-                  !destination.contains(":"),
-                  !destination.contains("//"),
-                  let to = URL(string: destination, relativeTo: from) else { return }
-            links.append(Note.Link(from: from.path, to: to.path, text: context))
+                  !link.absolute,
+                  let to = from.use(for: destination) else { return }
+            links.append(Note.Link(from: from, to: to, text: context))
         }
 
         mutating func visitParagraph(_ paragraph: Paragraph) {

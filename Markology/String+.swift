@@ -102,15 +102,3 @@ extension NSMutableAttributedString {
         return self
     }
 }
-
-extension UIFont {
-    func apply(trait: UIFontDescriptor.SymbolicTraits? = nil, size: CGFloat? = nil) -> UIFont {
-        var font = fontDescriptor
-        var traits = font.symbolicTraits
-        if let trait = trait {
-            traits.insert(trait)
-            font = fontDescriptor.withSymbolicTraits(traits) ?? font
-        }
-        return UIFont(descriptor: font, size: size ?? pointSize)
-    }
-}

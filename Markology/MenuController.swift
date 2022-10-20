@@ -6,8 +6,6 @@ class MenuController: UIViewController, Bindable {
         case notes, new
     }
 
-    let table = UITableView()
-    let search = UISearchBar()
     var sections: [Section] = []
     var progressSink: AnyCancellable?
     var searchSink: AnyCancellable?
@@ -15,6 +13,24 @@ class MenuController: UIViewController, Bindable {
     var ids: [Note.ID] = [] {
         didSet { reload() }
     }
+
+    lazy var search: UISearchBar = {
+        let search = UISearchBar()
+        search.placeholder = "Search or Create"
+        search.enablesReturnKeyAutomatically = false
+        search.searchBarStyle = .minimal
+        search.delegate = self
+        return search
+    }()
+
+    lazy var table: UITableView = {
+        let table = UITableView()
+        table.keyboardDismissMode = .onDrag
+        table.dataSource = self
+        table.delegate = self
+        table.register(Note.ID.Cell.self)
+        return table
+    }()
 
     func reload() {
         sections = []
@@ -30,21 +46,12 @@ class MenuController: UIViewController, Bindable {
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings))
 
-        search.placeholder = "Search or Create"
-        search.enablesReturnKeyAutomatically = false
-        search.searchBarStyle = .minimal
-        search.delegate = self
         searchSink = Engine.subscribe(with(\.ids), to: Note.ID.Search(text: ""))
 
         let progress = UIProgressView(progressViewStyle: .bar)
         progressSink = Engine.progress.sink {
             progress.progress = $0
         }
-
-        table.keyboardDismissMode = .onDrag
-        table.dataSource = self
-        table.delegate = self
-        table.register(Note.ID.Cell.self)
 
         let stack = UIStackView(arrangedSubviews: [search, progress, table])
             .pinned(to: view)

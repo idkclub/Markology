@@ -1,5 +1,23 @@
 import UIKit
 
+extension UIColor {
+    static let idkCyan = UIColor(red: 0.00, green: 0.58, blue: 0.83, alpha: 1.00)
+    static let idkMagenta = UIColor(red: 0.80, green: 0.00, blue: 0.42, alpha: 1.00)
+    static let idkYellow = UIColor(named: "Highlight")!
+}
+
+extension UIFont {
+    func apply(trait: UIFontDescriptor.SymbolicTraits? = nil, size: CGFloat? = nil) -> UIFont {
+        var font = fontDescriptor
+        var traits = font.symbolicTraits
+        if let trait = trait {
+            traits.insert(trait)
+            font = fontDescriptor.withSymbolicTraits(traits) ?? font
+        }
+        return UIFont(descriptor: font, size: size ?? pointSize)
+    }
+}
+
 extension UIView {
     func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true) -> Self {
         view.addSubview(self)
@@ -24,6 +42,10 @@ extension UITextView {
               let range = textRange(from: start, to: end) else { return nil }
         return range
     }
+}
+
+extension UIEdgeInsets {
+    static var padded = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
 }
 
 extension UITableView {

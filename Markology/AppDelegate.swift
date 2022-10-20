@@ -37,7 +37,7 @@ class SceneDelegate: NSObject, UISceneDelegate {
         guard let split = window?.rootViewController as? SplitController,
               let note = split.history.viewControllers.last as? NoteController,
               let id = note.id else { return nil }
-        let activity = NSUserActivity(activityType: "club.idk.Markology.Note")
+        let activity = NSUserActivity(activityType: "\(Engine.bundle).Note")
         activity.isEligibleForHandoff = true
         activity.title = note.title
         activity.userInfo?["file"] = id.file
@@ -77,9 +77,9 @@ class EmptyController: UIViewController {
         view.backgroundColor = .systemBackground
         title = "Welcome"
         let text = UITextView().pinned(to: view)
+        text.textContainerInset = .padded
         text.text = "Select or create a new note on the sidebar to get started."
         text.font = UIFont.preferredFont(forTextStyle: .body)
         text.textColor = .secondaryLabel
-        text.textContainerInset = .init(top: 15, left: 15, bottom: 15, right: 15)
     }
 }

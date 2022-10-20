@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4E4583BB28FA88CB00C617BE /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BA28FA88CB00C617BE /* String+.swift */; };
-		4E4583BD28FA899100C617BE /* Markup+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BC28FA899100C617BE /* Markup+.swift */; };
+		4E4583BD28FA899100C617BE /* Markdown+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BC28FA899100C617BE /* Markdown+.swift */; };
 		4E4583BF28FA8A4000C617BE /* EditVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BE28FA8A4000C617BE /* EditVisitor.swift */; };
 		4E4583C128FA8ABD00C617BE /* NoteVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C028FA8ABD00C617BE /* NoteVisitor.swift */; };
 		4E4583C328FA8EA700C617BE /* EditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C228FA8EA700C617BE /* EditCell.swift */; };
@@ -23,11 +23,10 @@
 		4E77770228F481F700DAEF80 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770128F481F700DAEF80 /* Note.swift */; };
 		4E77770428F486E900DAEF80 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770328F486E900DAEF80 /* MenuController.swift */; };
 		4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770528F5008C00DAEF80 /* NoteController.swift */; };
-		4E77770828F500C600DAEF80 /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770728F500C600DAEF80 /* UIView+.swift */; };
+		4E77770828F500C600DAEF80 /* UIKit+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770728F500C600DAEF80 /* UIKit+.swift */; };
 		4E77771228F6237800DAEF80 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771128F6237800DAEF80 /* TextView.swift */; };
 		4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; };
 		4E77771C28F7330600DAEF80 /* GRDB-dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		4E77771E28F74AC100DAEF80 /* UIColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771D28F74AC100DAEF80 /* UIColor+.swift */; };
 		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,7 +46,7 @@
 
 /* Begin PBXFileReference section */
 		4E4583BA28FA88CB00C617BE /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
-		4E4583BC28FA899100C617BE /* Markup+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Markup+.swift"; sourceTree = "<group>"; };
+		4E4583BC28FA899100C617BE /* Markdown+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Markdown+.swift"; sourceTree = "<group>"; };
 		4E4583BE28FA8A4000C617BE /* EditVisitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditVisitor.swift; sourceTree = "<group>"; };
 		4E4583C028FA8ABD00C617BE /* NoteVisitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteVisitor.swift; sourceTree = "<group>"; };
 		4E4583C228FA8EA700C617BE /* EditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCell.swift; sourceTree = "<group>"; };
@@ -63,9 +62,8 @@
 		4E77770128F481F700DAEF80 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		4E77770328F486E900DAEF80 /* MenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		4E77770528F5008C00DAEF80 /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
-		4E77770728F500C600DAEF80 /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
+		4E77770728F500C600DAEF80 /* UIKit+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit+.swift"; sourceTree = "<group>"; };
 		4E77771128F6237800DAEF80 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
-		4E77771D28F74AC100DAEF80 /* UIColor+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+.swift"; sourceTree = "<group>"; };
 		4E77771F28F9B42000DAEF80 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -106,7 +104,7 @@
 				4E4583C228FA8EA700C617BE /* EditCell.swift */,
 				4E4583BE28FA8A4000C617BE /* EditVisitor.swift */,
 				4E7776F728F47D0700DAEF80 /* Engine.swift */,
-				4E4583BC28FA899100C617BE /* Markup+.swift */,
+				4E4583BC28FA899100C617BE /* Markdown+.swift */,
 				4E77770328F486E900DAEF80 /* MenuController.swift */,
 				4E77770128F481F700DAEF80 /* Note.swift */,
 				4E6A3A6928FF1082005CCE32 /* NoteCell.swift */,
@@ -118,8 +116,7 @@
 				4E4583C728FBC1CA00C617BE /* SettingsController.swift */,
 				4E4583BA28FA88CB00C617BE /* String+.swift */,
 				4E77771128F6237800DAEF80 /* TextView.swift */,
-				4E77771D28F74AC100DAEF80 /* UIColor+.swift */,
-				4E77770728F500C600DAEF80 /* UIView+.swift */,
+				4E77770728F500C600DAEF80 /* UIKit+.swift */,
 				4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */,
 			);
 			path = Markology;
@@ -205,7 +202,7 @@
 			files = (
 				4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */,
 				4E4583C128FA8ABD00C617BE /* NoteVisitor.swift in Sources */,
-				4E77770828F500C600DAEF80 /* UIView+.swift in Sources */,
+				4E77770828F500C600DAEF80 /* UIKit+.swift in Sources */,
 				4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */,
 				4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */,
 				4E77771228F6237800DAEF80 /* TextView.swift in Sources */,
@@ -216,10 +213,9 @@
 				4E4583BB28FA88CB00C617BE /* String+.swift in Sources */,
 				4E77770228F481F700DAEF80 /* Note.swift in Sources */,
 				4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */,
-				4E77771E28F74AC100DAEF80 /* UIColor+.swift in Sources */,
 				4E4583C328FA8EA700C617BE /* EditCell.swift in Sources */,
 				4E6A3A6A28FF1082005CCE32 /* NoteCell.swift in Sources */,
-				4E4583BD28FA899100C617BE /* Markup+.swift in Sources */,
+				4E4583BD28FA899100C617BE /* Markdown+.swift in Sources */,
 				4E4583BF28FA8A4000C617BE /* EditVisitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

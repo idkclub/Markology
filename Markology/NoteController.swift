@@ -133,11 +133,20 @@ class NoteController: UIViewController, Bindable {
             let confirm = UIAlertController(title: "Delete \(self?.entry?.name ?? id.name)?", message: "This operation cannot be undone.", preferredStyle: .alert)
             confirm.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             confirm.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
-                self?.document = nil
-                let file = Engine.paths.locate(file: id.file)
-                try? FileManager.default.removeItem(at: file.url)
-                Engine.shared.delete(files: [file])
-                self?.id = nil
+                Task {
+                    if let document = self?.document {
+                        _ = await document.close()
+                    }
+                    self?.document = nil
+                    let file = Engine.paths.locate(file: id.file)
+                    // TODO: Handle errors.
+                    var error: NSError?
+                    NSFileCoordinator().coordinate(writingItemAt: file.url, options: .forDeleting, error: &error) {
+                        try? FileManager.default.removeItem(at: $0)
+                    }
+                    Engine.shared.delete(files: [file])
+                    self?.id = nil
+                }
             })
             self?.present(confirm, animated: true)
         })
@@ -220,10 +229,12 @@ class NoteController: UIViewController, Bindable {
             if let count = entry?.to.count, count > 0 {
                 sections.append(.to(count))
             }
-            navigationItem.rightBarButtonItems = [
-                menuButton,
-                UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)),
-            ]
+            var items: [UIBarButtonItem] = []
+            if entry != nil || document != nil {
+                items.append(menuButton)
+            }
+            items.append(UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)))
+            navigationItem.rightBarButtonItems = items
             reload(sections: sections)
         }
     }

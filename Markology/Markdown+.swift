@@ -16,7 +16,12 @@ extension Heading {
 
 extension Link {
     var color: UIColor {
-        guard let url = destination else { return .label }
-        return url.contains(":") || url.contains("//") ? UIColor.idkCyan : UIColor.idkMagenta
+        guard destination != nil else { return .label }
+        return absolute ? UIColor.idkCyan : UIColor.idkMagenta
+    }
+
+    var absolute: Bool {
+        guard let destination = destination else { return false }
+        return destination.contains("//") || destination.contains(":")
     }
 }

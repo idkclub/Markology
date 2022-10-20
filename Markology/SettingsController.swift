@@ -34,12 +34,10 @@ class SettingsController: UIViewController {
             views.append(cloudButton)
         }
 
-        views.append(UIView())
-
         let stack = UIStackView(arrangedSubviews: views)
-            .pinned(to: view)
+            .pinned(to: view, bottom: false)
         stack.axis = .vertical
-        stack.layoutMargins = .init(top: 15, left: 15, bottom: 15, right: 15)
+        stack.layoutMargins = .padded
         stack.isLayoutMarginsRelativeArrangement = true
         stack.spacing = 5
     }

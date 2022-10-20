@@ -5,9 +5,9 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
     weak var controller: N?
     lazy var markdown = {
         let markdown = TextView().pinned(to: contentView)
+        markdown.textContainerInset = .padded
         markdown.isScrollEnabled = false
         markdown.isEditable = false
-        markdown.textContainerInset = .init(top: 15, left: 15, bottom: 15, right: 15)
         markdown.dataDetectorTypes = .all
         markdown.delegate = self
         return markdown
@@ -28,7 +28,7 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
 
     func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         guard url.host == nil else { return true }
-        guard let relative = file.use(for: url) else { return false }
+        guard let relative = file.use(for: url.path) else { return false }
         var name = ""
         if let range = textView.range(for: characterRange),
            let text = textView.text(in: range)
