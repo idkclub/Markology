@@ -1,13 +1,24 @@
+import Combine
 import Markdown
 import UIKit
 
 class EditCell: NoteCell<NoteController> {
     var previous: UITextRange?
     var dirty = false
+    var insertSink: AnyCancellable?
 
     override func config(_ controller: NoteController) {
         super.config(controller)
         markdown.isEditable = true
+        insertSink = controller.addLink.sink {
+            guard let selection = self.markdown.selectedTextRange else { return }
+            if selection.start == selection.end,
+               let token = self.markdown.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
+            {
+                self.markdown.selectedTextRange = token
+            }
+            self.markdown.insertText("[\($0.name)](\($0.file))")
+        }
     }
 
     override func render(_ text: String) {
@@ -82,8 +93,8 @@ class EditCell: NoteCell<NoteController> {
         textView.selectedRange = select
         controller?.document?.text = text
         controller?.document?.updateChangeCount(.done)
-        controller?.tableView?.beginUpdates()
-        controller?.tableView?.endUpdates()
+        controller?.tableView.beginUpdates()
+        controller?.tableView.endUpdates()
         dirty = false
     }
 
@@ -94,6 +105,16 @@ class EditCell: NoteCell<NoteController> {
         var position = selection.end
         if position == previous?.end {
             position = selection.start
+        }
+        if selection.start != selection.end,
+           let text = textView.text(in: selection),
+           !text.contains(where: \.isNewline)
+        {
+            controller?.search = text
+        } else if let token = textView.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.backward)),
+                  let text = textView.text(in: token)
+        {
+            controller?.search = text
         }
         var rect = textView.convert(textView.caretRect(for: position), to: tableView)
         if rect.origin.y == .infinity {

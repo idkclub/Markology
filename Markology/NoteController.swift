@@ -2,7 +2,7 @@ import Combine
 import Markdown
 import UIKit
 
-class NoteController: UITableViewController, Bindable {
+class NoteController: UIViewController, Bindable {
     private enum Section: Equatable {
         case note, edit
         case from(Int), to(Int)
@@ -24,11 +24,62 @@ class NoteController: UITableViewController, Bindable {
         didSet { reload() }
     }
 
+    lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(EditCell.self)
+        tableView.register(EmptyCell.self)
+        tableView.register(NoteCell<Self>.self)
+        tableView.register(Note.Entry.Link.Cell.self)
+        tableView.delegate = self
+        tableView.dataSource = self
+        return tableView
+    }()
+
+    private var linkSink: AnyCancellable?
+    private var link: [Note.ID] = [] {
+        didSet {
+            // TODO: Animate?
+            collectionView.isHidden = false
+            collectionView.reloadData()
+        }
+    }
+
+    var search: String? {
+        didSet {
+            guard search != oldValue else { return }
+            guard let search = search else {
+                collectionView.isHidden = true
+                linkSink = nil
+                return
+            }
+            linkSink = Engine.subscribe(with(\.link), to: Note.ID.Search(text: search))
+        }
+    }
+
+    lazy var collectionView: UICollectionView = {
+        let size = 40.0
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.estimatedItemSize = CGSize(width: size, height: size)
+        layout.headerReferenceSize = CGSize(width: size, height: size)
+        layout.sectionFootersPinToVisibleBounds = true
+        let collectionView = UICollectionView(frame: .infinite, collectionViewLayout: layout)
+        collectionView.register(LinkCell.self)
+        collectionView.register(header: Header.self)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.heightAnchor.constraint(equalToConstant: size).isActive = true
+        collectionView.backgroundColor = .secondarySystemBackground
+        collectionView.isHidden = true
+        return collectionView
+    }()
+
     private lazy var menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(menu))
 
     var edit = false
     @objc func toggleEdit() {
         if edit {
+            search = nil
             sync()
         }
         edit = !edit
@@ -59,6 +110,8 @@ class NoteController: UITableViewController, Bindable {
         document?.text ?? entry?.text ?? ""
     }
 
+    var addLink = PassthroughSubject<Note.ID, Never>()
+
     @objc func menu() {
         guard let id = id else { return }
         let menu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -85,10 +138,10 @@ class NoteController: UITableViewController, Bindable {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(EditCell.self)
-        tableView.register(EmptyCell.self)
-        tableView.register(NoteCell<Self>.self)
-        tableView.register(Note.Entry.Link.Cell.self)
+        view.backgroundColor = .systemBackground
+        let stack = UIStackView(arrangedSubviews: [tableView, collectionView]).pinned(to: view, bottom: false)
+        stack.axis = .vertical
+        stack.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -159,8 +212,10 @@ class NoteController: UITableViewController, Bindable {
             self.tableView.endUpdates()
         }
     }
+}
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
+extension NoteController: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
         sections.count
     }
 
@@ -171,7 +226,7 @@ class NoteController: UITableViewController, Bindable {
         return date
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard let entry = entry else { return nil }
         switch sections[section] {
         case .edit, .note:
@@ -183,7 +238,7 @@ class NoteController: UITableViewController, Bindable {
         }
     }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch sections[indexPath.section] {
         case .note:
             if entry == nil, document == nil {
@@ -199,7 +254,7 @@ class NoteController: UITableViewController, Bindable {
         }
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch sections[section] {
         case .note, .edit:
             return 1
@@ -209,8 +264,10 @@ class NoteController: UITableViewController, Bindable {
             return entry?.to.count ?? 0
         }
     }
+}
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+extension NoteController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let dest: Note.ID
         switch sections[indexPath.section] {
         case .from:
@@ -224,8 +281,95 @@ class NoteController: UITableViewController, Bindable {
     }
 }
 
+extension NoteController: UICollectionViewDataSource {
+    var linkSections: [MenuController.Section] {
+        var sections: [MenuController.Section] = []
+        if link.count > 0 {
+            sections.append(.notes)
+        }
+        sections.append(.new)
+        return sections
+    }
+
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        linkSections.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch linkSections[indexPath.section] {
+        case .notes:
+            return collectionView.render("magnifyingglass", forHeader: indexPath) as Header
+        case .new:
+            return collectionView.render("plus", forHeader: indexPath) as Header
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        switch linkSections[section] {
+        case .notes:
+            return link.count
+        case .new:
+            return 1
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        switch linkSections[indexPath.section] {
+        case .notes:
+            return collectionView.render(link[indexPath.row].name, for: indexPath) as LinkCell
+        case .new:
+            return collectionView.render(search ?? "", for: indexPath) as LinkCell
+        }
+    }
+}
+
+extension NoteController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let target: Note.ID
+        switch linkSections[indexPath.section] {
+        case .notes:
+            target = link[indexPath.row]
+        case .new:
+            guard let search = search else { return }
+            target = .generate(for: search)
+        }
+        addLink.send(target)
+    }
+}
+
 extension NoteController {
-    class EmptyCell: UITableViewCell, TableCell {
+    class LinkCell: UICollectionViewCell, RenderCell {
+        lazy var label: UILabel = {
+            UILabel().pinned(to: contentView)
+        }()
+
+        func render(_ text: String) {
+            if text == "" {
+                label.text = "Empty Note"
+                label.textColor = .placeholderText
+            } else {
+                label.text = text
+                label.textColor = .label
+            }
+        }
+    }
+}
+
+extension NoteController {
+    class Header: UICollectionReusableView, RenderCell {
+        lazy var image: UIImageView = {
+            UIImageView().pinned(to: self, withInset: 10)
+        }()
+
+        func render(_ symbol: String) {
+            image.image = UIImage(systemName: symbol)
+            image.tintColor = .secondaryLabel
+        }
+    }
+}
+
+extension NoteController {
+    class EmptyCell: UITableViewCell, RenderCell {
         func render(_ file: Paths.File.Name) {
             var content = defaultContentConfiguration()
             content.text = "\(file.dropFirst()) wasn't found. Begin editing to create it."

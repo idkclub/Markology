@@ -131,7 +131,7 @@ extension Note {
             }
         }
 
-        class Cell: UITableViewCell, TableCell {
+        class Cell: UITableViewCell, RenderCell {
             func render(_ text: String) {
                 var content = defaultContentConfiguration()
                 if text == "" {
