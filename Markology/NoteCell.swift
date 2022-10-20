@@ -72,8 +72,6 @@ protocol Navigator: NSObject {
 extension Navigator where Self: UIViewController {
     func navigate(to id: Note.ID) {
         guard let nav = navigationController else { return }
-        let controller = NoteController()
-        nav.show(controller, sender: self)
-        controller.id = id
+        nav.show(NoteController.with(id: id), sender: self)
     }
 }

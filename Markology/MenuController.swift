@@ -108,15 +108,14 @@ extension MenuController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let split = splitViewController,
               let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
-        let controller = NoteController()
-        nav.viewControllers = [controller]
+        let controller: NoteController
         switch sections[indexPath.section] {
         case .notes:
-            controller.id = ids[indexPath.row]
+            controller = .with(id: ids[indexPath.row])
         case .new:
-            controller.edit = true
-            controller.id = Note.ID.generate(for: search.text ?? "")
+            controller = .with(id: Note.ID.generate(for: search.text ?? ""), edit: true)
         }
+        nav.viewControllers = [controller]
         split.show(.secondary)
     }
 }

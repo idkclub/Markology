@@ -3,6 +3,13 @@ import Markdown
 import UIKit
 
 class NoteController: UIViewController, Bindable {
+    static func with(id: Note.ID, edit: Bool = false) -> NoteController {
+        let note = NoteController()
+        note.edit = edit
+        note.id = id
+        return note
+    }
+
     private enum Section: Equatable {
         case note, edit
         case from(Int), to(Int)
@@ -97,7 +104,7 @@ class NoteController: UIViewController, Bindable {
                 if nav.viewControllers.count > 1 {
                     nav.popViewController(animated: true)
                 } else {
-                    nav.viewControllers = [NoteController()]
+                    nav.viewControllers = [EmptyController()]
                     split.show(.primary)
                 }
                 return
@@ -115,8 +122,12 @@ class NoteController: UIViewController, Bindable {
     @objc func menu() {
         guard let id = id else { return }
         let menu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        if text != "" {
-            menu.addAction(UIAlertAction(title: "Share", style: .default) { _ in })
+        if !text.isEmpty {
+            menu.addAction(UIAlertAction(title: "Share", style: .default) { _ in
+                let activityVc = UIActivityViewController(activityItems: [self.text], applicationActivities: nil)
+                activityVc.popoverPresentationController?.barButtonItem = self.menuButton
+                self.present(activityVc, animated: true)
+            })
         }
         menu.addAction(UIAlertAction(title: "Delete Note", style: .destructive) { [weak self] _ in
             let confirm = UIAlertController(title: "Delete \(self?.entry?.name ?? id.name)?", message: "This operation cannot be undone.", preferredStyle: .alert)
@@ -158,36 +169,10 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
-    private func reload() {
-        title = entry?.name ?? id?.name
-        guard let id = id else { return }
-        Task {
-            if edit, document == nil {
-                let document = NoteDocument(name: id.file)
-                // TODO: Handle errors.
-                if FileManager.default.fileExists(atPath: document.fileURL.path) {
-                    guard await document.open() else { return }
-                } else {
-                    try? FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-                    document.text = id.name == "" ? "" : "# \(id.name)\n\n"
-                    guard await document.save(to: document.fileURL, for: .forCreating) else { return }
-                }
-                self.document = document
-            }
-            var sections: [Section] = [edit ? .edit : .note]
-            if let count = entry?.from.count, count > 0 {
-                sections.append(.from(count))
-            }
-            if let count = entry?.to.count, count > 0 {
-                sections.append(.to(count))
-            }
-            navigationItem.rightBarButtonItems = [
-                menuButton,
-                UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)),
-            ]
-            let last = self.sections
-            self.sections = sections
-            self.tableView.beginUpdates()
+    private func reload(sections: [Section]) {
+        let last = self.sections
+        self.sections = sections
+        tableView.performBatchUpdates {
             if last.count > sections.count {
                 self.tableView.deleteSections(IndexSet(integersIn: sections.count ..< last.count), with: .automatic)
             } else if sections.count > last.count {
@@ -209,7 +194,37 @@ class NoteController: UIViewController, Bindable {
                     self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .none)
                 }
             }
-            self.tableView.endUpdates()
+        }
+    }
+
+    private func reload() {
+        title = entry?.name ?? id?.name
+        guard let id = id else { return }
+        Task {
+            if edit, document == nil {
+                let document = NoteDocument(name: id.file)
+                // TODO: Handle errors.
+                if FileManager.default.fileExists(atPath: document.fileURL.path) {
+                    guard await document.open() else { return }
+                } else {
+                    try? FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+                    document.text = id.name.isEmpty ? "" : "# \(id.name)\n\n"
+                    guard await document.save(to: document.fileURL, for: .forCreating) else { return }
+                }
+                self.document = document
+            }
+            var sections: [Section] = [edit ? .edit : .note]
+            if let count = entry?.from.count, count > 0 {
+                sections.append(.from(count))
+            }
+            if let count = entry?.to.count, count > 0 {
+                sections.append(.to(count))
+            }
+            navigationItem.rightBarButtonItems = [
+                menuButton,
+                UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)),
+            ]
+            reload(sections: sections)
         }
     }
 }
@@ -372,7 +387,7 @@ extension NoteController {
     class EmptyCell: UITableViewCell, RenderCell {
         func render(_ file: Paths.File.Name) {
             var content = defaultContentConfiguration()
-            content.text = "\(file.dropFirst()) wasn't found. Begin editing to create it."
+            content.text = "\n\n\(file.dropFirst()) wasn't found. Begin editing to create it.\n\n"
             content.textProperties.color = .placeholderText
             content.textProperties.alignment = .center
             contentConfiguration = content
@@ -383,9 +398,6 @@ extension NoteController {
 extension NoteController: Navigator {
     func navigate(to id: Note.ID) {
         guard let nav = navigationController else { return }
-        let controller = NoteController()
-        nav.show(controller, sender: self)
-        controller.edit = edit
-        controller.id = id
+        nav.show(NoteController.with(id: id, edit: edit), sender: self)
     }
 }
