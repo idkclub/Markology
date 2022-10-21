@@ -25,21 +25,17 @@ class NoteController: UIViewController, Bindable {
     }
 
     private(set) var document: NoteDocument?
-    private var sections: [Section] = []
     private var entrySink: AnyCancellable?
     private var entry: Note.Entry? {
         didSet { reload() }
     }
 
     lazy var tableView: UITableView = {
-        let offset = 50.0
         let tableView = UITableView().pinned(to: view, top: false, keyboard: true)
         tableView.register(EditCell.self)
         tableView.register(EmptyCell.self)
         tableView.register(NoteCell<Self>.self)
         tableView.register(Note.Entry.Link.Cell.self)
-        tableView.contentInset.bottom = offset
-        tableView.verticalScrollIndicatorInsets.bottom = offset
         tableView.delegate = self
         tableView.dataSource = self
         return tableView
@@ -56,9 +52,18 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
+    private var showLinks: Bool = false {
+        didSet {
+            collectionView.isHidden = !showLinks
+            let offset = showLinks ? 50.0 : 0
+            tableView.contentInset.bottom = offset
+            tableView.verticalScrollIndicatorInsets.bottom = offset
+        }
+    }
+
     private var link: [Note.ID] = [] {
         didSet {
-            collectionView.isHidden = false
+            showLinks = true
             collectionView.reloadData()
             collectionView.setContentOffset(.zero, animated: false)
         }
@@ -68,7 +73,7 @@ class NoteController: UIViewController, Bindable {
         didSet {
             guard search != oldValue else { return }
             guard let search = search else {
-                collectionView.isHidden = true
+                showLinks = false
                 linkQuery = nil
                 return
             }
@@ -169,8 +174,10 @@ class NoteController: UIViewController, Bindable {
         present(menu, animated: true)
     }
 
+    var loaded = false
     override func viewDidLoad() {
         super.viewDidLoad()
+        loaded = true
         view.backgroundColor = .systemBackground
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
@@ -190,7 +197,51 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
-    private func reload(sections: [Section]) {
+    private func reload() {
+        title = entry?.name ?? id?.name
+        guard let id = id else { return }
+        guard edit, document == nil else {
+            layout()
+            return
+        }
+        Task {
+            let document = NoteDocument(name: id.file)
+            // TODO: Handle errors.
+            if FileManager.default.fileExists(atPath: document.fileURL.path) {
+                guard await document.open() else { return }
+            } else {
+                try? FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+                document.text = id.name.isEmpty ? "" : "# \(id.name)\n\n"
+                guard await document.save(to: document.fileURL, for: .forCreating) else { return }
+            }
+            self.document = document
+            layout()
+        }
+    }
+
+    private func layout() {
+        var sections: [Section] = [edit ? .edit : .note]
+        if let count = entry?.from.count, count > 0 {
+            sections.append(.from(count))
+        }
+        if let count = entry?.to.count, count > 0 {
+            sections.append(.to(count))
+        }
+        var items: [UIBarButtonItem] = []
+        if entry != nil || document != nil {
+            items.append(menuButton)
+        }
+        items.append(UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)))
+        navigationItem.rightBarButtonItems = items
+        reloadTable(with: sections)
+    }
+
+    private var sections: [Section] = []
+    private func reloadTable(with sections: [Section]) {
+        guard loaded else {
+            self.sections = sections
+            return
+        }
         let last = self.sections
         tableView.performBatchUpdates {
             self.sections = sections
@@ -210,51 +261,19 @@ class NoteController: UIViewController, Bindable {
                     self.tableView.deleteRows(at: (section.count ..< last[index].count).map { IndexPath(row: $0, section: index) }, with: .automatic)
                 }
                 if section != last[index] {
-                    self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .fade)
+                    let index = (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }
+                    self.tableView.reloadRows(at: index, with: .fade)
                 } else if section != .edit {
                     self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .none)
                 }
             }
         }
     }
-
-    private func reload() {
-        title = entry?.name ?? id?.name
-        guard let id = id else { return }
-        Task {
-            if edit, document == nil {
-                let document = NoteDocument(name: id.file)
-                // TODO: Handle errors.
-                if FileManager.default.fileExists(atPath: document.fileURL.path) {
-                    guard await document.open() else { return }
-                } else {
-                    try? FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-                    document.text = id.name.isEmpty ? "" : "# \(id.name)\n\n"
-                    guard await document.save(to: document.fileURL, for: .forCreating) else { return }
-                }
-                self.document = document
-            }
-            var sections: [Section] = [edit ? .edit : .note]
-            if let count = entry?.from.count, count > 0 {
-                sections.append(.from(count))
-            }
-            if let count = entry?.to.count, count > 0 {
-                sections.append(.to(count))
-            }
-            var items: [UIBarButtonItem] = []
-            if entry != nil || document != nil {
-                items.append(menuButton)
-            }
-            items.append(UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)))
-            navigationItem.rightBarButtonItems = items
-            reload(sections: sections)
-        }
-    }
 }
 
 extension NoteController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return sections.count
+        sections.count
     }
 
     private var date: DateFormatter {

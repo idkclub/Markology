@@ -37,7 +37,7 @@ class Engine {
         ValueObservation
             .tracking(query.fetch)
             .removeDuplicates()
-            .publisher(in: shared.db)
+            .publisher(in: shared.db, scheduling: .immediate)
             // TODO: Handle error.
             .sink(receiveCompletion: {
                 print($0)
@@ -56,7 +56,7 @@ class Engine {
             }
             try db.create(virtualTable: "note_search", using: FTS5()) { t in
                 t.synchronize(withTable: "note")
-                // TODO: Consider subclassing similar to porter if can avoid "NES" breaking.
+                // TODO: Consider subclassing similar to porter if can avoid "NES" breaking. Also, investigate missing emoji searches.
                 t.tokenizer = .unicode61()
                 t.column("name")
                 t.column("text")
