@@ -10,6 +10,8 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
         static let modified = Column(CodingKeys.modified)
     }
 
+    // TODO: Investigate ordering value for "Movie" case.
+    static let search = "bm25(note_search, 50)"
     static let from = hasMany(Link.self, using: Link.toKey).forKey("fromLink")
     static let to = hasMany(Link.self, using: Link.fromKey).forKey("toLink")
 
@@ -31,15 +33,15 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     }
 
     struct Search: Query {
-        let query: String
+        let text: String
 
         func fetch(db: Database) throws -> [Note] {
-            if let pattern = FTS5Pattern(matchingAllPrefixesIn: query) {
+            if let pattern = FTS5Pattern(matchingAllPrefixesIn: text) {
                 return try Note.fetchAll(db, sql: """
                 select note.* from note
                 join note_search on note.rowid = note_search.rowid
                     and note_search match ?
-                order by rank
+                order by \(search)
                 """, arguments: [pattern])
             }
             return try Note.order(Note.Columns.name.asc).fetchAll(db)
@@ -115,19 +117,28 @@ extension Note {
         }
 
         struct Search: Query {
+            let pattern: FTS5Pattern?
+            let limit: Int
             let text: String
-            let limit: Int = 10
-            let recent = true
+
+            init(text: String, limit: Int = 10) {
+                self.text = text
+                self.limit = limit
+                pattern = FTS5Pattern(matchingAllPrefixesIn: text)
+            }
 
             func fetch(db: Database) throws -> [ID] {
-                let wildcard = "%\(text.replacingOccurrences(of: " ", with: "%"))%"
-                var request = ID.query.filter(Note.Columns.name.like(wildcard))
-                if recent {
-                    request = request.order(Note.Columns.modified.desc).limit(limit)
-                } else {
-                    request = request.order(Note.Columns.name.asc)
+                guard let pattern = pattern else {
+                    let request = ID.query.order(Note.Columns.modified.desc).limit(limit)
+                    return try ID.fetchAll(db, request)
                 }
-                return try ID.fetchAll(db, request)
+                return try ID.fetchAll(db, sql: """
+                select note.file, note.name from note
+                join note_search on note.rowid = note_search.rowid
+                    and note_search match ?
+                order by \(search)
+                limit ?
+                """, arguments: [pattern, limit])
             }
         }
 

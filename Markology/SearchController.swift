@@ -18,7 +18,7 @@ class SearchController: UITableViewController, Bindable, Navigator {
                 return
             }
             title = "Results for \"\(query)\""
-            noteSink = Engine.subscribe(with(\.notes), to: Note.Search(query: query))
+            noteSink = Engine.subscribe(with(\.notes), to: Note.Search(text: query))
         }
     }
 

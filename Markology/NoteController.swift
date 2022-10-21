@@ -32,22 +32,35 @@ class NoteController: UIViewController, Bindable {
     }
 
     lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let offset = 50.0
+        let tableView = UITableView().pinned(to: view, top: false, keyboard: true)
         tableView.register(EditCell.self)
         tableView.register(EmptyCell.self)
         tableView.register(NoteCell<Self>.self)
         tableView.register(Note.Entry.Link.Cell.self)
+        tableView.contentInset.bottom = offset
+        tableView.verticalScrollIndicatorInsets.bottom = offset
         tableView.delegate = self
         tableView.dataSource = self
         return tableView
     }()
 
     private var linkSink: AnyCancellable?
+    private var linkQuery: Note.ID.Search? {
+        didSet {
+            guard let linkQuery = linkQuery else {
+                linkSink = nil
+                return
+            }
+            linkSink = Engine.subscribe(with(\.link), to: linkQuery)
+        }
+    }
+
     private var link: [Note.ID] = [] {
         didSet {
-            // TODO: Animate?
             collectionView.isHidden = false
             collectionView.reloadData()
+            collectionView.setContentOffset(.zero, animated: false)
         }
     }
 
@@ -56,10 +69,10 @@ class NoteController: UIViewController, Bindable {
             guard search != oldValue else { return }
             guard let search = search else {
                 collectionView.isHidden = true
-                linkSink = nil
+                linkQuery = nil
                 return
             }
-            linkSink = Engine.subscribe(with(\.link), to: Note.ID.Search(text: search))
+            linkQuery = Note.ID.Search(text: search, limit: 5)
         }
     }
 
@@ -70,13 +83,13 @@ class NoteController: UIViewController, Bindable {
         layout.estimatedItemSize = CGSize(width: size, height: size)
         layout.headerReferenceSize = CGSize(width: size, height: size)
         layout.sectionFootersPinToVisibleBounds = true
-        let collectionView = UICollectionView(frame: .infinite, collectionViewLayout: layout)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).pinned(to: view, top: false, keyboard: true)
         collectionView.register(LinkCell.self)
         collectionView.register(header: Header.self)
+        collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.heightAnchor.constraint(equalToConstant: size).isActive = true
-        collectionView.backgroundColor = .secondarySystemBackground
         collectionView.isHidden = true
         return collectionView
     }()
@@ -159,9 +172,8 @@ class NoteController: UIViewController, Bindable {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        let stack = UIStackView(arrangedSubviews: [tableView, collectionView]).pinned(to: view, bottom: false)
-        stack.axis = .vertical
-        stack.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
+        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        collectionView.backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -180,8 +192,8 @@ class NoteController: UIViewController, Bindable {
 
     private func reload(sections: [Section]) {
         let last = self.sections
-        self.sections = sections
         tableView.performBatchUpdates {
+            self.sections = sections
             if last.count > sections.count {
                 self.tableView.deleteSections(IndexSet(integersIn: sections.count ..< last.count), with: .automatic)
             } else if sections.count > last.count {
@@ -242,7 +254,7 @@ class NoteController: UIViewController, Bindable {
 
 extension NoteController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        sections.count
+        return sections.count
     }
 
     private var date: DateFormatter {
@@ -324,7 +336,7 @@ extension NoteController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch linkSections[indexPath.section] {
         case .notes:
-            return collectionView.render("magnifyingglass", forHeader: indexPath) as Header
+            return collectionView.render(linkQuery?.pattern == nil ? "clock" : "magnifyingglass", forHeader: indexPath) as Header
         case .new:
             return collectionView.render("plus", forHeader: indexPath) as Header
         }

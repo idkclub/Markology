@@ -19,16 +19,20 @@ extension UIFont {
 }
 
 extension UIView {
-    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true) -> Self {
+    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true, keyboard: Bool = false) -> Self {
         view.addSubview(self)
         translatesAutoresizingMaskIntoConstraints = false
         var constraints = [
             leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: withInset),
             trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -withInset),
-            topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: withInset),
         ]
+        if top {
+            constraints.append(topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: withInset))
+        }
         if bottom {
-            constraints.append(bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -withInset))
+            constraints.append(keyboard ?
+                bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor) :
+                bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -withInset))
         }
         NSLayoutConstraint.activate(constraints)
         return self

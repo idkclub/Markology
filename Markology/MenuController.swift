@@ -9,7 +9,16 @@ class MenuController: UIViewController, Bindable {
     var sections: [Section] = []
     var progressSink: AnyCancellable?
     var searchSink: AnyCancellable?
-    var query: String = ""
+    var query: Note.ID.Search? {
+        didSet {
+            guard let query = query else {
+                searchSink = nil
+                return
+            }
+            searchSink = Engine.subscribe(with(\.ids), to: query)
+        }
+    }
+
     var ids: [Note.ID] = [] {
         didSet { reload() }
     }
@@ -45,14 +54,11 @@ class MenuController: UIViewController, Bindable {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings))
-
-        searchSink = Engine.subscribe(with(\.ids), to: Note.ID.Search(text: ""))
-
+        query = Note.ID.Search(text: "")
         let progress = UIProgressView(progressViewStyle: .bar)
         progressSink = Engine.progress.sink {
             progress.progress = $0
         }
-
         let stack = UIStackView(arrangedSubviews: [search, progress, table])
             .pinned(to: view)
         stack.axis = .vertical
@@ -65,7 +71,7 @@ class MenuController: UIViewController, Bindable {
 
 extension MenuController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchSink = Engine.subscribe(with(\.ids), to: Note.ID.Search(text: searchText))
+        query = Note.ID.Search(text: searchText)
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -104,6 +110,9 @@ extension MenuController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch sections[section] {
         case .notes:
+            if query?.pattern != nil {
+                return "Related"
+            }
             return "Recent"
         case .new:
             return "New"

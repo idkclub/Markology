@@ -70,6 +70,7 @@ class Paths {
         if icloud {
             let query = NSMetadataQuery()
             query.operationQueue = OperationQueue()
+            query.operationQueue?.qualityOfService = .utility
             query.operationQueue?.maxConcurrentOperationCount = 1
             query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
             query.predicate = NSPredicate(value: true)

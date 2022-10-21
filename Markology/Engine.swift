@@ -56,10 +56,11 @@ class Engine {
             }
             try db.create(virtualTable: "note_search", using: FTS5()) { t in
                 t.synchronize(withTable: "note")
-                t.tokenizer = .porter(wrapping: .unicode61())
-                t.column("file")
+                // TODO: Consider subclassing similar to porter if can avoid "NES" breaking.
+                t.tokenizer = .unicode61()
                 t.column("name")
                 t.column("text")
+                t.column("file")
             }
             try db.create(table: "link") { t in
                 t.column("from", .text).references("note", onDelete: .cascade)
