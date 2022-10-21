@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/idkclub/GRDB.swift",
       "state" : {
-        "branch" : "master",
-        "revision" : "7d11fc9e45cae8bbd52769d03a05d2636258e36e"
+        "branch" : "fts5",
+        "revision" : "03676f4d3f853fc9ffb46f4e7f53bc4daad7e074"
       }
     },
     {

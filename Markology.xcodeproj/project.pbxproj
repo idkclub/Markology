@@ -437,7 +437,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/idkclub/GRDB.swift";
 			requirement = {
-				branch = master;
+				branch = fts5;
 				kind = branch;
 			};
 		};

@@ -56,8 +56,8 @@ class Engine {
             }
             try db.create(virtualTable: "note_search", using: FTS5()) { t in
                 t.synchronize(withTable: "note")
-                // TODO: Consider subclassing similar to porter if can avoid "NES" breaking. Also, investigate missing emoji searches.
-                t.tokenizer = .unicode61()
+                // TODO: Consider subclassing similar to porter if can avoid "NES" breaking.
+                t.tokenizer = .unicode61(categories: "L* N* S*")
                 t.column("name")
                 t.column("text")
                 t.column("file")
