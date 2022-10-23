@@ -29,7 +29,7 @@ struct NoteVisitor: MarkupVisitor {
     }
 
     mutating func visitLink(_ link: Markdown.Link) -> NSMutableAttributedString {
-        guard let url = link.destination else { return defaultVisit(link) }
+        guard let url = link.encoded else { return defaultVisit(link) }
         return defaultVisit(link)
             .adding(key: .link, value: url)
             .adding(key: .foregroundColor, value: link.color)

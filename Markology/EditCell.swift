@@ -11,13 +11,14 @@ class EditCell: NoteCell<NoteController> {
         super.config(controller)
         markdown.isEditable = true
         insertSink = controller.addLink.sink {
-            guard let selection = self.markdown.selectedTextRange else { return }
+            guard let selection = self.markdown.selectedTextRange,
+                  let url = $0.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
             if selection.start == selection.end,
                let token = self.markdown.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
             {
                 self.markdown.selectedTextRange = token
             }
-            self.markdown.insertText("[\($0.name)](\($0.file))")
+            self.markdown.insertText("[\($0.name)](\(url))")
         }
     }
 

@@ -15,6 +15,8 @@ extension Heading {
 }
 
 extension Link {
+    private static let urlCharacters = CharacterSet(charactersIn: ":?@#").union(.urlPathAllowed)
+
     var color: UIColor {
         guard destination != nil else { return .label }
         return absolute ? UIColor.idkCyan : UIColor.idkMagenta
@@ -23,5 +25,9 @@ extension Link {
     var absolute: Bool {
         guard let destination = destination else { return false }
         return destination.contains("//") || destination.contains(":")
+    }
+
+    var encoded: String? {
+        destination?.addingPercentEncoding(withAllowedCharacters: Link.urlCharacters)
     }
 }

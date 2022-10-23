@@ -28,7 +28,8 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
 
     func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         guard url.host == nil else { return true }
-        guard let relative = file.use(for: url.path) else { return false }
+        guard let path = url.path.removingPercentEncoding,
+              let relative = file.use(for: path) else { return false }
         var name = ""
         if let range = textView.range(for: characterRange),
            let text = textView.text(in: range)

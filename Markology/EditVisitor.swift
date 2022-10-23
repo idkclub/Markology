@@ -47,7 +47,7 @@ struct EditVisitor: MarkupVisitor {
 
     mutating func visitLink(_ link: Link) -> NSMutableAttributedString {
         guard let range = range(for: link),
-              let url = link.destination else { return text }
+              let url = link.encoded else { return text }
         return defaultVisit(link)
             .adding(key: .link, value: url, range: range)
             .adding(key: .foregroundColor, value: link.color, range: range)

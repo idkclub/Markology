@@ -77,8 +77,9 @@ class EmptyController: UIViewController {
         view.backgroundColor = .systemBackground
         title = "Welcome"
         let text = UITextView().pinned(to: view)
-        text.textContainerInset = .padded
         text.text = "Select or create a new note on the sidebar to get started."
+        text.isSelectable = false
+        text.textContainerInset = .padded
         text.font = UIFont.preferredFont(forTextStyle: .body)
         text.textColor = .secondaryLabel
     }
