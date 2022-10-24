@@ -10,8 +10,7 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
         static let modified = Column(CodingKeys.modified)
     }
 
-    // TODO: Investigate ordering value for "Movie" case.
-    static let search = "bm25(note_search, 50)"
+    static let searchRank = "round(bm25(note_search, 50)), note.modified desc"
     static let from = hasMany(Link.self, using: Link.toKey).forKey("fromLink")
     static let to = hasMany(Link.self, using: Link.fromKey).forKey("toLink")
 
@@ -41,7 +40,7 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
                 select note.* from note
                 join note_search on note.rowid = note_search.rowid
                     and note_search match ?
-                order by \(search)
+                order by \(searchRank)
                 """, arguments: [pattern])
             }
             return try Note.order(Note.Columns.name.asc).fetchAll(db)
@@ -136,20 +135,20 @@ extension Note {
                 select note.file, note.name from note
                 join note_search on note.rowid = note_search.rowid
                     and note_search match ?
-                order by \(search)
+                order by \(searchRank)
                 limit ?
                 """, arguments: [pattern, limit])
             }
         }
 
         class Cell: UITableViewCell, RenderCell {
-            func render(_ text: String) {
+            func render(_ id: ID) {
                 var content = defaultContentConfiguration()
-                if text == "" {
+                if id.name == "" {
                     content.text = "Empty Note"
                     content.textProperties.color = .placeholderText
                 } else {
-                    content.text = text
+                    content.text = id.name
                 }
                 contentConfiguration = content
             }

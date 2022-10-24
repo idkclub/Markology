@@ -101,9 +101,10 @@ extension MenuController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch sections[indexPath.section] {
         case .notes:
-            return tableView.render(ids[indexPath.row].name, for: indexPath) as Note.ID.Cell
+            return tableView.render(ids[indexPath.row], for: indexPath) as Note.ID.Cell
         case .new:
-            return tableView.render(search.text ?? "", for: indexPath) as Note.ID.Cell
+            let id = Note.ID(file: "", name: search.text ?? "")
+            return tableView.render(id, for: indexPath) as Note.ID.Cell
         }
     }
 

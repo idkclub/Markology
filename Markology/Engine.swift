@@ -58,7 +58,6 @@ class Engine {
             }
             try db.create(virtualTable: "note_search", using: FTS5()) { t in
                 t.synchronize(withTable: "note")
-                // TODO: Consider subclassing similar to porter if can avoid "NES" breaking.
                 t.tokenizer = .unicode61(categories: "L* N* S*")
                 t.column("name")
                 t.column("text")
@@ -129,7 +128,7 @@ extension Engine: Monitor {
         let doc = Document(parsing: text)
         var walk = NoteWalker(from: name)
         walk.visit(doc)
-        try! db.write { db in
+        try? db.write { db in
             try Note.Link.filter(Note.Link.Columns.from == name).deleteAll(db)
             try Note(file: name, name: walk.name, text: text, modified: modified).save(db)
             try walk.links.forEach { try $0.save(db) }
