@@ -1,3 +1,4 @@
+import Combine
 import UIKit
 
 @main
@@ -48,6 +49,7 @@ class SceneDelegate: NSObject, UISceneDelegate {
 class SplitController: UISplitViewController {
     let history = UINavigationController()
     var restore: Note.ID?
+    var errors: AnyCancellable?
     override func viewDidLoad() {
         super.viewDidLoad()
         history.navigationBar.prefersLargeTitles = true
@@ -62,6 +64,14 @@ class SplitController: UISplitViewController {
         history.viewControllers = [controller]
         primaryBackgroundStyle = .sidebar
         delegate = self
+
+        errors = Engine.errors.sink {
+            let alert = UIAlertController(title: "Error", message: $0.localizedDescription, preferredStyle: .alert)
+            alert.addAction(.init(title: "Okay", style: .cancel) { _ in alert.dismiss(animated: true) })
+            DispatchQueue.main.async {
+                self.present(alert, animated: true)
+            }
+        }
     }
 }
 

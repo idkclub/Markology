@@ -13,6 +13,7 @@ class Engine {
     static let bundle = Bundle.main.bundleIdentifier!
     static let shared = try! Engine()
     let progress = CurrentValueSubject<Float, Never>(1)
+    let errors = PassthroughSubject<Error, Never>()
     let paths = Paths(for: bundle)
     private let db: DatabaseWriter
     init() throws {
@@ -38,9 +39,10 @@ class Engine {
             .tracking(query.fetch)
             .removeDuplicates()
             .publisher(in: shared.db, scheduling: .immediate)
-            // TODO: Handle error.
             .sink(receiveCompletion: {
-                print($0)
+                if case let .failure(err) = $0 {
+                    errors.send(err)
+                }
             }, receiveValue: action)
     }
 
@@ -106,6 +108,9 @@ extension Engine: Monitor {
                 NSFileCoordinator().coordinate(readingItemAt: file.url, error: &error) {
                     guard let text = try? String(contentsOf: $0).replacingOccurrences(of: "\r\n", with: "\n") else { return }
                     update(file: file.name, with: text, at: modified)
+                }
+                if let error = error {
+                    errors.send(error)
                 }
             }
         }

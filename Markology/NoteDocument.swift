@@ -20,4 +20,12 @@ class NoteDocument: UIDocument {
         // TODO: Handle error.
         text.data(using: .utf8)!
     }
+
+    override func handleError(_ error: Error, userInteractionPermitted: Bool) {
+        print(error, userInteractionPermitted)
+        if userInteractionPermitted {
+            Engine.errors.send(error)
+        }
+        super.handleError(error, userInteractionPermitted: userInteractionPermitted)
+    }
 }

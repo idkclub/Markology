@@ -157,10 +157,18 @@ class NoteController: UIViewController, Bindable {
                     }
                     self?.document = nil
                     let file = Engine.paths.locate(file: id.file)
-                    // TODO: Handle errors.
-                    var error: NSError?
-                    NSFileCoordinator().coordinate(writingItemAt: file.url, options: .forDeleting, error: &error) {
-                        try? FileManager.default.removeItem(at: $0)
+                    DispatchQueue.main.async {
+                        var error: NSError?
+                        NSFileCoordinator().coordinate(writingItemAt: file.url, options: .forDeleting, error: &error) {
+                            do {
+                                try FileManager.default.removeItem(at: $0)
+                            } catch {
+                                Engine.errors.send(error)
+                            }
+                        }
+                        if let error = error {
+                            Engine.errors.send(error)
+                        }
                     }
                     Engine.shared.delete(files: [file])
                     self?.id = nil
@@ -206,13 +214,22 @@ class NoteController: UIViewController, Bindable {
         }
         Task {
             let document = NoteDocument(name: id.file)
-            // TODO: Handle errors.
             if FileManager.default.fileExists(atPath: document.fileURL.path) {
-                guard await document.open() else { return }
+                guard await document.open() else {
+                    edit = false
+                    return
+                }
             } else {
-                try? FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+                do {
+                    try FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+                } catch {
+                    Engine.errors.send(error)
+                }
                 document.text = id.name.isEmpty ? "" : "# \(id.name)\n\n"
-                guard await document.save(to: document.fileURL, for: .forCreating) else { return }
+                guard await document.save(to: document.fileURL, for: .forCreating) else {
+                    edit = false
+                    return
+                }
             }
             self.document = document
             layout()
@@ -246,25 +263,25 @@ class NoteController: UIViewController, Bindable {
         tableView.performBatchUpdates {
             self.sections = sections
             if last.count > sections.count {
-                self.tableView.deleteSections(IndexSet(integersIn: sections.count ..< last.count), with: .automatic)
+                self.tableView.deleteSections(IndexSet(integersIn: sections.count ..< last.count), with: .fade)
             } else if sections.count > last.count {
                 self.tableView.insertSections(IndexSet(integersIn: last.count ..< sections.count), with: .fade)
             }
             for (index, section) in sections.enumerated() {
                 if index >= last.count {
-                    self.tableView.insertRows(at: (0 ..< section.count).map { IndexPath(row: $0, section: index) }, with: .middle)
+                    self.tableView.insertRows(at: (0 ..< section.count).map { IndexPath(row: $0, section: index) }, with: .automatic)
                     continue
                 }
                 if section.count > last[index].count {
-                    self.tableView.insertRows(at: (last[index].count ..< section.count).map { IndexPath(row: $0, section: index) }, with: .automatic)
+                    self.tableView.insertRows(at: (last[index].count ..< section.count).map { IndexPath(row: $0, section: index) }, with: .fade)
                 } else if section.count < last[index].count {
-                    self.tableView.deleteRows(at: (section.count ..< last[index].count).map { IndexPath(row: $0, section: index) }, with: .automatic)
+                    self.tableView.deleteRows(at: (section.count ..< last[index].count).map { IndexPath(row: $0, section: index) }, with: .fade)
                 }
                 if section != last[index] {
                     let index = (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }
-                    self.tableView.reloadRows(at: index, with: .fade)
+                    self.tableView.reloadRows(at: index, with: .automatic)
                 } else if section != .edit {
-                    self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .none)
+                    self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .automatic)
                 }
             }
         }
