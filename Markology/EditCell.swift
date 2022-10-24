@@ -10,6 +10,7 @@ class EditCell: NoteCell<NoteController> {
     override func config(_ controller: NoteController) {
         super.config(controller)
         markdown.isEditable = true
+        markdown.commandable = controller
         insertSink = controller.addLink.sink {
             guard let selection = self.markdown.selectedTextRange,
                   let url = $0.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
@@ -30,7 +31,6 @@ class EditCell: NoteCell<NoteController> {
         markdown.becomeFirstResponder()
     }
 
-    // TODO: Handle tab/shift-tab for indentation?
     override func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard let body = textView.text,
               text == "\n",

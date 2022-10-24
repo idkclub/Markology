@@ -288,6 +288,13 @@ class NoteController: UIViewController, Bindable {
     }
 }
 
+extension NoteController: Commandable {
+    func handle(_ command: UIKeyCommand) {
+        edit = false
+        reload()
+    }
+}
+
 extension NoteController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         sections.count
@@ -344,6 +351,10 @@ extension NoteController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let dest: Note.ID
         switch sections[indexPath.section] {
+        case .note:
+            edit = true
+            reload()
+            return
         case .from:
             dest = entry!.from[indexPath.row].note
         case .to:

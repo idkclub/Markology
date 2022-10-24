@@ -17,6 +17,20 @@ class TextView: UITextView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override var keyCommands: [UIKeyCommand] {
+        [UIKeyCommand(input: "\t", modifierFlags: [], action: #selector(command))]
+    }
+
+    var commandable: Commandable?
+
+    @objc func command(_ command: UIKeyCommand) {
+        commandable?.handle(command)
+    }
+}
+
+protocol Commandable {
+    func handle(_: UIKeyCommand)
 }
 
 extension TextView {
