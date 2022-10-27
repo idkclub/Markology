@@ -2,10 +2,16 @@ import Markdown
 import UIKit
 
 struct NoteVisitor: MarkupVisitor {
+    static func process(markup: Markup) -> NSMutableAttributedString {
+        var visitor = NoteVisitor()
+        return visitor.visit(markup)
+            .setMissing(key: .foregroundColor, value: UIColor.label)
+    }
+
     var indent = [TextView.Indent]()
 
-    mutating func block(_ markup: Markdown.Markup) -> NSMutableAttributedString {
-        let result = defaultVisit(markup)
+    mutating func block(_ markup: Markdown.Markup, rendered: NSMutableAttributedString? = nil) -> NSMutableAttributedString {
+        let result = rendered != nil ? rendered! : defaultVisit(markup)
         guard markup.indexInParent + 1 != markup.parent?.childCount else { return result }
         return result
             .newline
@@ -100,12 +106,8 @@ struct NoteVisitor: MarkupVisitor {
             .apply(trait: .traitBold)
     }
 
-    func visitTable(_ table: Table) -> NSMutableAttributedString {
-        // TODO: Figure out how to render a custom view.
-        table.format()
-            .html
-            .newline
-            .newline
+    mutating func visitTable(_ table: Table) -> NSMutableAttributedString {
+        block(table, rendered: NSMutableAttributedString(attachment: TextView.Table(for: table)))
     }
 
     func visitLineBreak(_ lineBreak: LineBreak) -> NSMutableAttributedString {

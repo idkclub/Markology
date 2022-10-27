@@ -2,20 +2,16 @@ import Markdown
 import UIKit
 
 class TextView: UITextView {
-    init(frame: CGRect = .infinite) {
+    convenience init() {
         let layoutManager = LayoutManager()
         let textStorage = NSTextStorage()
         let textContainer = NSTextContainer()
         textStorage.addLayoutManager(layoutManager)
         layoutManager.addTextContainer(textContainer)
-        super.init(frame: frame, textContainer: textContainer)
+        self.init(frame: .zero, textContainer: textContainer)
+        layoutManager.delegate = self
         linkTextAttributes = [:]
         smartDashesType = .no
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     override var keyCommands: [UIKeyCommand] {
@@ -27,10 +23,120 @@ class TextView: UITextView {
     @objc func command(_ command: UIKeyCommand) {
         commandable?.handle(command)
     }
+
+    var attachments: Set<UIView> = []
 }
 
 protocol Commandable {
     func handle(_: UIKeyCommand)
+}
+
+extension TextView: NSLayoutManagerDelegate {
+    func layoutManager(_ layoutManager: NSLayoutManager, didCompleteLayoutFor textContainer: NSTextContainer?, atEnd layoutFinishedFlag: Bool) {
+        guard layoutFinishedFlag else { return }
+        var seen: Set<UIView> = []
+        attributedText.enumerateAttribute(.attachment, in: attributedText.range) { value, range, _ in
+            guard let value = value as? Table,
+                  let view = value.view else { return }
+            if view.superview != self {
+                view.removeFromSuperview()
+                addSubview(view)
+            }
+            seen.insert(view)
+            let glyph = layoutManager.glyphIndexForCharacter(at: range.lowerBound)
+            let usedRect = layoutManager.lineFragmentUsedRect(forGlyphAt: glyph, effectiveRange: nil)
+            view.frame = usedRect.offsetBy(dx: textContainerInset.left, dy: textContainerInset.top)
+        }
+        attachments.forEach {
+            if !seen.contains($0) {
+                $0.removeFromSuperview()
+            }
+        }
+        attachments = seen
+    }
+}
+
+extension TextView {
+    class Table: NSTextAttachment {
+        var cells: [[TextView]] = []
+        var view: UIScrollView?
+        var table: Markdown.Table?
+        convenience init(for table: Markdown.Table) {
+            self.init(data: nil, ofType: "net.daringfireball.markdown")
+            self.table = table
+            view = UIScrollView()
+            var rows = [table.head.cells]
+            rows.append(contentsOf: table.body.rows.map { $0.cells })
+            rows.forEach {
+                var row: [TextView] = []
+                $0.enumerated().forEach { x, cell in
+                    let text = TextView()
+                    let paragraph = NSMutableParagraphStyle()
+                    switch table.columnAlignments[x] {
+                    case .left:
+                        paragraph.alignment = .left
+                    case .right:
+                        paragraph.alignment = .right
+                    case .center:
+                        paragraph.alignment = .center
+                    default:
+                        break
+                    }
+                    text.attributedText = NoteVisitor.process(markup: cell)
+                        .adding(key: .paragraphStyle, value: paragraph)
+                    text.backgroundColor = .clear
+                    text.isScrollEnabled = false
+                    text.isEditable = false
+                    row.append(text)
+                    view?.addSubview(text)
+                }
+                cells.append(row)
+            }
+        }
+
+        var lastWidth = 0.0
+        var size = CGSize.zero
+        func layout(width: CGFloat) {
+            guard width != lastWidth, let table = table else { return }
+            lastWidth = width
+            var widths: [CGFloat] = Array(repeating: 0.0, count: table.maxColumnCount)
+            var heights: [CGFloat] = Array(repeating: 0.0, count: cells.count)
+            cells.enumerated().forEach { y, row in
+                row.enumerated().forEach { x, cell in
+                    let size = cell.sizeThatFits(CGSize(width: width, height: 0))
+                    widths[x] = max(widths[x], size.width)
+                    heights[y] = max(heights[y], size.height)
+                }
+            }
+            var widthOffset = 0.0
+            var heightOffset = 0.0
+            cells.enumerated().forEach { y, row in
+                let height = heights[y]
+                widthOffset = 0
+                row.enumerated().forEach { x, cell in
+                    let width = widths[x]
+                    let rect = CGRect(x: widthOffset, y: heightOffset, width: width, height: height)
+                    if cell.frame != rect {
+                        cell.frame = rect
+                    }
+                    widthOffset += width
+                }
+                heightOffset += height
+            }
+            size = CGSize(width: widthOffset, height: heightOffset)
+            view?.contentSize = size
+        }
+
+        override func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
+            let padded = lineFrag.inset(by: .padded)
+            layout(width: padded.width)
+            return CGRect(origin: .zero, size: size)
+        }
+
+        override func image(forBounds imageBounds: CGRect, textContainer: NSTextContainer?, characterIndex charIndex: Int) -> UIImage? {
+            nil
+        }
+    }
 }
 
 extension TextView {

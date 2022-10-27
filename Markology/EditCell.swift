@@ -24,10 +24,7 @@ class EditCell: NoteCell<NoteController> {
     }
 
     override func render(_ text: String) {
-        let doc = Document(parsing: text)
-        var visitor = EditVisitor(text: text)
-        markdown.attributedText = visitor.visit(doc)
-            .setMissing(key: .foregroundColor, value: UIColor.label)
+        markdown.attributedText = EditVisitor.process(text: text)
         markdown.becomeFirstResponder()
     }
 

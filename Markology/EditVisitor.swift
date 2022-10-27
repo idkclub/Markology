@@ -2,10 +2,17 @@ import Markdown
 import UIKit
 
 struct EditVisitor: MarkupVisitor {
+    static func process(text: String) -> NSMutableAttributedString {
+        let doc = Document(parsing: text)
+        var visitor = EditVisitor(text: text)
+        return visitor.visit(doc)
+            .setMissing(key: .foregroundColor, value: UIColor.label)
+    }
+
     let lengths: [Int: (String, Int)]
     var text: NSMutableAttributedString
 
-    init(text: String) {
+    private init(text: String) {
         self.text = text.body
         var offset = 0
         lengths = text.components(separatedBy: .newlines).enumerated().reduce(into: [:]) {

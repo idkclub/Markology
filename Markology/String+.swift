@@ -48,11 +48,13 @@ extension [NSAttributedString.Key: Any] {
     ]
 }
 
-extension NSMutableAttributedString {
+extension NSAttributedString {
     var range: NSRange {
         NSRange(location: 0, length: length)
     }
+}
 
+extension NSMutableAttributedString {
     var newline: Self {
         appending(NSAttributedString(string: "\n"))
     }

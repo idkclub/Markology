@@ -20,10 +20,7 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
     }
 
     func render(_ text: String) {
-        let doc = Document(parsing: text)
-        var visitor = NoteVisitor()
-        markdown.attributedText = visitor.visit(doc)
-            .setMissing(key: .foregroundColor, value: UIColor.label)
+        markdown.attributedText = NoteVisitor.process(markup: Document(parsing: text))
     }
 
     func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
