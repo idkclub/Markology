@@ -2,12 +2,13 @@ import Markdown
 import UIKit
 
 struct NoteVisitor: MarkupVisitor {
-    static func process(markup: Markup) -> NSMutableAttributedString {
-        var visitor = NoteVisitor()
+    static func process(markup: Markup, checkbox: Bool = false) -> NSMutableAttributedString {
+        var visitor = NoteVisitor(checkbox: checkbox)
         return visitor.visit(markup)
             .setMissing(key: .foregroundColor, value: UIColor.label)
     }
 
+    var checkbox = false
     var indent = [TextView.Indent]()
 
     mutating func block(_ markup: Markdown.Markup, rendered: NSMutableAttributedString? = nil) -> NSMutableAttributedString {
@@ -55,6 +56,8 @@ struct NoteVisitor: MarkupVisitor {
             .indent(for: .list)
     }
 
+    static let checkbox = "checkbox"
+
     mutating func visitListItem(_ listItem: ListItem) -> NSMutableAttributedString {
         let body = block(listItem)
         let box: String
@@ -67,20 +70,24 @@ struct NoteVisitor: MarkupVisitor {
         case .none:
             box = ""
         }
+        var bullet: NSMutableAttributedString
         switch listItem.parent {
         case is UnorderedList:
-            return "• \(box)"
+            bullet = "• \(box)"
                 .body
-                .appending(body)
         case is OrderedList:
-            return "\(listItem.indexInParent + 1). "
+            bullet = "\(listItem.indexInParent + 1). "
                 .body
                 .apply(trait: .traitMonoSpace)
                 .appending(box.body)
-                .appending(body)
         default:
             return body
         }
+        if checkbox, let lower = listItem.range?.lowerBound {
+            bullet = bullet.adding(key: .link, value: "\(NoteVisitor.checkbox)://\(lower.line)")
+        }
+        return bullet
+            .appending(body)
     }
 
     mutating func visitParagraph(_ paragraph: Paragraph) -> NSMutableAttributedString {

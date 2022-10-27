@@ -20,10 +20,16 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
     }
 
     func render(_ text: String) {
-        markdown.attributedText = NoteVisitor.process(markup: Document(parsing: text))
+        markdown.attributedText = NoteVisitor.process(markup: Document(parsing: text), checkbox: controller is NoteController)
     }
 
     func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        if url.scheme == NoteVisitor.checkbox {
+            if let host = url.host, let line = Int(host) {
+                controller?.toggleCheckbox(at: line)
+            }
+            return false
+        }
         guard url.host == nil else { return true }
         guard let path = url.path.removingPercentEncoding,
               let relative = file.use(for: path) else { return false }
@@ -65,6 +71,7 @@ extension NoteCell: ConfigCell {
 
 protocol Navigator: NSObject {
     func navigate(to id: Note.ID)
+    func toggleCheckbox(at line: Int)
 }
 
 extension Navigator where Self: UIViewController {
@@ -72,4 +79,6 @@ extension Navigator where Self: UIViewController {
         guard let nav = navigationController else { return }
         nav.show(NoteController.with(id: id), sender: self)
     }
+
+    func toggleCheckbox(at line: Int) {}
 }

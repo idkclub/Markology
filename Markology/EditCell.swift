@@ -38,6 +38,15 @@ class EditCell: NoteCell<NoteController> {
         var dashCount = 0
         loop: for (index, char) in body[line].enumerated() {
             switch char {
+            case "[":
+                prefix.append(char)
+                dashCount = 0
+            case "X", "]":
+                if !prefix.contains("[") {
+                    break loop
+                }
+                prefix.append(char)
+                dashCount = 0
             case " ":
                 prefix.append(char)
             case ">":

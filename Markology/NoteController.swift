@@ -207,33 +207,37 @@ class NoteController: UIViewController, Bindable {
 
     private func reload() {
         title = entry?.name ?? id?.name
-        guard let id = id else { return }
         guard edit, document == nil else {
             layout()
             return
         }
         Task {
-            let document = NoteDocument(name: id.file)
-            if FileManager.default.fileExists(atPath: document.fileURL.path) {
-                guard await document.open() else {
-                    edit = false
-                    return
-                }
-            } else {
-                do {
-                    try FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-                } catch {
-                    Engine.errors.send(error)
-                }
-                document.text = id.name.isEmpty ? "" : "# \(id.name)\n\n"
-                guard await document.save(to: document.fileURL, for: .forCreating) else {
-                    edit = false
-                    return
-                }
-            }
-            self.document = document
+            await openDocument()
             layout()
         }
+    }
+
+    private func openDocument() async {
+        guard let id = id, document == nil else { return }
+        let document = NoteDocument(name: id.file)
+        if FileManager.default.fileExists(atPath: document.fileURL.path) {
+            guard await document.open() else {
+                edit = false
+                return
+            }
+        } else {
+            do {
+                try FileManager.default.createDirectory(at: document.fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            } catch {
+                Engine.errors.send(error)
+            }
+            document.text = id.name.isEmpty ? "" : "# \(id.name)\n\n"
+            guard await document.save(to: document.fileURL, for: .forCreating) else {
+                edit = false
+                return
+            }
+        }
+        self.document = document
     }
 
     private func layout() {
@@ -469,5 +473,22 @@ extension NoteController: Navigator {
     func navigate(to id: Note.ID) {
         guard let nav = navigationController else { return }
         nav.show(NoteController.with(id: id, edit: edit), sender: self)
+    }
+
+    func toggleCheckbox(at line: Int) {
+        Task {
+            await openDocument()
+            guard let document = document else { return }
+            var lines = document.text.components(separatedBy: .newlines)
+            let current = lines[line - 1]
+            guard let bracket = current.firstIndex(of: "[") else { return }
+            let index = current.index(after: bracket)
+            lines[line - 1] = current.replacingCharacters(in: index ... index, with: current[index] == " " ? "x" : " ")
+            document.text = lines.joined(separator: "\n")
+            document.updateChangeCount(.done)
+            UIView.performWithoutAnimation {
+                reload()
+            }
+        }
     }
 }
