@@ -123,7 +123,7 @@ extension Note {
             init(text: String, limit: Int = 10) {
                 self.text = text
                 self.limit = limit
-                pattern = FTS5Pattern(matchingAllPrefixesIn: text)
+                pattern = Engine.shared.tokenize(query: text)
             }
 
             func fetch(db: Database) throws -> [ID] {
