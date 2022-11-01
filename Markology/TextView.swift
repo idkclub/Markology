@@ -97,13 +97,14 @@ extension TextView {
         var lastWidth = 0.0
         var size = CGSize.zero
         func layout(width: CGFloat) {
-            guard width != lastWidth, let table = table else { return }
-            lastWidth = width
+            let clamped = min(width, 400)
+            guard clamped != lastWidth, let table = table else { return }
+            lastWidth = clamped
             var widths: [CGFloat] = Array(repeating: 0.0, count: table.maxColumnCount)
             var heights: [CGFloat] = Array(repeating: 0.0, count: cells.count)
             cells.enumerated().forEach { y, row in
                 row.enumerated().forEach { x, cell in
-                    let size = cell.sizeThatFits(CGSize(width: width, height: 0))
+                    let size = cell.sizeThatFits(CGSize(width: clamped, height: .infinity))
                     widths[x] = max(widths[x], size.width)
                     heights[y] = max(heights[y], size.height)
                 }
