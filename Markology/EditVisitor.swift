@@ -60,6 +60,14 @@ struct EditVisitor: MarkupVisitor {
             .adding(key: .foregroundColor, value: link.color, range: range)
     }
 
+    mutating func visitImage(_ image: Image) -> NSMutableAttributedString {
+        guard let range = range(for: image),
+              let url = image.encoded else { return text }
+        return defaultVisit(image)
+            .adding(key: .link, value: url, range: range)
+            .adding(key: .foregroundColor, value: image.color, range: range)
+    }
+
     var quoteLevel = 0
     mutating func visitBlockQuote(_ blockQuote: BlockQuote) -> NSMutableAttributedString {
         guard let range = range(for: blockQuote) else { return text }

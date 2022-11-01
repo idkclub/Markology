@@ -11,12 +11,13 @@ class NoteController: UIViewController, Bindable {
     }
 
     private enum Section: Equatable {
+        case file
         case note, edit
         case from(Int), to(Int)
 
         var count: Int {
             switch self {
-            case .note, .edit:
+            case .file, .note, .edit:
                 return 1
             case let .from(count), let .to(count):
                 return count
@@ -32,6 +33,7 @@ class NoteController: UIViewController, Bindable {
 
     lazy var tableView: UITableView = {
         let tableView = UITableView().pinned(to: view, top: false, keyboard: true)
+        tableView.register(FileCell.self)
         tableView.register(EditCell.self)
         tableView.register(EmptyCell.self)
         tableView.register(NoteCell<Self>.self)
@@ -141,13 +143,18 @@ class NoteController: UIViewController, Bindable {
         guard let id = id else { return }
         let menu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         if !text.isEmpty {
-            menu.addAction(UIAlertAction(title: "Share", style: .default) { _ in
+            menu.addAction(UIAlertAction(title: "Share Note", style: .default) { _ in
                 let activityVc = UIActivityViewController(activityItems: [self.text], applicationActivities: nil)
                 activityVc.popoverPresentationController?.barButtonItem = self.menuButton
                 self.present(activityVc, animated: true)
             })
         }
-        menu.addAction(UIAlertAction(title: "Delete Note", style: .destructive) { [weak self] _ in
+        if !id.file.isMarkdown {
+            menu.addAction(UIAlertAction(title: "Open File", style: .default) { _ in
+                id.file.url.open()
+            })
+        }
+        menu.addAction(UIAlertAction(title: "Delete \(id.file.isMarkdown ? "Note" : "File")", style: .destructive) { [weak self] _ in
             let confirm = UIAlertController(title: "Delete \(self?.entry?.name ?? id.name)?", message: "This operation cannot be undone.", preferredStyle: .alert)
             confirm.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             confirm.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
@@ -169,6 +176,18 @@ class NoteController: UIViewController, Bindable {
                         if let error = error {
                             Engine.errors.send(error)
                         }
+                        if !file.name.isMarkdown {
+                            NSFileCoordinator().coordinate(writingItemAt: file.name.markdown.url, options: .forDeleting, error: &error) {
+                                do {
+                                    try FileManager.default.removeItem(at: $0)
+                                } catch {
+                                    Engine.errors.send(error)
+                                }
+                            }
+                            if let error = error {
+                                Engine.errors.send(error)
+                            }
+                        }
                     }
                     Engine.shared.delete(files: [file])
                     self?.id = nil
@@ -185,10 +204,10 @@ class NoteController: UIViewController, Bindable {
     var loaded = false
     override func viewDidLoad() {
         super.viewDidLoad()
-        loaded = true
         view.backgroundColor = .systemBackground
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
+        loaded = true
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -219,7 +238,7 @@ class NoteController: UIViewController, Bindable {
 
     private func openDocument() async {
         guard let id = id, document == nil else { return }
-        let document = NoteDocument(name: id.file)
+        let document = NoteDocument(name: id.file.markdown)
         if FileManager.default.fileExists(atPath: document.fileURL.path) {
             guard await document.open() else {
                 edit = false
@@ -241,7 +260,11 @@ class NoteController: UIViewController, Bindable {
     }
 
     private func layout() {
-        var sections: [Section] = [edit ? .edit : .note]
+        var sections: [Section] = []
+        if id?.file.isMarkdown == false {
+            sections.append(.file)
+        }
+        sections.append(edit ? .edit : .note)
         if let count = entry?.from.count, count > 0 {
             sections.append(.from(count))
         }
@@ -314,6 +337,8 @@ extension NoteController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard let entry = entry else { return nil }
         switch sections[section] {
+        case .file:
+            return String(entry.file.dropFirst())
         case .edit, .note:
             return "Last Updated \(date.string(from: entry.note.modified))"
         case .from:
@@ -325,6 +350,8 @@ extension NoteController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch sections[indexPath.section] {
+        case .file:
+            return tableView.render(id!.file, for: indexPath) as FileCell
         case .note:
             if entry == nil, document == nil {
                 return tableView.render(id!.file, for: indexPath) as EmptyCell
@@ -341,7 +368,7 @@ extension NoteController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch sections[section] {
-        case .note, .edit:
+        case .file, .note, .edit:
             return 1
         case .from:
             return entry?.from.count ?? 0
@@ -453,6 +480,46 @@ extension NoteController {
         func render(_ symbol: String) {
             image.image = UIImage(systemName: symbol)
             image.tintColor = .secondaryLabel
+        }
+    }
+}
+
+extension NoteController {
+    class FileCell: UITableViewCell, RenderCell {
+        var height: NSLayoutConstraint?
+        lazy var imageDisplay = {
+            let view = UIImageView().pinned(to: contentView)
+            view.contentMode = .scaleAspectFit
+            return view
+        }()
+
+        lazy var textDisplay = {
+            let view = TextView().pinned(to: contentView)
+            view.isEditable = false
+            view.isScrollEnabled = false
+            view.textContainerInset = .padded
+            return view
+        }()
+
+        override func prepareForReuse() {
+            imageDisplay.image = nil
+            textDisplay.text = nil
+        }
+
+        func render(_ file: Paths.File.Name) {
+            if let text = try? String(contentsOf: file.url) {
+                textDisplay.attributedText = "".label.appending(text.code)
+                return
+            }
+            if let image = UIImage(contentsOfFile: file.url.path) {
+                imageDisplay.image = image
+                if let height = height {
+                    imageDisplay.removeConstraint(height)
+                }
+                height = imageDisplay.heightAnchor.constraint(equalTo: imageDisplay.widthAnchor, multiplier: image.size.height / image.size.width)
+                height?.isActive = true
+                height?.priority = .defaultHigh
+            }
         }
     }
 }

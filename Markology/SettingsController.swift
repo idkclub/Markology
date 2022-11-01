@@ -49,17 +49,6 @@ class SettingsController: UIViewController {
     @objc func sync() {}
 
     @objc func folder() {
-        open(url: Engine.paths.documents)
-    }
-
-    func open(url: URL) {
-        #if targetEnvironment(macCatalyst)
-            UIApplication.shared.open(url)
-        #else
-            guard let url = NSURLComponents(url: url, resolvingAgainstBaseURL: true) else { return }
-            url.scheme = "shareddocuments"
-            guard let url = url.url else { return }
-            UIApplication.shared.open(url)
-        #endif
+        Engine.paths.documents.open()
     }
 }

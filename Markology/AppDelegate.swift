@@ -62,7 +62,9 @@ class SplitController: UISplitViewController {
             controller = EmptyController()
         }
         history.viewControllers = [controller]
-        primaryBackgroundStyle = .sidebar
+        #if targetEnvironment(macCatalyst)
+            primaryBackgroundStyle = .sidebar
+        #endif
         delegate = self
 
         errors = Engine.errors.sink {

@@ -42,6 +42,24 @@ struct NoteVisitor: MarkupVisitor {
             .adding(key: .foregroundColor, value: link.color)
     }
 
+    mutating func visitImage(_ image: Image) -> NSMutableAttributedString {
+        guard let source = image.source,
+              let url = source.url.path.removingPercentEncoding,
+              let image = UIImage(contentsOfFile: url) else { return defaultVisit(image) }
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        if image.size.width < image.size.height {
+            let ratio = image.size.width / image.size.height
+            attachment.bounds = CGRect(x: 0, y: -90, width: ratio * 200, height: 200)
+        } else {
+            let ratio = image.size.height / image.size.width
+            let height = ratio * 200
+            attachment.bounds = CGRect(x: 0, y: -height / 2 + 10, width: 200, height: height)
+        }
+        return NSMutableAttributedString(attachment: attachment)
+            .adding(key: .link, value: source)
+    }
+
     mutating func visitOrderedList(_ orderedList: OrderedList) -> NSMutableAttributedString {
         indent.append(.list)
         defer { indent.remove(at: indent.lastIndex(of: .list)!) }
