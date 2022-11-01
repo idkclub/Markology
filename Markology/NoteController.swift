@@ -353,7 +353,7 @@ extension NoteController: UITableViewDataSource {
         case .file:
             return tableView.render(id!.file, for: indexPath) as FileCell
         case .note:
-            if entry == nil, document == nil {
+            if entry == nil || (!id!.file.isMarkdown && entry?.text == ""), document == nil {
                 return tableView.render(id!.file, for: indexPath) as EmptyCell
             }
             return tableView.render(NoteCell.Value(file: id!.file, text: text), with: self, for: indexPath) as NoteCell
@@ -503,22 +503,26 @@ extension NoteController {
 
         override func prepareForReuse() {
             imageDisplay.image = nil
+            imageDisplay.isHidden = true
             textDisplay.text = nil
+            textDisplay.isHidden = true
         }
 
         func render(_ file: Paths.File.Name) {
-            if let text = try? String(contentsOf: file.url) {
-                textDisplay.attributedText = "".label.appending(text.code)
-                return
-            }
             if let image = UIImage(contentsOfFile: file.url.path) {
                 imageDisplay.image = image
+                imageDisplay.isHidden = false
                 if let height = height {
                     imageDisplay.removeConstraint(height)
                 }
                 height = imageDisplay.heightAnchor.constraint(equalTo: imageDisplay.widthAnchor, multiplier: image.size.height / image.size.width)
                 height?.isActive = true
                 height?.priority = .defaultHigh
+            }
+            if let text = try? String(contentsOf: file.url) {
+                textDisplay.attributedText = "".label.appending(text.code)
+                textDisplay.isHidden = false
+                return
             }
         }
     }
@@ -528,7 +532,9 @@ extension NoteController {
     class EmptyCell: UITableViewCell, RenderCell {
         func render(_ file: Paths.File.Name) {
             var content = defaultContentConfiguration()
-            content.text = "\n\n\(file.dropFirst()) wasn't found. Begin editing to create it.\n\n"
+            content.text = file.isMarkdown ?
+                "\n\n\(file.dropFirst()) wasn't found. Begin editing to create it.\n\n" :
+                "No note currently attached. Begin editing to create one."
             content.textProperties.color = .placeholderText
             content.textProperties.alignment = .center
             contentConfiguration = content
