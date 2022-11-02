@@ -36,16 +36,15 @@ extension TextView: NSLayoutManagerDelegate {
         guard layoutFinishedFlag else { return }
         var seen: Set<UIView> = []
         attributedText.enumerateAttribute(.attachment, in: attributedText.range) { value, range, _ in
-            guard let value = value as? Table,
-                  let view = value.view else { return }
-            if view.superview != self {
-                view.removeFromSuperview()
-                addSubview(view)
+            guard let value = value as? Table else { return }
+            if value.view.superview != self {
+                value.view.removeFromSuperview()
+                addSubview(value.view)
             }
-            seen.insert(view)
+            seen.insert(value.view)
             let glyph = layoutManager.glyphIndexForCharacter(at: range.lowerBound)
             let usedRect = layoutManager.lineFragmentUsedRect(forGlyphAt: glyph, effectiveRange: nil)
-            view.frame = usedRect.offsetBy(dx: textContainerInset.left, dy: textContainerInset.top)
+            value.view.frame = usedRect.offsetBy(dx: textContainerInset.left, dy: textContainerInset.top)
         }
         attachments.forEach {
             if !seen.contains($0) {
@@ -58,16 +57,11 @@ extension TextView: NSLayoutManagerDelegate {
 
 extension TextView {
     class Table: NSTextAttachment {
-        var cells: [[UITextView]] = []
-        var view: UIScrollView?
-        var table: Markdown.Table?
-        convenience init(for table: Markdown.Table) {
-            self.init(data: nil, ofType: "net.daringfireball.markdown")
-            self.table = table
-            view = UIScrollView()
+        lazy var cells: [[UITextView]] = {
+            guard let table = table else { return [] }
             var rows = [table.head.cells]
             rows.append(contentsOf: table.body.rows.map { $0.cells })
-            cells = rows.map {
+            return rows.map {
                 $0.enumerated().map { x, cell in
                     let text = UITextView()
                     let paragraph = NSMutableParagraphStyle()
@@ -86,10 +80,16 @@ extension TextView {
                     text.backgroundColor = .clear
                     text.isScrollEnabled = false
                     text.isEditable = false
-                    view?.addSubview(text)
+                    view.addSubview(text)
                     return text
                 }
             }
+        }()
+        var view = UIScrollView()
+        var table: Markdown.Table?
+        convenience init(for table: Markdown.Table) {
+            self.init(data: nil, ofType: "net.daringfireball.markdown")
+            self.table = table
         }
 
         var lastWidth = 0.0
@@ -123,7 +123,7 @@ extension TextView {
                 heightOffset += height
             }
             size = CGSize(width: widthOffset, height: heightOffset)
-            view?.contentSize = size
+            view.contentSize = size
         }
 
         override func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
