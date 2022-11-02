@@ -58,7 +58,7 @@ extension TextView: NSLayoutManagerDelegate {
 
 extension TextView {
     class Table: NSTextAttachment {
-        var cells: [[TextView]] = []
+        var cells: [[UITextView]] = []
         var view: UIScrollView?
         var table: Markdown.Table?
         convenience init(for table: Markdown.Table) {
@@ -67,10 +67,9 @@ extension TextView {
             view = UIScrollView()
             var rows = [table.head.cells]
             rows.append(contentsOf: table.body.rows.map { $0.cells })
-            rows.forEach {
-                var row: [TextView] = []
-                $0.enumerated().forEach { x, cell in
-                    let text = TextView()
+            cells = rows.map {
+                $0.enumerated().map { x, cell in
+                    let text = UITextView()
                     let paragraph = NSMutableParagraphStyle()
                     switch table.columnAlignments[x] {
                     case .left:
@@ -87,10 +86,9 @@ extension TextView {
                     text.backgroundColor = .clear
                     text.isScrollEnabled = false
                     text.isEditable = false
-                    row.append(text)
                     view?.addSubview(text)
+                    return text
                 }
-                cells.append(row)
             }
         }
 
