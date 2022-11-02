@@ -33,53 +33,21 @@ class EditCell: NoteCell<NoteController> {
               text == "\n",
               let indexRange = Range(range, in: body) else { return true }
         let line = body.lineRange(for: indexRange)
-        var prefix = ""
-        var empty = true
-        var dashCount = 0
-        loop: for (index, char) in body[line].enumerated() {
-            switch char {
-            case "[":
-                prefix.append(char)
-                dashCount = 0
-            case "X", "]":
-                if !prefix.contains("[") {
-                    break loop
-                }
-                prefix.append(char)
-                dashCount = 0
-            case " ":
-                prefix.append(char)
-            case ">":
-                prefix.append(char)
-                dashCount = 0
-            case "-":
-                dashCount += 1
-                if prefix.contains(">") {
-                    prefix.append(char)
-                    continue
-                }
-                prefix = "\(String(repeating: " ", count: index))-"
-            case "\n":
-                break loop
-            default:
-                empty = false
-                break loop
-            }
-        }
-        guard dashCount < 3 else { return true }
-        if prefix != "" {
+        let prefix = Prefixer.match(body[line])
+        guard !prefix.dash else { return true }
+        if prefix.prefix != "" {
             dirty = true
             let replace: String
             let selected: Int
             let uiRange: UITextRange?
-            if empty {
+            if prefix.empty {
                 let range = NSRange(line, in: body)
                 replace = line.upperBound == body.endIndex ? "\n" : "\n\n"
                 selected = range.lowerBound + 1
                 uiRange = textView.range(for: range)
             } else {
-                replace = "\n\(prefix)"
-                selected = range.upperBound + 1 + prefix.count
+                replace = "\n\(prefix.prefix)"
+                selected = range.upperBound + replace.count
                 uiRange = textView.range(for: range)
             }
             guard let uiRange = uiRange else { return true }
@@ -142,11 +110,68 @@ class EditCell: NoteCell<NoteController> {
         visitor.visit(doc)
         return visitor.text
     }
+}
 
+extension EditCell {
     struct LinkWalker: MarkupWalker {
         var text = ""
         mutating func visitLink(_ link: Markdown.Link) {
             text = link.plainText
+        }
+    }
+}
+
+extension EditCell {
+    struct Prefixer {
+        var prefix = ""
+        var empty = true
+        var dash: Bool { dashCount >= 3 }
+        private var dashCount = 0
+        private var iterator: Substring.Iterator
+
+        static func match(_ string: Substring) -> Self {
+            var instance = Self(iterator: string.makeIterator())
+            while let char = instance.iterator.next() {
+                if !instance.handle(char: char) {
+                    break
+                }
+            }
+            return instance
+        }
+
+        private mutating func handle(char: Character) -> Bool {
+            switch char {
+            case "[":
+                dashCount = 0
+                guard !prefix.contains("["),
+                      let next = iterator.next(),
+                      [" ", "x"].contains(next),
+                      let close = iterator.next(),
+                      close == "]" else {
+                    empty = false
+                    return false
+                }
+                prefix.append("[ ]")
+                return true
+            case " ":
+                prefix.append(char)
+            case ">":
+                prefix.append(char)
+                dashCount = 0
+            case "-":
+                dashCount += 1
+                if prefix.contains(">") {
+                    prefix.append(char)
+                } else {
+                    prefix = "\(String(repeating: " ", count: prefix.count ))-"
+                }
+            case "\n":
+                return false
+            default:
+                empty = false
+                return false
+            }
+            return true
         }
     }
 }
