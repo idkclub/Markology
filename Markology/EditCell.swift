@@ -145,7 +145,7 @@ extension EditCell {
                 dashCount = 0
                 guard !prefix.contains("["),
                       let next = iterator.next(),
-                      [" ", "x"].contains(next),
+                      [" ", "x", "X"].contains(next),
                       let close = iterator.next(),
                       close == "]" else {
                     empty = false
