@@ -28,7 +28,7 @@ class SearchController: UITableViewController, Bindable, Navigator {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        tableView.render(NoteCell.value(for: notes[indexPath.row]), with: self, for: indexPath) as NoteCell
+        tableView.render(NoteCell.value(for: notes[indexPath.row], with: self), for: indexPath) as NoteCell
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

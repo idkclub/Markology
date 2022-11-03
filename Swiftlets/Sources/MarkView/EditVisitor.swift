@@ -73,7 +73,7 @@ struct EditVisitor: MarkupVisitor {
         guard let range = range(for: blockQuote) else { return text }
         quoteLevel += 1
         let quoted = defaultVisit(blockQuote)
-            .setMissing(key: .verticalRule, value: [TextView.Indent.quote], range: range)
+            .setMissing(key: .verticalRule, value: [MarkView.Indent.quote], range: range)
             .setMissing(key: .foregroundColor, value: UIColor.secondaryLabel, range: range)
         quoteLevel -= 1
         if quoteLevel > 0 {

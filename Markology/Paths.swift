@@ -155,8 +155,12 @@ extension Paths {
 
 extension Paths.File.Name {
     func use(for destination: Paths.File.Name) -> Self? {
-        guard let path = destination.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
-              let from = addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
+        guard let path = destination.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
+        return use(forEncoded: path)
+    }
+
+    func use(forEncoded path: String) -> Self? {
+        guard let from = addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
         return URL(string: path, relativeTo: URL(string: from))?.path
     }
 }

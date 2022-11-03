@@ -7,15 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4E4583BB28FA88CB00C617BE /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BA28FA88CB00C617BE /* String+.swift */; };
-		4E4583BD28FA899100C617BE /* Markdown+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BC28FA899100C617BE /* Markdown+.swift */; };
-		4E4583BF28FA8A4000C617BE /* EditVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BE28FA8A4000C617BE /* EditVisitor.swift */; };
-		4E4583C128FA8ABD00C617BE /* NoteVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C028FA8ABD00C617BE /* NoteVisitor.swift */; };
+		4E4583BB28FA88CB00C617BE /* Foundation+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BA28FA88CB00C617BE /* Foundation+.swift */; };
 		4E4583C328FA8EA700C617BE /* EditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C228FA8EA700C617BE /* EditCell.swift */; };
 		4E4583C628FBB93800C617BE /* Paths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C528FBB93800C617BE /* Paths.swift */; };
 		4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C728FBC1CA00C617BE /* SettingsController.swift */; };
 		4E596500291399A2000BB2EC /* ImportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5964FF291399A2000BB2EC /* ImportController.swift */; };
 		4E596507291399A2000BB2EC /* Import.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4E5964FD291399A2000BB2EC /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4E5965332913AB42000BB2EC /* KitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965322913AB42000BB2EC /* KitPlus */; };
+		4E5965372913B431000BB2EC /* KitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965362913B431000BB2EC /* KitPlus */; };
+		4E59653A2913B963000BB2EC /* MarkView in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965392913B963000BB2EC /* MarkView */; };
+		4E59653C2913C3D7000BB2EC /* MarkView in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59653B2913C3D7000BB2EC /* MarkView */; };
 		4E6A3A6A28FF1082005CCE32 /* NoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6928FF1082005CCE32 /* NoteCell.swift */; };
 		4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */; };
 		4E7776EB28F46E9E00DAEF80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */; };
@@ -25,8 +26,6 @@
 		4E77770228F481F700DAEF80 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770128F481F700DAEF80 /* Note.swift */; };
 		4E77770428F486E900DAEF80 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770328F486E900DAEF80 /* MenuController.swift */; };
 		4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770528F5008C00DAEF80 /* NoteController.swift */; };
-		4E77770828F500C600DAEF80 /* UIKit+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770728F500C600DAEF80 /* UIKit+.swift */; };
-		4E77771228F6237800DAEF80 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771128F6237800DAEF80 /* TextView.swift */; };
 		4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; };
 		4E77771C28F7330600DAEF80 /* GRDB-dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
@@ -68,10 +67,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4E4583BA28FA88CB00C617BE /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
-		4E4583BC28FA899100C617BE /* Markdown+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Markdown+.swift"; sourceTree = "<group>"; };
-		4E4583BE28FA8A4000C617BE /* EditVisitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditVisitor.swift; sourceTree = "<group>"; };
-		4E4583C028FA8ABD00C617BE /* NoteVisitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteVisitor.swift; sourceTree = "<group>"; };
+		4E4583BA28FA88CB00C617BE /* Foundation+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Foundation+.swift"; sourceTree = "<group>"; };
 		4E4583C228FA8EA700C617BE /* EditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCell.swift; sourceTree = "<group>"; };
 		4E4583C528FBB93800C617BE /* Paths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Paths.swift; sourceTree = "<group>"; };
 		4E4583C728FBC1CA00C617BE /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
@@ -79,6 +75,7 @@
 		4E5964FF291399A2000BB2EC /* ImportController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportController.swift; sourceTree = "<group>"; };
 		4E596504291399A2000BB2EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4E596508291399A2000BB2EC /* Import.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Import.entitlements; sourceTree = "<group>"; };
+		4E5965342913B073000BB2EC /* Swiftlets */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Swiftlets; sourceTree = "<group>"; };
 		4E6A3A6928FF1082005CCE32 /* NoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCell.swift; sourceTree = "<group>"; };
 		4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDocument.swift; sourceTree = "<group>"; };
 		4E7776E328F46E9C00DAEF80 /* Markology.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markology.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,8 +86,6 @@
 		4E77770128F481F700DAEF80 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		4E77770328F486E900DAEF80 /* MenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		4E77770528F5008C00DAEF80 /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
-		4E77770728F500C600DAEF80 /* UIKit+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit+.swift"; sourceTree = "<group>"; };
-		4E77771128F6237800DAEF80 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		4E77771F28F9B42000DAEF80 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -99,6 +94,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E59653C2913C3D7000BB2EC /* MarkView in Frameworks */,
+				4E5965372913B431000BB2EC /* KitPlus in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,7 +103,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E5965332913AB42000BB2EC /* KitPlus in Frameworks */,
 				4E77770028F47F0E00DAEF80 /* Markdown in Frameworks */,
+				4E59653A2913B963000BB2EC /* MarkView in Frameworks */,
 				4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -124,11 +123,20 @@
 			path = Import;
 			sourceTree = "<group>";
 		};
+		4E59652F2913AA0A000BB2EC /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				4E5965342913B073000BB2EC /* Swiftlets */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 		4E7776DA28F46E9C00DAEF80 = {
 			isa = PBXGroup;
 			children = (
-				4E7776E528F46E9C00DAEF80 /* Markology */,
 				4E5964FE291399A2000BB2EC /* Import */,
+				4E7776E528F46E9C00DAEF80 /* Markology */,
+				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -148,21 +156,16 @@
 				4E7776F628F46F7100DAEF80 /* Markology.entitlements */,
 				4E7776F428F46EC100DAEF80 /* AppDelegate.swift */,
 				4E4583C228FA8EA700C617BE /* EditCell.swift */,
-				4E4583BE28FA8A4000C617BE /* EditVisitor.swift */,
 				4E7776F728F47D0700DAEF80 /* Engine.swift */,
-				4E4583BC28FA899100C617BE /* Markdown+.swift */,
+				4E4583BA28FA88CB00C617BE /* Foundation+.swift */,
 				4E77770328F486E900DAEF80 /* MenuController.swift */,
 				4E77770128F481F700DAEF80 /* Note.swift */,
 				4E6A3A6928FF1082005CCE32 /* NoteCell.swift */,
 				4E77770528F5008C00DAEF80 /* NoteController.swift */,
 				4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */,
-				4E4583C028FA8ABD00C617BE /* NoteVisitor.swift */,
 				4E4583C528FBB93800C617BE /* Paths.swift */,
 				4E77771F28F9B42000DAEF80 /* SearchController.swift */,
 				4E4583C728FBC1CA00C617BE /* SettingsController.swift */,
-				4E4583BA28FA88CB00C617BE /* String+.swift */,
-				4E77771128F6237800DAEF80 /* TextView.swift */,
-				4E77770728F500C600DAEF80 /* UIKit+.swift */,
 				4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */,
 			);
 			path = Markology;
@@ -184,6 +187,10 @@
 			dependencies = (
 			);
 			name = Import;
+			packageProductDependencies = (
+				4E5965362913B431000BB2EC /* KitPlus */,
+				4E59653B2913C3D7000BB2EC /* MarkView */,
+			);
 			productName = Import;
 			productReference = 4E5964FD291399A2000BB2EC /* Import.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -207,6 +214,8 @@
 			packageProductDependencies = (
 				4E7776FF28F47F0E00DAEF80 /* Markdown */,
 				4E77771A28F732EC00DAEF80 /* GRDB-dynamic */,
+				4E5965322913AB42000BB2EC /* KitPlus */,
+				4E5965392913B963000BB2EC /* MarkView */,
 			);
 			productName = Markology;
 			productReference = 4E7776E328F46E9C00DAEF80 /* Markology.app */;
@@ -285,22 +294,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */,
-				4E4583C128FA8ABD00C617BE /* NoteVisitor.swift in Sources */,
-				4E77770828F500C600DAEF80 /* UIKit+.swift in Sources */,
 				4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */,
 				4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */,
-				4E77771228F6237800DAEF80 /* TextView.swift in Sources */,
 				4E77770428F486E900DAEF80 /* MenuController.swift in Sources */,
 				4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */,
 				4E4583C628FBB93800C617BE /* Paths.swift in Sources */,
 				4E7776F828F47D0700DAEF80 /* Engine.swift in Sources */,
-				4E4583BB28FA88CB00C617BE /* String+.swift in Sources */,
+				4E4583BB28FA88CB00C617BE /* Foundation+.swift in Sources */,
 				4E77770228F481F700DAEF80 /* Note.swift in Sources */,
 				4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */,
 				4E4583C328FA8EA700C617BE /* EditCell.swift in Sources */,
 				4E6A3A6A28FF1082005CCE32 /* NoteCell.swift in Sources */,
-				4E4583BD28FA899100C617BE /* Markdown+.swift in Sources */,
-				4E4583BF28FA8A4000C617BE /* EditVisitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -585,6 +589,22 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4E5965322913AB42000BB2EC /* KitPlus */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KitPlus;
+		};
+		4E5965362913B431000BB2EC /* KitPlus */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KitPlus;
+		};
+		4E5965392913B963000BB2EC /* MarkView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MarkView;
+		};
+		4E59653B2913C3D7000BB2EC /* MarkView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MarkView;
+		};
 		4E7776FF28F47F0E00DAEF80 /* Markdown */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4E7776FE28F47F0E00DAEF80 /* XCRemoteSwiftPackageReference "swift-markdown" */;

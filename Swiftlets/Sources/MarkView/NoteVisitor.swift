@@ -2,14 +2,14 @@ import Markdown
 import UIKit
 
 struct NoteVisitor: MarkupVisitor {
-    static func process(markup: Markup, checkbox: Bool = false) -> NSMutableAttributedString {
-        var visitor = NoteVisitor(checkbox: checkbox)
-        return visitor.visit(markup)
+    var checkbox = false
+    var resolver: URLResolver?
+    var indent = [MarkView.Indent]()
+
+    mutating func process(markup: Markup) -> NSMutableAttributedString {
+        visit(markup)
             .setMissing(key: .foregroundColor, value: UIColor.label)
     }
-
-    var checkbox = false
-    var indent = [TextView.Indent]()
 
     mutating func block(_ markup: Markdown.Markup, rendered: NSMutableAttributedString? = nil) -> NSMutableAttributedString {
         let result = rendered != nil ? rendered! : defaultVisit(markup)
@@ -44,7 +44,8 @@ struct NoteVisitor: MarkupVisitor {
 
     mutating func visitImage(_ image: Image) -> NSMutableAttributedString {
         guard let source = image.source,
-              let url = source.url.path.removingPercentEncoding,
+              !image.absolute,
+              let url = resolver?.resolve(path: source),
               let image = UIImage(contentsOfFile: url) else { return defaultVisit(image) }
         let attachment = NSTextAttachment()
         attachment.image = image
@@ -74,12 +75,9 @@ struct NoteVisitor: MarkupVisitor {
             .indent(for: .list)
     }
 
-    static let checkbox = "checkbox"
-
     mutating func visitListItem(_ listItem: ListItem) -> NSMutableAttributedString {
         let body = block(listItem)
         let box: String
-        // TODO: Clickable checkboxes.
         switch listItem.checkbox {
         case .checked:
             box = "☑ "
@@ -102,7 +100,7 @@ struct NoteVisitor: MarkupVisitor {
             return body
         }
         if checkbox, let lower = listItem.range?.lowerBound {
-            bullet = bullet.adding(key: .link, value: "\(NoteVisitor.checkbox)://\(lower.line)")
+            bullet = bullet.adding(key: .link, value: "\(MarkView.checkboxScheme)://\(lower.line)")
         }
         return bullet
             .appending(body)
@@ -132,7 +130,7 @@ struct NoteVisitor: MarkupVisitor {
     }
 
     mutating func visitTable(_ table: Table) -> NSMutableAttributedString {
-        block(table, rendered: NSMutableAttributedString(attachment: TextView.Table(for: table)))
+        block(table, rendered: NSMutableAttributedString(attachment: MarkView.Table(for: table)))
     }
 
     func visitLineBreak(_ lineBreak: LineBreak) -> NSMutableAttributedString {

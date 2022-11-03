@@ -1,25 +1,7 @@
 import UIKit
 
-extension UIColor {
-    static let idkCyan = UIColor(red: 0.00, green: 0.58, blue: 0.83, alpha: 1.00)
-    static let idkMagenta = UIColor(red: 0.80, green: 0.00, blue: 0.42, alpha: 1.00)
-    static let idkYellow = UIColor(named: "Highlight")!
-}
-
-extension UIFont {
-    func apply(trait: UIFontDescriptor.SymbolicTraits? = nil, size: CGFloat? = nil) -> UIFont {
-        var font = fontDescriptor
-        var traits = font.symbolicTraits
-        if let trait = trait {
-            traits.insert(trait)
-            font = fontDescriptor.withSymbolicTraits(traits) ?? font
-        }
-        return UIFont(descriptor: font, size: size ?? pointSize)
-    }
-}
-
-extension UIView {
-    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true, keyboard: Bool = false) -> Self {
+public extension UIView {
+    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true) -> Self {
         view.addSubview(self)
         translatesAutoresizingMaskIntoConstraints = false
         var constraints = [
@@ -30,16 +12,22 @@ extension UIView {
             constraints.append(topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: withInset))
         }
         if bottom {
-            constraints.append(keyboard ?
-                bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor) :
+            constraints.append(
                 bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -withInset))
         }
         NSLayoutConstraint.activate(constraints)
         return self
     }
+
+    @available(iOS 15.0, *)
+    func pinned(toKeyboardAnd view: UIView, withInset: CGFloat = 0, top: Bool = true) -> Self {
+        let view = pinned(to: view, withInset: withInset, bottom: false, top: top)
+        bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
+        return view
+    }
 }
 
-extension UITextView {
+public extension UITextView {
     func range(for range: NSRange) -> UITextRange? {
         guard let start = position(from: beginningOfDocument, offset: range.location),
               let end = position(from: start, offset: range.length),
@@ -48,11 +36,7 @@ extension UITextView {
     }
 }
 
-extension UIEdgeInsets {
-    static var padded = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
-}
-
-extension UITableView {
+public extension UITableView {
     func register<T: RenderCell>(_ cell: T.Type) {
         register(T.self, forCellReuseIdentifier: T.reuse)
     }
@@ -62,16 +46,9 @@ extension UITableView {
         cell.render(value)
         return cell
     }
-
-    func render<T: ConfigCell>(_ value: T.Value, with config: T.Config, for indexPath: IndexPath) -> T {
-        let cell = dequeueReusableCell(withIdentifier: T.reuse, for: indexPath) as! T
-        cell.config(config)
-        cell.render(value)
-        return cell
-    }
 }
 
-extension UICollectionView {
+public extension UICollectionView {
     func register<T: RenderCell>(_ cell: T.Type) {
         register(T.self, forCellWithReuseIdentifier: T.reuse)
     }
@@ -93,22 +70,7 @@ extension UICollectionView {
     }
 }
 
-protocol Bindable: AnyObject {}
-
-extension Bindable {
-    func with<T>(_ key: WritableKeyPath<Self, T>) -> ((T) -> Void) {
-        { [weak self] in
-            self?[keyPath: key] = $0
-        }
-    }
-}
-
-protocol ConfigCell<Config>: RenderCell {
-    associatedtype Config
-    func config(_: Config)
-}
-
-protocol RenderCell<Value>: NSObject {
+public protocol RenderCell<Value>: NSObject {
     associatedtype Value
     func render(_: Value)
 }

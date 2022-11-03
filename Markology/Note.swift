@@ -1,4 +1,5 @@
 import GRDB
+import KitPlus
 import Markdown
 import UIKit
 
@@ -82,20 +83,14 @@ extension Note {
             let text: String
             let note: ID
 
-            class Cell: UITableViewCell, ConfigCell {
-                var note = ""
-
-                func config(_ note: String) {
-                    self.note = note
-                }
-
-                func render(_ link: Note.Entry.Link) {
+            class Cell: UITableViewCell, RenderCell {
+                func render(_ value: (link: Note.Entry.Link, note: String)) {
                     var content = UIListContentConfiguration.valueCell()
-                    content.text = link.note.name
-                    if link.note.name != link.text,
-                       note != link.text
+                    content.text = value.link.note.name
+                    if value.link.note.name != value.link.text,
+                       value.note != value.link.text
                     {
-                        content.secondaryText = link.text
+                        content.secondaryText = value.link.text
                     }
                     contentConfiguration = content
                 }

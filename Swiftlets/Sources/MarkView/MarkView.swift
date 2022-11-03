@@ -1,7 +1,7 @@
 import Markdown
 import UIKit
 
-class TextView: UITextView {
+public class MarkView: UITextView {
     convenience init() {
         let layoutManager = LayoutManager()
         let textStorage = NSTextStorage()
@@ -14,25 +14,43 @@ class TextView: UITextView {
         smartDashesType = .no
     }
 
-    override var keyCommands: [UIKeyCommand] {
+    override public var keyCommands: [UIKeyCommand] {
         [UIKeyCommand(input: "\t", modifierFlags: [], action: #selector(command))]
     }
 
-    var commandable: Commandable?
+    public var commandable: Commandable?
 
     @objc func command(_ command: UIKeyCommand) {
         commandable?.handle(command)
     }
 
+    public var resolver: URLResolver?
+
+    public static let checkboxScheme = "checkbox"
+    public var linkCheckboxes: Bool = false
+
     var attachments: Set<UIView> = []
+
+    public func render(text: String, includingMarkup: Bool) {
+        if includingMarkup {
+            attributedText = EditVisitor.process(text: text)
+            return
+        }
+        var visitor = NoteVisitor(checkbox: linkCheckboxes, resolver: resolver)
+        attributedText = visitor.process(markup: Document(parsing: text))
+    }
 }
 
-protocol Commandable {
+public protocol Commandable {
     func handle(_: UIKeyCommand)
 }
 
-extension TextView: NSLayoutManagerDelegate {
-    func layoutManager(_ layoutManager: NSLayoutManager, didCompleteLayoutFor textContainer: NSTextContainer?, atEnd layoutFinishedFlag: Bool) {
+public protocol URLResolver {
+    func resolve(path: String) -> String?
+}
+
+extension MarkView: NSLayoutManagerDelegate {
+    public func layoutManager(_ layoutManager: NSLayoutManager, didCompleteLayoutFor textContainer: NSTextContainer?, atEnd layoutFinishedFlag: Bool) {
         guard layoutFinishedFlag else { return }
         var seen: Set<UIView> = []
         attributedText.enumerateAttribute(.attachment, in: attributedText.range) { value, range, _ in
@@ -55,7 +73,7 @@ extension TextView: NSLayoutManagerDelegate {
     }
 }
 
-extension TextView {
+extension MarkView {
     class Table: NSTextAttachment {
         lazy var cells: [[UITextView]] = {
             guard let table = table else { return [] }
@@ -75,7 +93,8 @@ extension TextView {
                     default:
                         break
                     }
-                    text.attributedText = NoteVisitor.process(markup: cell)
+                    var visitor = NoteVisitor()
+                    text.attributedText = visitor.process(markup: cell)
                         .adding(key: .paragraphStyle, value: paragraph)
                     text.backgroundColor = .clear
                     text.isScrollEnabled = false
@@ -85,6 +104,7 @@ extension TextView {
                 }
             }
         }()
+
         var view = UIScrollView()
         var table: Markdown.Table?
         convenience init(for table: Markdown.Table) {
@@ -126,9 +146,9 @@ extension TextView {
             view.contentSize = size
         }
 
+        static let padding = 20.0
         override func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
-            let padded = lineFrag.inset(by: .padded)
-            layout(width: padded.width)
+            layout(width: lineFrag.width - Table.padding)
             return CGRect(origin: .zero, size: size)
         }
 
@@ -138,7 +158,7 @@ extension TextView {
     }
 }
 
-extension TextView {
+extension MarkView {
     class LayoutManager: NSLayoutManager {
         override func drawGlyphs(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
             super.drawGlyphs(forGlyphRange: glyphsToShow, at: origin)

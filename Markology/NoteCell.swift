@@ -1,38 +1,38 @@
+import KitPlus
 import Markdown
+import MarkView
 import UIKit
 
 class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
     weak var controller: N?
-    lazy var markdown = {
-        let markdown = TextView().pinned(to: contentView)
-        markdown.textContainerInset = .padded
-        markdown.isScrollEnabled = false
-        markdown.isEditable = false
-        markdown.dataDetectorTypes = .all
-        markdown.delegate = self
-        return markdown
-    }()
-
+    lazy var markdown = markView()
     var file: Paths.File.Name = "/"
 
-    func config(_ controller: N) {
-        self.controller = controller
+    func markView() -> MarkView {
+        let view = MarkView().pinned(to: contentView)
+        view.textContainerInset = .padded
+        view.isScrollEnabled = false
+        view.isEditable = false
+        view.dataDetectorTypes = .all
+        view.delegate = self
+        return view
     }
 
     func render(_ text: String) {
-        markdown.attributedText = NoteVisitor.process(markup: Document(parsing: text), checkbox: controller is NoteController)
+        markdown.linkCheckboxes = controller is NoteController
+        markdown.resolver = self
+        markdown.render(text: text, includingMarkup: false)
     }
 
     func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if url.scheme == NoteVisitor.checkbox {
+        if url.scheme == MarkView.checkboxScheme {
             if let host = url.host, let line = Int(host) {
                 controller?.toggleCheckbox(at: line)
             }
             return false
         }
         guard url.host == nil else { return true }
-        guard let path = url.path.removingPercentEncoding,
-              let relative = file.use(for: path) else { return false }
+        guard let relative = file.use(forEncoded: url.path) else { return false }
         var name = ""
         if let range = textView.range(for: characterRange),
            let text = textView.text(in: range)
@@ -53,17 +53,26 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
     }
 }
 
-extension NoteCell: ConfigCell {
+extension NoteCell: URLResolver {
+    func resolve(path: String) -> String? {
+        guard let relative = file.use(forEncoded: path) else { return nil }
+        return relative.url.path.removingPercentEncoding
+    }
+}
+
+extension NoteCell: RenderCell {
     struct Value {
         let file: Paths.File.Name
         let text: String
+        let with: N
     }
 
-    static func value(for note: Note) -> Value {
-        return Value(file: note.file, text: note.text)
+    static func value(for note: Note, with: N) -> Value {
+        return Value(file: note.file, text: note.text, with: with)
     }
 
     func render(_ value: Value) {
+        controller = value.with
         file = value.file
         render(value.text)
     }

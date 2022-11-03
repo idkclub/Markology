@@ -1,5 +1,6 @@
 import Combine
 import Markdown
+import MarkView
 import UIKit
 
 class EditCell: NoteCell<NoteController> {
@@ -7,24 +8,26 @@ class EditCell: NoteCell<NoteController> {
     var dirty = false
     var insertSink: AnyCancellable?
 
-    override func config(_ controller: NoteController) {
-        super.config(controller)
-        markdown.isEditable = true
-        markdown.commandable = controller
+    override func markView() -> MarkView {
+        let view = super.markView()
+        guard let controller = controller else { return view }
+        view.isEditable = true
+        view.commandable = controller
         insertSink = controller.addLink.sink {
-            guard let selection = self.markdown.selectedTextRange,
+            guard let selection = view.selectedTextRange,
                   let url = $0.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
             if selection.start == selection.end,
-               let token = self.markdown.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
+               let token = view.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
             {
-                self.markdown.selectedTextRange = token
+                view.selectedTextRange = token
             }
-            self.markdown.insertText("[\($0.name)](\(url))")
+            view.insertText("[\($0.name)](\(url))")
         }
+        return view
     }
 
     override func render(_ text: String) {
-        markdown.attributedText = EditVisitor.process(text: text)
+        markdown.render(text: text, includingMarkup: true)
         markdown.becomeFirstResponder()
     }
 
@@ -147,7 +150,8 @@ extension EditCell {
                       let next = iterator.next(),
                       [" ", "x", "X"].contains(next),
                       let close = iterator.next(),
-                      close == "]" else {
+                      close == "]"
+                else {
                     empty = false
                     return false
                 }
@@ -163,7 +167,7 @@ extension EditCell {
                 if prefix.contains(">") {
                     prefix.append(char)
                 } else {
-                    prefix = "\(String(repeating: " ", count: prefix.count ))-"
+                    prefix = "\(String(repeating: " ", count: prefix.count))-"
                 }
             case "\n":
                 return false

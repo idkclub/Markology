@@ -1,5 +1,23 @@
 import UIKit
 
+extension UIFont {
+    func apply(trait: UIFontDescriptor.SymbolicTraits? = nil, size: CGFloat? = nil) -> UIFont {
+        var font = fontDescriptor
+        var traits = font.symbolicTraits
+        if let trait = trait {
+            traits.insert(trait)
+            font = fontDescriptor.withSymbolicTraits(traits) ?? font
+        }
+        return UIFont(descriptor: font, size: size ?? pointSize)
+    }
+}
+
+extension NSAttributedString {
+    var range: NSRange {
+        NSRange(location: 0, length: length)
+    }
+}
+
 extension String {
     var body: NSMutableAttributedString {
         NSMutableAttributedString(string: self, attributes: [
@@ -36,7 +54,6 @@ extension [NSAttributedString.Key: Any] {
     static let code: Self = [
         .backgroundColor: UIColor.secondarySystemFill,
         .foregroundColor: UIColor.secondaryLabel,
-        .strokeColor: UIColor.idkCyan,
         .font: UIFont.preferredFont(forTextStyle: .body)
             .apply(trait: .traitMonoSpace),
     ]
@@ -48,18 +65,12 @@ extension [NSAttributedString.Key: Any] {
     ]
 }
 
-extension NSAttributedString {
-    var range: NSRange {
-        NSRange(location: 0, length: length)
-    }
-}
-
 extension NSMutableAttributedString {
     var newline: Self {
         appending(NSAttributedString(string: "\n"))
     }
 
-    func indent(for type: TextView.Indent, range: NSRange? = nil) -> Self {
+    func indent(for type: MarkView.Indent, range: NSRange? = nil) -> Self {
         // NOTE: This is used to avoid region collapse causing double indents.
         var processed = 0
         enumerateAttribute(.paragraphStyle, in: range ?? self.range) { value, range, _ in
@@ -102,22 +113,5 @@ extension NSMutableAttributedString {
             addAttribute(key, value: new, range: range)
         }
         return self
-    }
-}
-
-extension URL {
-    var isMarkdown: Bool {
-        pathExtension == "md"
-    }
-
-    func open() {
-        #if targetEnvironment(macCatalyst)
-            UIApplication.shared.open(self)
-        #else
-            guard let url = NSURLComponents(url: self, resolvingAgainstBaseURL: true) else { return }
-            url.scheme = "shareddocuments"
-            guard let url = url.url else { return }
-            UIApplication.shared.open(url)
-        #endif
     }
 }

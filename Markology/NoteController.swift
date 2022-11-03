@@ -1,5 +1,7 @@
 import Combine
+import KitPlus
 import Markdown
+import MarkView
 import UIKit
 
 class NoteController: UIViewController, Bindable {
@@ -32,7 +34,7 @@ class NoteController: UIViewController, Bindable {
     }
 
     lazy var tableView: UITableView = {
-        let tableView = UITableView().pinned(to: view, top: false, keyboard: true)
+        let tableView = UITableView().pinned(toKeyboardAnd: view, top: false)
         tableView.register(FileCell.self)
         tableView.register(EditCell.self)
         tableView.register(EmptyCell.self)
@@ -90,7 +92,7 @@ class NoteController: UIViewController, Bindable {
         layout.estimatedItemSize = CGSize(width: size, height: size)
         layout.headerReferenceSize = CGSize(width: size, height: size)
         layout.sectionFootersPinToVisibleBounds = true
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).pinned(to: view, top: false, keyboard: true)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).pinned(toKeyboardAnd: view, top: false)
         collectionView.register(LinkCell.self)
         collectionView.register(header: Header.self)
         collectionView.backgroundColor = .clear
@@ -356,13 +358,13 @@ extension NoteController: UITableViewDataSource {
             if entry == nil || (!id!.file.isMarkdown && entry?.text == ""), document == nil {
                 return tableView.render(id!.file, for: indexPath) as EmptyCell
             }
-            return tableView.render(NoteCell.Value(file: id!.file, text: text), with: self, for: indexPath) as NoteCell
+            return tableView.render(NoteCell.Value(file: id!.file, text: text, with: self), for: indexPath) as NoteCell
         case .edit:
-            return tableView.render(NoteCell.Value(file: id!.file, text: text), with: self, for: indexPath) as EditCell
+            return tableView.render(NoteCell.Value(file: id!.file, text: text, with: self), for: indexPath) as EditCell
         case .from:
-            return tableView.render(entry!.from[indexPath.row], with: entry!.name, for: indexPath) as Note.Entry.Link.Cell
+            return tableView.render((link: entry!.from[indexPath.row], note: entry!.name), for: indexPath) as Note.Entry.Link.Cell
         case .to:
-            return tableView.render(entry!.to[indexPath.row], with: entry!.name, for: indexPath) as Note.Entry.Link.Cell
+            return tableView.render((link: entry!.to[indexPath.row], note: entry!.name), for: indexPath) as Note.Entry.Link.Cell
         }
     }
 
@@ -494,7 +496,7 @@ extension NoteController {
         }()
 
         lazy var textDisplay = {
-            let view = TextView().pinned(to: contentView)
+            let view = MarkView().pinned(to: contentView)
             view.isEditable = false
             view.isScrollEnabled = false
             view.textContainerInset = .padded
@@ -520,7 +522,8 @@ extension NoteController {
                 height?.priority = .defaultHigh
             }
             if let text = try? String(contentsOf: file.url) {
-                textDisplay.attributedText = "".label.appending(text.code)
+                textDisplay.text = text
+                textDisplay.font = .monospacedSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize, weight: .regular)
                 textDisplay.isHidden = false
                 return
             }
