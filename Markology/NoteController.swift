@@ -1,5 +1,6 @@
 import Combine
 import KitPlus
+import MarkCell
 import Markdown
 import MarkView
 import UIKit
@@ -38,7 +39,7 @@ class NoteController: UIViewController, Bindable {
         tableView.register(FileCell.self)
         tableView.register(EditCell.self)
         tableView.register(EmptyCell.self)
-        tableView.register(NoteCell<Self>.self)
+        tableView.register(MarkCell.self)
         tableView.register(Note.Entry.Link.Cell.self)
         tableView.delegate = self
         tableView.dataSource = self
@@ -139,7 +140,12 @@ class NoteController: UIViewController, Bindable {
         document?.text ?? entry?.text ?? ""
     }
 
-    var addLink = PassthroughSubject<Note.ID, Never>()
+    var addLink = PassthroughSubject<(url: String, text: String), Never>()
+
+    func navigate(to id: Note.ID) {
+        guard let nav = navigationController else { return }
+        nav.show(NoteController.with(id: id, edit: edit), sender: self)
+    }
 
     @objc func menu() {
         guard let id = id else { return }
@@ -317,10 +323,54 @@ class NoteController: UIViewController, Bindable {
     }
 }
 
+extension NoteController: MarkCellDelegate, EditCellDelegate {
+    func change(text: String) {
+        guard let document = document else { return }
+        document.text = text
+        document.updateChangeCount(.done)
+    }
+
+    func openLink(to url: URL, with text: String) -> Bool {
+        guard url.host == nil else { return true }
+        guard let relative = id?.file.use(for: url.path) else { return false }
+        navigate(to: Note.ID(file: relative, name: text))
+        return false
+    }
+
+    func resolve(path: String) -> String? {
+        guard let relative = id?.file.use(forEncoded: path) else { return nil }
+        return relative.url.path.removingPercentEncoding
+    }
+}
+
+extension NoteController: SearchDelegate {
+    func change(search: String) {
+        self.search = search
+    }
+}
+
+extension NoteController: CheckboxDelegate {
+    func checkboxToggled(at line: Int) {
+        Task {
+            await openDocument()
+            guard let document = document else { return }
+            var lines = document.text.components(separatedBy: .newlines)
+            let current = lines[line - 1]
+            guard let bracket = current.firstIndex(of: "[") else { return }
+            let index = current.index(after: bracket)
+            lines[line - 1] = current.replacingCharacters(in: index ... index, with: current[index] == " " ? "x" : " ")
+            document.text = lines.joined(separator: "\n")
+            document.updateChangeCount(.done)
+            UIView.performWithoutAnimation {
+                reload()
+            }
+        }
+    }
+}
+
 extension NoteController: KeyCommandable {
     func handle(_ command: UIKeyCommand) {
-        edit = false
-        reload()
+        toggleEdit()
     }
 }
 
@@ -358,9 +408,9 @@ extension NoteController: UITableViewDataSource {
             if entry == nil || (!id!.file.isMarkdown && entry?.text == ""), document == nil {
                 return tableView.render(id!.file, for: indexPath) as EmptyCell
             }
-            return tableView.render(NoteCell.Value(file: id!.file, text: text, with: self), for: indexPath) as NoteCell
+            return tableView.render((text: text, with: self), for: indexPath) as MarkCell
         case .edit:
-            return tableView.render(NoteCell.Value(file: id!.file, text: text, with: self), for: indexPath) as EditCell
+            return tableView.render((text: text, with: self), for: indexPath) as EditCell
         case .from:
             return tableView.render((link: entry!.from[indexPath.row], note: entry!.name), for: indexPath) as Note.Entry.Link.Cell
         case .to:
@@ -451,14 +501,15 @@ extension NoteController: UICollectionViewDelegate {
             guard let search = search else { return }
             target = .generate(for: search)
         }
-        addLink.send(target)
+        guard let url = target.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
+        addLink.send((url: url, text: target.name))
     }
 }
 
 extension NoteController {
     class LinkCell: UICollectionViewCell, RenderCell {
         lazy var label: UILabel = {
-            UILabel().pinned(to: contentView)
+            UILabel().pinned(to: contentView, layout: true)
         }()
 
         func render(_ text: String) {
@@ -496,10 +547,9 @@ extension NoteController {
         }()
 
         lazy var textDisplay = {
-            let view = UITextView().pinned(to: contentView)
+            let view = UITextView().pinned(to: contentView, layout: true)
             view.isEditable = false
             view.isScrollEnabled = false
-            view.textContainerInset = .padded
             return view
         }()
 
@@ -541,30 +591,6 @@ extension NoteController {
             content.textProperties.color = .placeholderText
             content.textProperties.alignment = .center
             contentConfiguration = content
-        }
-    }
-}
-
-extension NoteController: Navigator {
-    func navigate(to id: Note.ID) {
-        guard let nav = navigationController else { return }
-        nav.show(NoteController.with(id: id, edit: edit), sender: self)
-    }
-
-    func toggleCheckbox(at line: Int) {
-        Task {
-            await openDocument()
-            guard let document = document else { return }
-            var lines = document.text.components(separatedBy: .newlines)
-            let current = lines[line - 1]
-            guard let bracket = current.firstIndex(of: "[") else { return }
-            let index = current.index(after: bracket)
-            lines[line - 1] = current.replacingCharacters(in: index ... index, with: current[index] == " " ? "x" : " ")
-            document.text = lines.joined(separator: "\n")
-            document.updateChangeCount(.done)
-            UIView.performWithoutAnimation {
-                reload()
-            }
         }
     }
 }

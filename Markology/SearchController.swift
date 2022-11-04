@@ -1,8 +1,9 @@
 import Combine
+import MarkCell
 import Markdown
 import UIKit
 
-class SearchController: UITableViewController, Bindable, Navigator {
+class SearchController: UITableViewController, Bindable {
     var noteSink: AnyCancellable?
     var notes: [Note] = [] {
         didSet {
@@ -24,14 +25,38 @@ class SearchController: UITableViewController, Bindable, Navigator {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(NoteCell<Self>.self)
+        tableView.register(MarkCell.self)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        tableView.render(NoteCell.value(for: notes[indexPath.row], with: self), for: indexPath) as NoteCell
+        let note = notes[indexPath.row]
+        return tableView.render((text: note.text, with: CellDelegate(file: note.file, controller: self)), for: indexPath) as MarkCell
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         notes.count
+    }
+
+    class CellDelegate: MarkCellDelegate {
+        var file: Paths.File.Name
+        var controller: UIViewController
+
+        init(file: Paths.File.Name, controller: UIViewController) {
+            self.file = file
+            self.controller = controller
+        }
+
+        func openLink(to url: URL, with text: String) -> Bool {
+            guard url.host == nil else { return true }
+            guard let relative = file.use(forEncoded: url.path),
+                  let nav = controller.navigationController else { return false }
+            nav.show(NoteController.with(id: Note.ID(file: relative, name: text)), sender: self)
+            return false
+        }
+
+        func resolve(path: String) -> String? {
+            guard let relative = file.use(forEncoded: path) else { return nil }
+            return relative.url.path.removingPercentEncoding
+        }
     }
 }

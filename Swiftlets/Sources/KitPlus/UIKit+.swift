@@ -1,19 +1,20 @@
 import UIKit
 
 public extension UIView {
-    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true) -> Self {
+    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true, layout: Bool = false) -> Self {
         view.addSubview(self)
+        let guide = layout ? view.layoutMarginsGuide : view.safeAreaLayoutGuide
         translatesAutoresizingMaskIntoConstraints = false
         var constraints = [
-            leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: withInset),
-            trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -withInset),
+            leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: withInset),
+            trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -withInset),
         ]
         if top {
-            constraints.append(topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: withInset))
+            constraints.append(topAnchor.constraint(equalTo: guide.topAnchor, constant: withInset))
         }
         if bottom {
             constraints.append(
-                bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -withInset))
+                bottomAnchor.constraint(equalTo: guide.bottomAnchor, constant: -withInset))
         }
         NSLayoutConstraint.activate(constraints)
         return self
@@ -67,16 +68,5 @@ public extension UICollectionView {
         let header = dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: T.reuse, for: indexPath) as! T
         header.render(value)
         return header
-    }
-}
-
-public protocol RenderCell<Value>: NSObject {
-    associatedtype Value
-    func render(_: Value)
-}
-
-private extension RenderCell {
-    static var reuse: String {
-        NSStringFromClass(self)
     }
 }

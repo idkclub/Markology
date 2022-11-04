@@ -1,37 +1,67 @@
 import Combine
+import KitPlus
 import Markdown
 import MarkView
 import UIKit
 
-class EditCell: NoteCell<NoteController> {
+public class EditCell: UITableViewCell {
+    var delegate: EditCellDelegate?
     var previous: UITextRange?
     var dirty = false
     var insertSink: AnyCancellable?
 
-    override func markView() -> MarkView {
-        let view = super.markView()
-        guard let controller = controller else { return view }
+    lazy var markdown = {
+        let view = MarkView().pinned(to: contentView, layout: true)
+        view.isScrollEnabled = false
         view.isEditable = true
-        view.commandable = controller
-        insertSink = controller.addLink.sink {
-            guard let selection = view.selectedTextRange,
-                  let url = $0.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
-            if selection.start == selection.end,
-               let token = view.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
-            {
-                view.selectedTextRange = token
-            }
-            view.insertText("[\($0.name)](\(url))")
-        }
+        view.delegate = self
         return view
-    }
+    }()
 
-    override func render(_ text: String) {
+    func render(_ text: String) {
         markdown.render(text: text, includingMarkup: true)
         markdown.becomeFirstResponder()
     }
+}
 
-    override func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+extension EditCell: RenderCell {
+    public typealias Value = (text: String, with: EditCellDelegate)
+    public func render(_ value: Value) {
+        delegate = value.with
+        if let delegate = delegate as? KeyCommandable {
+            markdown.commandable = delegate
+        }
+        if let delegate = delegate as? SearchDelegate {
+            insertSink = delegate.addLink.sink { [weak self] in
+                guard let markdown = self?.markdown,
+                      let selection = markdown.selectedTextRange else { return }
+                if selection.start == selection.end,
+                   let token = markdown.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
+                {
+                    markdown.selectedTextRange = token
+                }
+                if ["gif", "jpg", "jpeg", "png"].contains(($0.url as NSString).pathExtension.lowercased()) {
+                    markdown.insertText("![\($0.text)](\($0.url))")
+                } else {
+                    markdown.insertText("[\($0.text)](\($0.url))")
+                }
+            }
+        }
+        render(value.text)
+    }
+}
+
+extension EditCell: UITextViewDelegate {
+    public func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        guard let range = textView.range(for: characterRange),
+              let text = textView.text(in: range) else { return false }
+        let doc = Document(parsing: text)
+        var visitor = LinkWalker()
+        visitor.visit(doc)
+        return delegate?.openLink(to: url, with: visitor.text) ?? false
+    }
+
+    public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard let body = textView.text,
               text == "\n",
               let indexRange = Range(range, in: body) else { return true }
@@ -62,57 +92,62 @@ class EditCell: NoteCell<NoteController> {
         return true
     }
 
-    // @objc seems to be required: https://github.com/apple/swift/issues/45421
-    @objc func textViewDidChange(_ textView: UITextView) {
+    public func textViewDidChange(_ textView: UITextView) {
         dirty = true
+        let text = textView.text ?? ""
+        delegate?.change(text: text)
         let select = textView.selectedRange
-        let text = textView.attributedText.string
         render(text)
         textView.selectedRange = select
-        controller?.document?.text = text
-        controller?.document?.updateChangeCount(.done)
-        controller?.tableView.beginUpdates()
-        controller?.tableView.endUpdates()
+        if let superview = superview as? UITableView {
+            superview.beginUpdates()
+            superview.endUpdates()
+        }
         dirty = false
     }
 
-    @objc func textViewDidChangeSelection(_ textView: UITextView) {
+    public func textViewDidChangeSelection(_ textView: UITextView) {
         guard !dirty,
               let selection = textView.selectedTextRange,
-              let tableView = controller?.tableView else { return }
+              let superview = superview as? UITableView else { return }
         var position = selection.end
         if position == previous?.end {
             position = selection.start
         }
-        if selection.start != selection.end,
-           let text = textView.text(in: selection),
-           !text.contains(where: \.isNewline)
-        {
-            controller?.search = text
-        } else if let token = textView.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.backward)),
-                  let text = textView.text(in: token)
-        {
-            controller?.search = text
-        }
-        var rect = textView.convert(textView.caretRect(for: position), to: tableView)
+
+        var rect = textView.convert(textView.caretRect(for: position), to: superview)
         if rect.origin.y == .infinity {
-            rect = convert(bounds, to: tableView)
+            rect = convert(bounds, to: superview)
             rect.origin.y = rect.minY + rect.height
             rect.size.height = 50
         } else {
             rect.origin.y -= rect.size.height
             rect.size.height *= 3
         }
-        tableView.scrollRectToVisible(rect, animated: false)
+        superview.scrollRectToVisible(rect, animated: false)
         previous = textView.selectedTextRange
-    }
 
-    override func name(from text: String) -> String {
-        let doc = Document(parsing: text)
-        var visitor = LinkWalker()
-        visitor.visit(doc)
-        return visitor.text
+        guard let delegate = delegate as? SearchDelegate else { return }
+        if selection.start != selection.end,
+           let text = textView.text(in: selection),
+           !text.contains(where: \.isNewline)
+        {
+            delegate.change(search: text)
+        } else if let token = textView.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.backward)),
+                  let text = textView.text(in: token)
+        {
+            delegate.change(search: text)
+        }
     }
+}
+
+public protocol EditCellDelegate: LinkDelegate {
+    func change(text: String)
+}
+
+public protocol SearchDelegate {
+    var addLink: PassthroughSubject<(url: String, text: String), Never> { get }
+    func change(search: String)
 }
 
 extension EditCell {

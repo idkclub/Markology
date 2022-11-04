@@ -22,9 +22,10 @@ class NoteDocument: UIDocument {
     }
 
     override func handleError(_ error: Error, userInteractionPermitted: Bool) {
-        print(error, userInteractionPermitted)
         if userInteractionPermitted {
             Engine.errors.send(error)
+        } else {
+            print("NoteDocument error:", error)
         }
         super.handleError(error, userInteractionPermitted: userInteractionPermitted)
     }

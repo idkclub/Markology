@@ -10,19 +10,28 @@ let package = Package(
             targets: ["KitPlus"]
         ),
         .library(
+            name: "MarkCell",
+            targets: ["MarkCell"]
+        ),
+        .library(
             name: "MarkView",
             targets: ["MarkView"]
         ),
     ],
     dependencies: [
-        //        .package(url: "https://github.com/idkclub/GRDB.swift", branch: "fts5"),
-//                .product(name: "GRDB", package: "GRDB.swift"),
         .package(url: "https://github.com/apple/swift-markdown.git", branch: "main"),
     ],
     targets: [
         .target(
             name: "KitPlus",
             dependencies: []
+        ),
+        .target(
+            name: "MarkCell",
+            dependencies: [
+                "KitPlus",
+                "MarkView",
+            ]
         ),
         .target(
             name: "MarkView",

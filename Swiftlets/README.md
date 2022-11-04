@@ -6,6 +6,10 @@ A collection of extracted components.
 
 UIKit helper extensions.
 
+## MarkCell
+
+UITableCells containing MarkView for display, editing.
+
 ## MarkView
 
 UITextView for displaying Markdown.

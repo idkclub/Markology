@@ -168,7 +168,10 @@ extension Engine {
             if header != "" {
                 return header
             }
-            return fallback
+            if fallback != "" {
+                return fallback
+            }
+            return String(from.dropFirst())
         }
 
         mutating func visitHeading(_ heading: Heading) {

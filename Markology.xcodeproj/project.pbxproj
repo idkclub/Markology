@@ -8,16 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		4E4583BB28FA88CB00C617BE /* Foundation+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BA28FA88CB00C617BE /* Foundation+.swift */; };
-		4E4583C328FA8EA700C617BE /* EditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C228FA8EA700C617BE /* EditCell.swift */; };
 		4E4583C628FBB93800C617BE /* Paths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C528FBB93800C617BE /* Paths.swift */; };
 		4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C728FBC1CA00C617BE /* SettingsController.swift */; };
 		4E596500291399A2000BB2EC /* ImportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5964FF291399A2000BB2EC /* ImportController.swift */; };
 		4E596507291399A2000BB2EC /* Import.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4E5964FD291399A2000BB2EC /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4E5965332913AB42000BB2EC /* KitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965322913AB42000BB2EC /* KitPlus */; };
 		4E5965372913B431000BB2EC /* KitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965362913B431000BB2EC /* KitPlus */; };
-		4E59653A2913B963000BB2EC /* MarkView in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965392913B963000BB2EC /* MarkView */; };
 		4E59653C2913C3D7000BB2EC /* MarkView in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59653B2913C3D7000BB2EC /* MarkView */; };
-		4E6A3A6A28FF1082005CCE32 /* NoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6928FF1082005CCE32 /* NoteCell.swift */; };
 		4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */; };
 		4E7776EB28F46E9E00DAEF80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */; };
 		4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F428F46EC100DAEF80 /* AppDelegate.swift */; };
@@ -29,6 +26,7 @@
 		4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; };
 		4E77771C28F7330600DAEF80 /* GRDB-dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
+		4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB692915626700185CA3 /* MarkCell */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,7 +66,6 @@
 
 /* Begin PBXFileReference section */
 		4E4583BA28FA88CB00C617BE /* Foundation+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Foundation+.swift"; sourceTree = "<group>"; };
-		4E4583C228FA8EA700C617BE /* EditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCell.swift; sourceTree = "<group>"; };
 		4E4583C528FBB93800C617BE /* Paths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Paths.swift; sourceTree = "<group>"; };
 		4E4583C728FBC1CA00C617BE /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		4E5964FD291399A2000BB2EC /* Import.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Import.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,7 +73,6 @@
 		4E596504291399A2000BB2EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4E596508291399A2000BB2EC /* Import.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Import.entitlements; sourceTree = "<group>"; };
 		4E5965342913B073000BB2EC /* Swiftlets */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Swiftlets; sourceTree = "<group>"; };
-		4E6A3A6928FF1082005CCE32 /* NoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCell.swift; sourceTree = "<group>"; };
 		4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDocument.swift; sourceTree = "<group>"; };
 		4E7776E328F46E9C00DAEF80 /* Markology.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markology.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -105,8 +101,8 @@
 			files = (
 				4E5965332913AB42000BB2EC /* KitPlus in Frameworks */,
 				4E77770028F47F0E00DAEF80 /* Markdown in Frameworks */,
-				4E59653A2913B963000BB2EC /* MarkView in Frameworks */,
 				4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */,
+				4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,12 +151,10 @@
 			children = (
 				4E7776F628F46F7100DAEF80 /* Markology.entitlements */,
 				4E7776F428F46EC100DAEF80 /* AppDelegate.swift */,
-				4E4583C228FA8EA700C617BE /* EditCell.swift */,
 				4E7776F728F47D0700DAEF80 /* Engine.swift */,
 				4E4583BA28FA88CB00C617BE /* Foundation+.swift */,
 				4E77770328F486E900DAEF80 /* MenuController.swift */,
 				4E77770128F481F700DAEF80 /* Note.swift */,
-				4E6A3A6928FF1082005CCE32 /* NoteCell.swift */,
 				4E77770528F5008C00DAEF80 /* NoteController.swift */,
 				4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */,
 				4E4583C528FBB93800C617BE /* Paths.swift */,
@@ -215,7 +209,7 @@
 				4E7776FF28F47F0E00DAEF80 /* Markdown */,
 				4E77771A28F732EC00DAEF80 /* GRDB-dynamic */,
 				4E5965322913AB42000BB2EC /* KitPlus */,
-				4E5965392913B963000BB2EC /* MarkView */,
+				4E7DBB692915626700185CA3 /* MarkCell */,
 			);
 			productName = Markology;
 			productReference = 4E7776E328F46E9C00DAEF80 /* Markology.app */;
@@ -303,8 +297,6 @@
 				4E4583BB28FA88CB00C617BE /* Foundation+.swift in Sources */,
 				4E77770228F481F700DAEF80 /* Note.swift in Sources */,
 				4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */,
-				4E4583C328FA8EA700C617BE /* EditCell.swift in Sources */,
-				4E6A3A6A28FF1082005CCE32 /* NoteCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -597,10 +589,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = KitPlus;
 		};
-		4E5965392913B963000BB2EC /* MarkView */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = MarkView;
-		};
 		4E59653B2913C3D7000BB2EC /* MarkView */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MarkView;
@@ -614,6 +602,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4E77771928F732EC00DAEF80 /* XCRemoteSwiftPackageReference "GRDB" */;
 			productName = "GRDB-dynamic";
+		};
+		4E7DBB692915626700185CA3 /* MarkCell */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MarkCell;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
