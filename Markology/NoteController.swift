@@ -317,7 +317,7 @@ class NoteController: UIViewController, Bindable {
     }
 }
 
-extension NoteController: Commandable {
+extension NoteController: KeyCommandable {
     func handle(_ command: UIKeyCommand) {
         edit = false
         reload()
@@ -496,7 +496,7 @@ extension NoteController {
         }()
 
         lazy var textDisplay = {
-            let view = MarkView().pinned(to: contentView)
+            let view = UITextView().pinned(to: contentView)
             view.isEditable = false
             view.isScrollEnabled = false
             view.textContainerInset = .padded

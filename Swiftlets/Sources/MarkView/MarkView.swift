@@ -15,16 +15,18 @@ public class MarkView: UITextView {
     }
 
     override public var keyCommands: [UIKeyCommand] {
-        [UIKeyCommand(input: "\t", modifierFlags: [], action: #selector(command))]
+        commandable != nil
+            ? [UIKeyCommand(input: "\t", modifierFlags: [], action: #selector(command))]
+            : []
     }
 
-    public var commandable: Commandable?
+    public var commandable: KeyCommandable?
 
     @objc func command(_ command: UIKeyCommand) {
         commandable?.handle(command)
     }
 
-    public var resolver: URLResolver?
+    public var resolver: PathResolver?
 
     public static let checkboxScheme = "checkbox"
     public var linkCheckboxes: Bool = false
@@ -41,11 +43,11 @@ public class MarkView: UITextView {
     }
 }
 
-public protocol Commandable {
+public protocol KeyCommandable {
     func handle(_: UIKeyCommand)
 }
 
-public protocol URLResolver {
+public protocol PathResolver {
     func resolve(path: String) -> String?
 }
 

@@ -3,7 +3,7 @@ import UIKit
 
 struct NoteVisitor: MarkupVisitor {
     var checkbox = false
-    var resolver: URLResolver?
+    var resolver: PathResolver?
     var indent = [MarkView.Indent]()
 
     mutating func process(markup: Markup) -> NSMutableAttributedString {
@@ -44,6 +44,7 @@ struct NoteVisitor: MarkupVisitor {
 
     mutating func visitImage(_ image: Image) -> NSMutableAttributedString {
         guard let source = image.source,
+              // TODO: Load remote images?
               !image.absolute,
               let url = resolver?.resolve(path: source),
               let image = UIImage(contentsOfFile: url) else { return defaultVisit(image) }

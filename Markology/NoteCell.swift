@@ -53,7 +53,7 @@ class NoteCell<N: Navigator>: UITableViewCell, UITextViewDelegate {
     }
 }
 
-extension NoteCell: URLResolver {
+extension NoteCell: PathResolver {
     func resolve(path: String) -> String? {
         guard let relative = file.use(forEncoded: path) else { return nil }
         return relative.url.path.removingPercentEncoding
