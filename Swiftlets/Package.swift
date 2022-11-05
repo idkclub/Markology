@@ -10,8 +10,8 @@ let package = Package(
             targets: ["GRDBPlus"]
         ),
         .library(
-            name: "KitPlus",
-            targets: ["KitPlus"]
+            name: "UIKitPlus",
+            targets: ["UIKitPlus"]
         ),
         .library(
             name: "MarkCell",
@@ -42,13 +42,13 @@ let package = Package(
             ]
         ),
         .target(
-            name: "KitPlus",
+            name: "UIKitPlus",
             dependencies: []
         ),
         .target(
             name: "MarkCell",
             dependencies: [
-                "KitPlus",
+                "UIKitPlus",
                 "MarkView",
             ]
         ),

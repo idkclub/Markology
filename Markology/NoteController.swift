@@ -1,5 +1,5 @@
 import Combine
-import KitPlus
+import UIKitPlus
 import MarkCell
 import Markdown
 import MarkView

@@ -12,20 +12,20 @@
 		4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C728FBC1CA00C617BE /* SettingsController.swift */; };
 		4E596500291399A2000BB2EC /* ImportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5964FF291399A2000BB2EC /* ImportController.swift */; };
 		4E596507291399A2000BB2EC /* Import.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4E5964FD291399A2000BB2EC /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		4E5965332913AB42000BB2EC /* KitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965322913AB42000BB2EC /* KitPlus */; };
-		4E5965372913B431000BB2EC /* KitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965362913B431000BB2EC /* KitPlus */; };
+		4E5965332913AB42000BB2EC /* UIKitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965322913AB42000BB2EC /* UIKitPlus */; };
+		4E5965372913B431000BB2EC /* UIKitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965362913B431000BB2EC /* UIKitPlus */; };
 		4E59653C2913C3D7000BB2EC /* MarkView in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59653B2913C3D7000BB2EC /* MarkView */; };
 		4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */; };
 		4E7776EB28F46E9E00DAEF80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */; };
 		4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F428F46EC100DAEF80 /* AppDelegate.swift */; };
 		4E7776F828F47D0700DAEF80 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F728F47D0700DAEF80 /* Engine.swift */; };
-		4E77770028F47F0E00DAEF80 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7776FF28F47F0E00DAEF80 /* Markdown */; };
 		4E77770428F486E900DAEF80 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770328F486E900DAEF80 /* MenuController.swift */; };
 		4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770528F5008C00DAEF80 /* NoteController.swift */; };
 		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
 		4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB692915626700185CA3 /* MarkCell */; };
 		4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB6C2915BE2E00185CA3 /* Paths */; };
 		4E7DBB6F2915D54900185CA3 /* Notes in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB6E2915D54900185CA3 /* Notes */; };
+		4E9E65592915E6DF0035D4FC /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 4E9E65582915E6DF0035D4FC /* Markdown */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,7 +88,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E59653C2913C3D7000BB2EC /* MarkView in Frameworks */,
-				4E5965372913B431000BB2EC /* KitPlus in Frameworks */,
+				4E5965372913B431000BB2EC /* UIKitPlus in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,8 +97,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E7DBB6F2915D54900185CA3 /* Notes in Frameworks */,
-				4E5965332913AB42000BB2EC /* KitPlus in Frameworks */,
-				4E77770028F47F0E00DAEF80 /* Markdown in Frameworks */,
+				4E5965332913AB42000BB2EC /* UIKitPlus in Frameworks */,
+				4E9E65592915E6DF0035D4FC /* Markdown in Frameworks */,
 				4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */,
 				4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */,
 			);
@@ -132,7 +132,6 @@
 				4E7776E528F46E9C00DAEF80 /* Markology */,
 				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
-				4E7DBB6B2915BE2E00185CA3 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -163,13 +162,6 @@
 			path = Markology;
 			sourceTree = "<group>";
 		};
-		4E7DBB6B2915BE2E00185CA3 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -187,7 +179,7 @@
 			);
 			name = Import;
 			packageProductDependencies = (
-				4E5965362913B431000BB2EC /* KitPlus */,
+				4E5965362913B431000BB2EC /* UIKitPlus */,
 				4E59653B2913C3D7000BB2EC /* MarkView */,
 			);
 			productName = Import;
@@ -211,11 +203,11 @@
 			);
 			name = Markology;
 			packageProductDependencies = (
-				4E7776FF28F47F0E00DAEF80 /* Markdown */,
-				4E5965322913AB42000BB2EC /* KitPlus */,
+				4E5965322913AB42000BB2EC /* UIKitPlus */,
 				4E7DBB692915626700185CA3 /* MarkCell */,
 				4E7DBB6C2915BE2E00185CA3 /* Paths */,
 				4E7DBB6E2915D54900185CA3 /* Notes */,
+				4E9E65582915E6DF0035D4FC /* Markdown */,
 			);
 			productName = Markology;
 			productReference = 4E7776E328F46E9C00DAEF80 /* Markology.app */;
@@ -249,8 +241,8 @@
 			);
 			mainGroup = 4E7776DA28F46E9C00DAEF80;
 			packageReferences = (
-				4E7776FE28F47F0E00DAEF80 /* XCRemoteSwiftPackageReference "swift-markdown" */,
-				4E77771928F732EC00DAEF80 /* XCRemoteSwiftPackageReference "GRDB" */,
+				4E9E65542915E6D10035D4FC /* XCRemoteSwiftPackageReference "GRDB" */,
+				4E9E65572915E6DF0035D4FC /* XCRemoteSwiftPackageReference "swift-markdown" */,
 			);
 			productRefGroup = 4E7776E428F46E9C00DAEF80 /* Products */;
 			projectDirPath = "";
@@ -567,15 +559,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		4E7776FE28F47F0E00DAEF80 /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-markdown";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		4E77771928F732EC00DAEF80 /* XCRemoteSwiftPackageReference "GRDB" */ = {
+		4E9E65542915E6D10035D4FC /* XCRemoteSwiftPackageReference "GRDB" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/idkclub/GRDB.swift";
 			requirement = {
@@ -583,25 +567,28 @@
 				kind = branch;
 			};
 		};
+		4E9E65572915E6DF0035D4FC /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-markdown";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4E5965322913AB42000BB2EC /* KitPlus */ = {
+		4E5965322913AB42000BB2EC /* UIKitPlus */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = KitPlus;
+			productName = UIKitPlus;
 		};
-		4E5965362913B431000BB2EC /* KitPlus */ = {
+		4E5965362913B431000BB2EC /* UIKitPlus */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = KitPlus;
+			productName = UIKitPlus;
 		};
 		4E59653B2913C3D7000BB2EC /* MarkView */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MarkView;
-		};
-		4E7776FF28F47F0E00DAEF80 /* Markdown */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4E7776FE28F47F0E00DAEF80 /* XCRemoteSwiftPackageReference "swift-markdown" */;
-			productName = Markdown;
 		};
 		4E7DBB692915626700185CA3 /* MarkCell */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -614,6 +601,11 @@
 		4E7DBB6E2915D54900185CA3 /* Notes */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Notes;
+		};
+		4E9E65582915E6DF0035D4FC /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E9E65572915E6DF0035D4FC /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,4 +1,4 @@
-import KitPlus
+import UIKitPlus
 import Notes
 import UIKit
 

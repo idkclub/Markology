@@ -2,7 +2,7 @@
 
 A collection of extracted components.
 
-## KitPlus
+## UIKitPlus
 
 UIKit helper extensions.
 
