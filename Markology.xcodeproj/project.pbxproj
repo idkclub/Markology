@@ -12,19 +12,18 @@
 		4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C728FBC1CA00C617BE /* SettingsController.swift */; };
 		4E596500291399A2000BB2EC /* ImportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5964FF291399A2000BB2EC /* ImportController.swift */; };
 		4E596507291399A2000BB2EC /* Import.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4E5964FD291399A2000BB2EC /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		4E5965372913B431000BB2EC /* UIKitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965362913B431000BB2EC /* UIKitPlus */; };
-		4E59A2CF291621250038D4C0 /* MarkCell in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59A2CE291621250038D4C0 /* MarkCell */; };
 		4E59A2D2291657AE0038D4C0 /* NotesUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59A2D1291657AE0038D4C0 /* NotesUI */; };
 		4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */; };
+		4E7074762916693600FB00D4 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7074752916693600FB00D4 /* Engine.swift */; };
+		4E707479291669A000FB00D4 /* NotesUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E707478291669A000FB00D4 /* NotesUI */; };
+		4E70747C29166A1600FB00D4 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E70747B29166A1600FB00D4 /* Paths */; };
 		4E7776EB28F46E9E00DAEF80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */; };
 		4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F428F46EC100DAEF80 /* AppDelegate.swift */; };
 		4E7776F828F47D0700DAEF80 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F728F47D0700DAEF80 /* Engine.swift */; };
 		4E77770428F486E900DAEF80 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770328F486E900DAEF80 /* MenuController.swift */; };
 		4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770528F5008C00DAEF80 /* NoteController.swift */; };
 		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
-		4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB692915626700185CA3 /* MarkCell */; };
 		4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB6C2915BE2E00185CA3 /* Paths */; };
-		4E9E65592915E6DF0035D4FC /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 4E9E65582915E6DF0035D4FC /* Markdown */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +70,7 @@
 		4E596508291399A2000BB2EC /* Import.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Import.entitlements; sourceTree = "<group>"; };
 		4E5965342913B073000BB2EC /* Swiftlets */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Swiftlets; sourceTree = "<group>"; };
 		4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDocument.swift; sourceTree = "<group>"; };
+		4E7074752916693600FB00D4 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
 		4E7776E328F46E9C00DAEF80 /* Markology.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markology.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4E7776F428F46EC100DAEF80 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -86,8 +86,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4E5965372913B431000BB2EC /* UIKitPlus in Frameworks */,
-				4E59A2CF291621250038D4C0 /* MarkCell in Frameworks */,
+				4E707479291669A000FB00D4 /* NotesUI in Frameworks */,
+				4E70747C29166A1600FB00D4 /* Paths in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,8 +96,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E59A2D2291657AE0038D4C0 /* NotesUI in Frameworks */,
-				4E9E65592915E6DF0035D4FC /* Markdown in Frameworks */,
-				4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */,
 				4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -110,6 +108,7 @@
 			children = (
 				4E596508291399A2000BB2EC /* Import.entitlements */,
 				4E596504291399A2000BB2EC /* Info.plist */,
+				4E7074752916693600FB00D4 /* Engine.swift */,
 				4E5964FF291399A2000BB2EC /* ImportController.swift */,
 			);
 			path = Import;
@@ -123,6 +122,13 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		4E70747A29166A1600FB00D4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		4E7776DA28F46E9C00DAEF80 = {
 			isa = PBXGroup;
 			children = (
@@ -130,6 +136,7 @@
 				4E7776E528F46E9C00DAEF80 /* Markology */,
 				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
+				4E70747A29166A1600FB00D4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -177,8 +184,8 @@
 			);
 			name = Import;
 			packageProductDependencies = (
-				4E5965362913B431000BB2EC /* UIKitPlus */,
-				4E59A2CE291621250038D4C0 /* MarkCell */,
+				4E707478291669A000FB00D4 /* NotesUI */,
+				4E70747B29166A1600FB00D4 /* Paths */,
 			);
 			productName = Import;
 			productReference = 4E5964FD291399A2000BB2EC /* Import.appex */;
@@ -201,9 +208,7 @@
 			);
 			name = Markology;
 			packageProductDependencies = (
-				4E7DBB692915626700185CA3 /* MarkCell */,
 				4E7DBB6C2915BE2E00185CA3 /* Paths */,
-				4E9E65582915E6DF0035D4FC /* Markdown */,
 				4E59A2D1291657AE0038D4C0 /* NotesUI */,
 			);
 			productName = Markology;
@@ -275,6 +280,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E596500291399A2000BB2EC /* ImportController.swift in Sources */,
+				4E7074762916693600FB00D4 /* Engine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,30 +581,21 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4E5965362913B431000BB2EC /* UIKitPlus */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UIKitPlus;
-		};
-		4E59A2CE291621250038D4C0 /* MarkCell */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = MarkCell;
-		};
 		4E59A2D1291657AE0038D4C0 /* NotesUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NotesUI;
 		};
-		4E7DBB692915626700185CA3 /* MarkCell */ = {
+		4E707478291669A000FB00D4 /* NotesUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MarkCell;
+			productName = NotesUI;
+		};
+		4E70747B29166A1600FB00D4 /* Paths */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Paths;
 		};
 		4E7DBB6C2915BE2E00185CA3 /* Paths */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Paths;
-		};
-		4E9E65582915E6DF0035D4FC /* Markdown */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4E9E65572915E6DF0035D4FC /* XCRemoteSwiftPackageReference "swift-markdown" */;
-			productName = Markdown;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

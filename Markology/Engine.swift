@@ -15,12 +15,7 @@ class Engine: DataSource {
     let paths = Paths(for: bundle)
     let db: DatabaseWriter
     init() throws {
-        let cache = try FileManager.default.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        ).appendingPathComponent("note.db")
+        let cache = paths.cached(file: "note.db")!
         var config = Configuration()
         config.foreignKeysEnabled = false
         db = try DatabasePool(path: cache.path, configuration: config)

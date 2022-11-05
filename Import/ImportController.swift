@@ -1,5 +1,7 @@
 import Combine
+import GRDBPlus
 import MarkCell
+import NotesUI
 import UIKit
 import UIKitPlus
 
@@ -16,6 +18,8 @@ class ImportController: UIViewController {
         view.dataSource = self
         return view
     }()
+
+    let linkController = LinkController()
 
     struct Item {
         let temp: URL
@@ -65,22 +69,38 @@ class ImportController: UIViewController {
         }
     }
 
+    var errorSink: AnyCancellable?
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        errorSink = Engine.shared.errors.sink {
+            print($0)
+        }
         tableView.backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
+        linkController.delegate = self
+        add(linkController)
         Task {
             try! await loadItems()
         }
     }
+}
 
-    var addLink = PassthroughSubject<(url: String, text: String), Never>()
+extension ImportController: LinkControllerDelegate {
+    func adjustInset(by offset: CGFloat) {
+        tableView.contentInset.bottom = offset
+        tableView.verticalScrollIndicatorInsets.bottom = offset
+    }
+
+    func subscribe<T>(_ action: @escaping (T.Value) -> Void, to query: T) -> AnyCancellable where T: GRDBPlus.Query, T.Value: Equatable {
+        Engine.shared.subscribe(action, to: query)
+    }
 }
 
 extension ImportController: EditCellDelegate {
     func change(text: String) {}
 
     func openLink(to url: URL, with text: String) -> Bool {
-        return true
+        return false
     }
 }
 
@@ -98,15 +118,11 @@ extension ImportController: UITableViewDataSource {
         case 0:
             return tableView.render(items[indexPath.section].temp, for: indexPath) as FileCell
         default:
-            return tableView.render((text: "", with: self, search: self), for: indexPath) as EditCell
+            return tableView.render((text: "", with: self, search: linkController), for: indexPath) as EditCell
         }
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         items[section].file
     }
-}
-
-extension ImportController: SearchDelegate {
-    func change(search: String) {}
 }

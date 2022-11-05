@@ -33,13 +33,16 @@ public class Paths {
         FileManager.default.ubiquityIdentityToken != nil
     }
 
-    private var localURL: URL? {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    private var groupURL: URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.\(id)")?.resolvingSymlinksInPath()
     }
 
-    // TODO: Use in appex contexts.
-    private var groupURL: URL? {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.\(id)")?.appendingPathComponent("Documents").resolvingSymlinksInPath()
+    public func cached(file: String) -> URL? {
+        groupURL?.appendingPathComponent("Library/Caches").appendingPathComponent(file)
+    }
+
+    private var localURL: URL? {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
     }
 
     private var icloudURL: URL? {
