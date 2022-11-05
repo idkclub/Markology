@@ -69,13 +69,11 @@ class ImportController: UIViewController {
         }
     }
 
-    var errorSink: AnyCancellable?
+    var errors: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        errorSink = Engine.shared.errors.sink {
-            print($0)
-        }
+        errors = Engine.shared.errors.sink(receiveValue: alert)
         tableView.backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
         linkController.delegate = self
         add(linkController)

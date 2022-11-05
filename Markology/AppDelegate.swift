@@ -67,13 +67,7 @@ class SplitController: UISplitViewController {
         primaryBackgroundStyle = .sidebar
         delegate = self
 
-        errors = Engine.errors.sink {
-            let alert = UIAlertController(title: "Error", message: $0.localizedDescription, preferredStyle: .alert)
-            alert.addAction(.init(title: "Okay", style: .cancel) { _ in alert.dismiss(animated: true) })
-            DispatchQueue.main.async {
-                self.present(alert, animated: true)
-            }
-        }
+        errors = Engine.errors.sink(receiveValue: alert)
     }
 }
 

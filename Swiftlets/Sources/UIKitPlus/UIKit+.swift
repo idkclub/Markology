@@ -36,6 +36,14 @@ public extension UIViewController {
         controller.arrange(in: view)
         controller.didMove(toParent: self)
     }
+
+    func alert(error: Error) {
+        let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+        alert.addAction(.init(title: "Okay", style: .cancel) { _ in alert.dismiss(animated: true) })
+        DispatchQueue.main.async {
+            self.present(alert, animated: true)
+        }
+    }
 }
 
 public protocol SubController: UIViewController {
