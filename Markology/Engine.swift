@@ -89,7 +89,7 @@ extension Engine: Monitor {
         try? db.write {
             let names = files.map { $0.name }
             try Note.deleteAll(db: $0, excluding: names)
-            try Note.Link.deleteAll(db: $0, excluding: names)
+            try Link.deleteAll(db: $0, excluding: names)
         }
         update(files: files)
     }
@@ -136,7 +136,7 @@ extension Engine: Monitor {
         try? db.write {
             let names = files.map { $0.name }
             try Note.deleteAll(db: $0, in: names)
-            try Note.Link.deleteAll(db: $0, in: names)
+            try Link.deleteAll(db: $0, in: names)
         }
     }
 
@@ -145,7 +145,7 @@ extension Engine: Monitor {
         var walk = NoteWalker(from: name)
         walk.visit(doc)
         try? db.write { db in
-            try Note.Link.deleteAll(db: db, in: [name])
+            try Link.deleteAll(db: db, in: [name])
             try Note(file: name, name: walk.name, text: text, modified: modified).save(db)
             try walk.links.forEach { try $0.save(db) }
         }
@@ -158,7 +158,7 @@ extension Engine {
         var context = ""
         var fallback = ""
         var header = ""
-        var links: [Note.Link] = []
+        var links: [Notes.Link] = []
 
         var name: String {
             if header != "" {
@@ -181,14 +181,14 @@ extension Engine {
             guard let destination = link.destination,
                   !link.absolute,
                   let to = from.use(for: destination)?.removingPercentEncoding else { return }
-            links.append(Note.Link(from: from, to: to, text: context))
+            links.append(Link(from: from, to: to, text: context))
         }
 
         mutating func visitImage(_ image: Image) {
             guard let source = image.source,
                   !image.absolute,
                   let to = from.use(for: source)?.removingPercentEncoding else { return }
-            links.append(Note.Link(from: from, to: to, text: context))
+            links.append(Link(from: from, to: to, text: context))
         }
 
         mutating func visitParagraph(_ paragraph: Paragraph) {

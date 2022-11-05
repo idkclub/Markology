@@ -8,7 +8,7 @@ import Paths
 import UIKit
 
 class NoteController: UIViewController, Bindable {
-    static func with(id: Note.ID, edit: Bool = false) -> NoteController {
+    static func with(id: ID, edit: Bool = false) -> NoteController {
         let note = NoteController()
         note.edit = edit
         note.id = id
@@ -32,7 +32,7 @@ class NoteController: UIViewController, Bindable {
 
     private(set) var document: NoteDocument?
     private var entrySink: AnyCancellable?
-    private var entry: Note.Entry? {
+    private var entry: Entry? {
         didSet { reload() }
     }
 
@@ -42,14 +42,14 @@ class NoteController: UIViewController, Bindable {
         tableView.register(EditCell.self)
         tableView.register(EmptyCell.self)
         tableView.register(MarkCell.self)
-        tableView.register(Note.Entry.Link.Cell.self)
+        tableView.register(Entry.Link.Cell.self)
         tableView.delegate = self
         tableView.dataSource = self
         return tableView
     }()
 
     private var linkSink: AnyCancellable?
-    private var linkQuery: Note.ID.Search? {
+    private var linkQuery: ID.Search? {
         didSet {
             guard let linkQuery = linkQuery else {
                 linkSink = nil
@@ -68,7 +68,7 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
-    private var link: [Note.ID] = [] {
+    private var link: [ID] = [] {
         didSet {
             showLinks = true
             collectionView.reloadData()
@@ -84,7 +84,7 @@ class NoteController: UIViewController, Bindable {
                 linkQuery = nil
                 return
             }
-            linkQuery = Note.ID.search(text: search, limit: 5)
+            linkQuery = ID.search(text: search, limit: 5)
         }
     }
 
@@ -118,7 +118,7 @@ class NoteController: UIViewController, Bindable {
         reload()
     }
 
-    var id: Note.ID? {
+    var id: ID? {
         didSet {
             if id != oldValue {
                 document = nil
@@ -134,7 +134,7 @@ class NoteController: UIViewController, Bindable {
                 }
                 return
             }
-            entrySink = Engine.subscribe(with(\.entry), to: Note.Entry.load(id: id))
+            entrySink = Engine.subscribe(with(\.entry), to: Entry.load(id: id))
         }
     }
 
@@ -144,7 +144,7 @@ class NoteController: UIViewController, Bindable {
 
     var addLink = PassthroughSubject<(url: String, text: String), Never>()
 
-    func navigate(to id: Note.ID) {
+    func navigate(to id: ID) {
         guard let nav = navigationController else { return }
         nav.show(NoteController.with(id: id, edit: edit), sender: self)
     }
@@ -335,7 +335,7 @@ extension NoteController: MarkCellDelegate, EditCellDelegate {
     func openLink(to url: URL, with text: String) -> Bool {
         guard url.host == nil else { return true }
         guard let relative = id?.file.use(for: url.path) else { return false }
-        navigate(to: Note.ID(file: relative, name: text))
+        navigate(to: ID(file: relative, name: text))
         return false
     }
 
@@ -414,9 +414,9 @@ extension NoteController: UITableViewDataSource {
         case .edit:
             return tableView.render((text: text, with: self), for: indexPath) as EditCell
         case .from:
-            return tableView.render((link: entry!.from[indexPath.row], note: entry!.name), for: indexPath) as Note.Entry.Link.Cell
+            return tableView.render((link: entry!.from[indexPath.row], note: entry!.name), for: indexPath) as Entry.Link.Cell
         case .to:
-            return tableView.render((link: entry!.to[indexPath.row], note: entry!.name), for: indexPath) as Note.Entry.Link.Cell
+            return tableView.render((link: entry!.to[indexPath.row], note: entry!.name), for: indexPath) as Entry.Link.Cell
         }
     }
 
@@ -434,7 +434,7 @@ extension NoteController: UITableViewDataSource {
 
 extension NoteController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let dest: Note.ID
+        let dest: ID
         switch sections[indexPath.section] {
         case .note:
             edit = true
@@ -495,7 +495,7 @@ extension NoteController: UICollectionViewDataSource {
 
 extension NoteController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let target: Note.ID
+        let target: ID
         switch linkSections[indexPath.section] {
         case .notes:
             target = link[indexPath.row]

@@ -2,9 +2,9 @@ import KitPlus
 import Notes
 import UIKit
 
-extension Note.Entry.Link {
+extension Entry.Link {
     class Cell: UITableViewCell, RenderCell {
-        func render(_ value: (link: Note.Entry.Link, note: String)) {
+        func render(_ value: (link: Entry.Link, note: String)) {
             var content = UIListContentConfiguration.valueCell()
             content.text = value.link.note.name
             if value.link.note.name != value.link.text,
@@ -17,9 +17,9 @@ extension Note.Entry.Link {
     }
 }
 
-extension Note.ID {
+extension ID {
     class Cell: UITableViewCell, RenderCell {
-        func render(_ id: Note.ID) {
+        func render(_ id: ID) {
             var content = defaultContentConfiguration()
             if id.name == "" {
                 content.text = "Empty Note"

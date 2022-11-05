@@ -29,7 +29,7 @@ class SceneDelegate: NSObject, UISceneDelegate {
         if let state = session.stateRestorationActivity,
            let file = state.userInfo?["file"] as? File.Name
         {
-            split.restore = Note.ID(file: file, name: state.title ?? file)
+            split.restore = ID(file: file, name: state.title ?? file)
         }
         window.rootViewController = split
         window.makeKeyAndVisible()
@@ -50,7 +50,7 @@ class SceneDelegate: NSObject, UISceneDelegate {
 
 class SplitController: UISplitViewController {
     let history = UINavigationController()
-    var restore: Note.ID?
+    var restore: ID?
     var errors: AnyCancellable?
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -52,7 +52,7 @@ class SearchController: UITableViewController, Bindable {
             guard url.host == nil else { return true }
             guard let relative = file.use(forEncoded: url.path),
                   let nav = controller.navigationController else { return false }
-            nav.show(NoteController.with(id: Note.ID(file: relative, name: text)), sender: self)
+            nav.show(NoteController.with(id: ID(file: relative, name: text)), sender: self)
             return false
         }
 

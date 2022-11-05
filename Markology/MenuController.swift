@@ -10,7 +10,7 @@ class MenuController: UIViewController, Bindable {
     var sections: [Section] = []
     var progressSink: AnyCancellable?
     var searchSink: AnyCancellable?
-    var query: Note.ID.Search? {
+    var query: ID.Search? {
         didSet {
             guard let query = query else {
                 searchSink = nil
@@ -20,7 +20,7 @@ class MenuController: UIViewController, Bindable {
         }
     }
 
-    var ids: [Note.ID] = [] {
+    var ids: [ID] = [] {
         didSet { reload() }
     }
 
@@ -38,7 +38,7 @@ class MenuController: UIViewController, Bindable {
         table.keyboardDismissMode = .onDrag
         table.dataSource = self
         table.delegate = self
-        table.register(Note.ID.Cell.self)
+        table.register(ID.Cell.self)
         return table
     }()
 
@@ -55,7 +55,7 @@ class MenuController: UIViewController, Bindable {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings))
-        query = Note.ID.search(text: "")
+        query = ID.search(text: "")
         let progress = UIProgressView(progressViewStyle: .bar)
         progressSink = Engine.progress.sink {
             progress.progress = $0
@@ -72,7 +72,7 @@ class MenuController: UIViewController, Bindable {
 
 extension MenuController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        query = Note.ID.search(text: searchText)
+        query = ID.search(text: searchText)
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -102,10 +102,10 @@ extension MenuController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch sections[indexPath.section] {
         case .notes:
-            return tableView.render(ids[indexPath.row], for: indexPath) as Note.ID.Cell
+            return tableView.render(ids[indexPath.row], for: indexPath) as ID.Cell
         case .new:
-            let id = Note.ID(file: "", name: search.text ?? "")
-            return tableView.render(id, for: indexPath) as Note.ID.Cell
+            let id = ID(file: "", name: search.text ?? "")
+            return tableView.render(id, for: indexPath) as ID.Cell
         }
     }
 
@@ -128,7 +128,7 @@ extension MenuController: UITableViewDelegate {
         case .notes:
             controller = .with(id: ids[indexPath.row])
         case .new:
-            controller = .with(id: Note.ID.generate(for: search.text ?? ""), edit: true)
+            controller = .with(id: ID.generate(for: search.text ?? ""), edit: true)
         }
         nav.viewControllers = [controller]
         split.show(.secondary)
