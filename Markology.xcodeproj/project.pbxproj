@@ -14,7 +14,7 @@
 		4E596507291399A2000BB2EC /* Import.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4E5964FD291399A2000BB2EC /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4E5965332913AB42000BB2EC /* UIKitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965322913AB42000BB2EC /* UIKitPlus */; };
 		4E5965372913B431000BB2EC /* UIKitPlus in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5965362913B431000BB2EC /* UIKitPlus */; };
-		4E59653C2913C3D7000BB2EC /* MarkView in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59653B2913C3D7000BB2EC /* MarkView */; };
+		4E59A2CF291621250038D4C0 /* MarkCell in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59A2CE291621250038D4C0 /* MarkCell */; };
 		4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */; };
 		4E7776EB28F46E9E00DAEF80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */; };
 		4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F428F46EC100DAEF80 /* AppDelegate.swift */; };
@@ -87,8 +87,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4E59653C2913C3D7000BB2EC /* MarkView in Frameworks */,
 				4E5965372913B431000BB2EC /* UIKitPlus in Frameworks */,
+				4E59A2CF291621250038D4C0 /* MarkCell in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +125,13 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		4E59A2CD291621250038D4C0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		4E7776DA28F46E9C00DAEF80 = {
 			isa = PBXGroup;
 			children = (
@@ -132,6 +139,7 @@
 				4E7776E528F46E9C00DAEF80 /* Markology */,
 				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
+				4E59A2CD291621250038D4C0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -180,7 +188,7 @@
 			name = Import;
 			packageProductDependencies = (
 				4E5965362913B431000BB2EC /* UIKitPlus */,
-				4E59653B2913C3D7000BB2EC /* MarkView */,
+				4E59A2CE291621250038D4C0 /* MarkCell */,
 			);
 			productName = Import;
 			productReference = 4E5964FD291399A2000BB2EC /* Import.appex */;
@@ -586,9 +594,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = UIKitPlus;
 		};
-		4E59653B2913C3D7000BB2EC /* MarkView */ = {
+		4E59A2CE291621250038D4C0 /* MarkCell */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MarkView;
+			productName = MarkCell;
 		};
 		4E7DBB692915626700185CA3 /* MarkCell */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -405,7 +405,7 @@ extension NoteController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch sections[indexPath.section] {
         case .file:
-            return tableView.render(id!.file, for: indexPath) as FileCell
+            return tableView.render(id!.file.url, for: indexPath) as FileCell
         case .note:
             if entry == nil || (!id!.file.isMarkdown && entry?.text == ""), document == nil {
                 return tableView.render(id!.file, for: indexPath) as EmptyCell
@@ -535,50 +535,6 @@ extension NoteController {
         func render(_ symbol: String) {
             image.image = UIImage(systemName: symbol)
             image.tintColor = .secondaryLabel
-        }
-    }
-}
-
-extension NoteController {
-    class FileCell: UITableViewCell, RenderCell {
-        var height: NSLayoutConstraint?
-        lazy var imageDisplay = {
-            let view = UIImageView().pinned(to: contentView)
-            view.contentMode = .scaleAspectFit
-            return view
-        }()
-
-        lazy var textDisplay = {
-            let view = UITextView().pinned(to: contentView, layout: true)
-            view.isEditable = false
-            view.isScrollEnabled = false
-            return view
-        }()
-
-        override func prepareForReuse() {
-            imageDisplay.image = nil
-            imageDisplay.isHidden = true
-            textDisplay.text = nil
-            textDisplay.isHidden = true
-        }
-
-        func render(_ file: File.Name) {
-            if let image = UIImage(contentsOfFile: file.url.path) {
-                imageDisplay.image = image
-                imageDisplay.isHidden = false
-                if let height = height {
-                    imageDisplay.removeConstraint(height)
-                }
-                height = imageDisplay.heightAnchor.constraint(equalTo: imageDisplay.widthAnchor, multiplier: image.size.height / image.size.width)
-                height?.isActive = true
-                height?.priority = .defaultHigh
-            }
-            if let text = try? String(contentsOf: file.url) {
-                textDisplay.text = text
-                textDisplay.font = .monospacedSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize, weight: .regular)
-                textDisplay.isHidden = false
-                return
-            }
         }
     }
 }
