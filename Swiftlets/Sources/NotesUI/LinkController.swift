@@ -106,7 +106,7 @@ extension LinkController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch linkSections[indexPath.section] {
         case .notes:
-            return collectionView.render(linkQuery.valid ? "clock" : "magnifyingglass", forHeader: indexPath) as Header
+            return collectionView.render(linkQuery.valid ?  "magnifyingglass" : "clock", forHeader: indexPath) as Header
         case .new:
             return collectionView.render("plus", forHeader: indexPath) as Header
         }
