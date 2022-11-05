@@ -19,14 +19,14 @@ public struct ID: Codable, Equatable, FetchableRecord {
     }
 
     public struct Search: Query {
-        var pattern: FTS5Pattern?
+        let pattern: FTS5Pattern?
         let limit: Int
         let text: String
 
         init(text: String, limit: Int) {
             self.text = text
             self.limit = limit
-//                pattern = Engine.shared.tokenize(query: text)
+            pattern = Note.tokenizer.parse(query: text)
         }
 
         public func fetch(db: Database) throws -> [ID] {

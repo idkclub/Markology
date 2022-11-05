@@ -1,6 +1,6 @@
-import UIKitPlus
 import Notes
 import UIKit
+import UIKitPlus
 
 extension Entry.Link {
     class Cell: UITableViewCell, RenderCell {

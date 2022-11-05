@@ -1,11 +1,11 @@
 import Combine
-import UIKitPlus
 import MarkCell
 import Markdown
 import MarkView
 import Notes
 import Paths
 import UIKit
+import UIKitPlus
 
 class NoteController: UIViewController, Bindable {
     static func with(id: ID, edit: Bool = false) -> NoteController {

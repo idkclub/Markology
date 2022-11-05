@@ -11,6 +11,7 @@ public struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
         static let modified = Column(CodingKeys.modified)
     }
 
+    static let tokenizer = FTS5TokenizerDescriptor.unicode61(categories: "L* N* S* Co", tokenCharacters: Set("#"))
     static let searchRank = "round(bm25(note_search, 50)), note.modified desc"
     static let from = hasMany(Link.self, using: Link.toKey).forKey("fromLink")
     static let to = hasMany(Link.self, using: Link.fromKey).forKey("toLink")
@@ -48,10 +49,16 @@ public struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     }
 
     public struct Search: Query {
+        let pattern: FTS5Pattern?
         let text: String
 
+        init(text: String) {
+            self.text = text
+            pattern = Note.tokenizer.parse(query: text)
+        }
+
         public func fetch(db: Database) throws -> [Note] {
-            if let pattern = FTS5Pattern(matchingAllPrefixesIn: text) {
+            if let pattern = pattern {
                 return try Note.fetchAll(db, sql: """
                 select note.* from note
                 join note_search on note.rowid = note_search.rowid
@@ -65,5 +72,32 @@ public struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
 
     public static func search(text: String) -> Search {
         Search(text: text)
+    }
+
+    public static func migrate(db: DatabaseWriter) throws {
+        var migrator = DatabaseMigrator()
+        migrator.eraseDatabaseOnSchemaChange = true
+        migrator.registerMigration("v0") { db in
+            try db.create(table: "note") { t in
+                t.column("file", .text).primaryKey(onConflict: .replace)
+                t.column("name", .text)
+                t.column("text", .text)
+                t.column("modified", .datetime)
+            }
+            try db.create(virtualTable: "note_search", using: FTS5()) { t in
+                t.synchronize(withTable: "note")
+                t.tokenizer = tokenizer
+                t.column("name")
+                t.column("text")
+                t.column("file")
+            }
+            try db.create(table: "link") { t in
+                t.column("from", .text).references("note", onDelete: .cascade)
+                t.column("to", .text).references("note")
+                t.column("text")
+                t.uniqueKey(["from", "to", "text"], onConflict: .ignore)
+            }
+        }
+        try migrator.migrate(db)
     }
 }

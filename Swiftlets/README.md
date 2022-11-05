@@ -2,9 +2,9 @@
 
 A collection of extracted components.
 
-## UIKitPlus
+## GRDBPlus
 
-UIKit helper extensions.
+GRDB helper extensions.
 
 ## MarkCell
 
@@ -13,3 +13,11 @@ UITableCells containing MarkView for display, editing.
 ## MarkView
 
 UITextView for displaying Markdown.
+
+## Notes
+
+GRDB structs for notes.
+
+## UIKitPlus
+
+UIKit helper extensions.

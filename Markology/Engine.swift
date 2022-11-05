@@ -13,7 +13,6 @@ class Engine {
     let progress = CurrentValueSubject<Float, Never>(1)
     let errors = PassthroughSubject<Error, Never>()
     let paths = Paths(for: bundle)
-    private let tokenizer = FTS5TokenizerDescriptor.unicode61(categories: "L* N* S* Co", tokenCharacters: Set("#"))
     private let db: DatabaseWriter
     init() throws {
         let cache = try FileManager.default.url(
@@ -25,7 +24,7 @@ class Engine {
         var config = Configuration()
         config.foreignKeysEnabled = false
         db = try DatabasePool(path: cache.path, configuration: config)
-        try migrate()
+        try Note.migrate(db: db)
         paths.monitor = self
     }
 
@@ -43,44 +42,6 @@ class Engine {
                     errors.send(err)
                 }
             }, receiveValue: action)
-    }
-
-    // TODO: Upstream the quoting / tokenizer usage?
-    func tokenize(query: String) -> FTS5Pattern? {
-        guard !query.isEmpty else { return nil }
-        return (try? db.read { db in
-            let tokens = try db.makeTokenizer(self.tokenizer).tokenize(query: query).compactMap {
-                $0.flags.contains(.colocated) ? nil : $0.token
-            }
-            return try db.makeFTS5Pattern(rawPattern: tokens.map { "\"\($0)\"*" }.joined(separator: " "), forTable: "note_search")
-        })
-    }
-
-    private func migrate() throws {
-        var migrator = DatabaseMigrator()
-        migrator.eraseDatabaseOnSchemaChange = true
-        migrator.registerMigration("v0") { db in
-            try db.create(table: "note") { t in
-                t.column("file", .text).primaryKey(onConflict: .replace)
-                t.column("name", .text)
-                t.column("text", .text)
-                t.column("modified", .datetime)
-            }
-            try db.create(virtualTable: "note_search", using: FTS5()) { t in
-                t.synchronize(withTable: "note")
-                t.tokenizer = self.tokenizer
-                t.column("name")
-                t.column("text")
-                t.column("file")
-            }
-            try db.create(table: "link") { t in
-                t.column("from", .text).references("note", onDelete: .cascade)
-                t.column("to", .text).references("note")
-                t.column("text")
-                t.uniqueKey(["from", "to", "text"], onConflict: .ignore)
-            }
-        }
-        try migrator.migrate(db)
     }
 }
 
