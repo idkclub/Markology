@@ -2,23 +2,22 @@ import Markdown
 import UIKit
 
 struct EditVisitor: MarkupVisitor {
-    static func process(text: String) -> NSMutableAttributedString {
-        let doc = Document(parsing: text)
-        var visitor = EditVisitor(text: text)
-        return visitor.visit(doc)
-            .setMissing(key: .foregroundColor, value: UIColor.label)
-    }
-
     let lengths: [Int: (String, Int)]
     var text: NSMutableAttributedString
+    var url = true
 
-    private init(text: String) {
+    init(text: String) {
         self.text = text.body
         var offset = 0
         lengths = text.components(separatedBy: .newlines).enumerated().reduce(into: [:]) {
             $0[$1.offset] = ($1.element, offset)
             offset += $1.element.utf16.count + 1
         }
+    }
+
+    mutating func process(markup: Markup) -> NSMutableAttributedString {
+        visit(markup)
+            .setMissing(key: .foregroundColor, value: UIColor.label)
     }
 
     func index(for source: SourceRange.Bound) -> Int? {
@@ -55,17 +54,23 @@ struct EditVisitor: MarkupVisitor {
     mutating func visitLink(_ link: Link) -> NSMutableAttributedString {
         guard let range = range(for: link),
               let url = link.encoded else { return text }
-        return defaultVisit(link)
-            .adding(key: .link, value: url, range: range)
+        let body = defaultVisit(link)
             .adding(key: .foregroundColor, value: link.color, range: range)
+        if self.url {
+            return body.adding(key: .link, value: url, range: range)
+        }
+        return body
     }
 
     mutating func visitImage(_ image: Image) -> NSMutableAttributedString {
         guard let range = range(for: image),
               let url = image.encoded else { return text }
-        return defaultVisit(image)
-            .adding(key: .link, value: url, range: range)
+        let body = defaultVisit(image)
             .adding(key: .foregroundColor, value: image.color, range: range)
+        if self.url {
+            return body.adding(key: .link, value: url, range: range)
+        }
+        return body
     }
 
     var quoteLevel = 0

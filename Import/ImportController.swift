@@ -98,10 +98,6 @@ extension ImportController: LinkControllerDelegate {
 
 extension ImportController: EditCellDelegate {
     func change(text: String) {}
-
-    func openLink(to url: URL, with text: String) -> Bool {
-        return false
-    }
 }
 
 extension ImportController: UITableViewDataSource {

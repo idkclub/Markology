@@ -29,17 +29,21 @@ public class MarkView: UITextView {
     public var resolver: PathResolver?
 
     public static let checkboxScheme = "checkbox"
+    public var linkURLs: Bool = true
     public var linkCheckboxes: Bool = false
 
     var attachments: Set<UIView> = []
 
     public func render(text: String, includingMarkup: Bool) {
+        let doc = Document(parsing: text)
         if includingMarkup {
-            attributedText = EditVisitor.process(text: text)
+            var visitor = EditVisitor(text: text)
+            visitor.url = linkURLs
+            attributedText = visitor.process(markup: doc)
             return
         }
-        var visitor = NoteVisitor(checkbox: linkCheckboxes, resolver: resolver)
-        attributedText = visitor.process(markup: Document(parsing: text))
+        var visitor = NoteVisitor(checkbox: linkCheckboxes, url: linkURLs, resolver: resolver)
+        attributedText = visitor.process(markup: doc)
     }
 }
 

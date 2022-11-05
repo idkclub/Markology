@@ -20,6 +20,7 @@ public class EditCell: UITableViewCell {
     }()
 
     func render(_ text: String) {
+        markdown.linkURLs = delegate is LinkDelegate
         markdown.render(text: text, includingMarkup: true)
         markdown.becomeFirstResponder()
     }
@@ -60,7 +61,10 @@ extension EditCell: UITextViewDelegate {
         let doc = Document(parsing: text)
         var visitor = LinkWalker()
         visitor.visit(doc)
-        return delegate?.openLink(to: url, with: visitor.text) ?? false
+        if let delegate = delegate as? LinkDelegate {
+            return delegate.openLink(to: url, with: visitor.text)
+        }
+        return false
     }
 
     public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
@@ -143,7 +147,7 @@ extension EditCell: UITextViewDelegate {
     }
 }
 
-public protocol EditCellDelegate: LinkDelegate {
+public protocol EditCellDelegate {
     func change(text: String)
 }
 

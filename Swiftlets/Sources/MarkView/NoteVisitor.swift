@@ -3,6 +3,7 @@ import UIKit
 
 struct NoteVisitor: MarkupVisitor {
     var checkbox = false
+    var url = true
     var resolver: PathResolver?
     var indent = [MarkView.Indent]()
 
@@ -37,9 +38,12 @@ struct NoteVisitor: MarkupVisitor {
 
     mutating func visitLink(_ link: Markdown.Link) -> NSMutableAttributedString {
         guard let url = link.encoded else { return defaultVisit(link) }
-        return defaultVisit(link)
-            .adding(key: .link, value: url)
+        let body = defaultVisit(link)
             .adding(key: .foregroundColor, value: link.color)
+        if self.url {
+            return body.adding(key: .link, value: url)
+        }
+        return body
     }
 
     mutating func visitImage(_ image: Image) -> NSMutableAttributedString {
@@ -58,8 +62,11 @@ struct NoteVisitor: MarkupVisitor {
             let height = ratio * 200
             attachment.bounds = CGRect(x: 0, y: -height / 2 + 10, width: 200, height: height)
         }
-        return NSMutableAttributedString(attachment: attachment)
-            .adding(key: .link, value: source)
+        let attach = NSMutableAttributedString(attachment: attachment)
+        if self.url {
+            return attach.adding(key: .link, value: source)
+        }
+        return attach
     }
 
     mutating func visitOrderedList(_ orderedList: OrderedList) -> NSMutableAttributedString {
