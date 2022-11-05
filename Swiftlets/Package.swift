@@ -6,6 +6,10 @@ let package = Package(
     name: "Swiftlets",
     products: [
         .library(
+            name: "GRDBPlus",
+            targets: ["GRDBPlus"]
+        ),
+        .library(
             name: "KitPlus",
             targets: ["KitPlus"]
         ),
@@ -17,11 +21,26 @@ let package = Package(
             name: "MarkView",
             targets: ["MarkView"]
         ),
+        .library(
+            name: "Paths",
+            targets: ["Paths"]
+        ),
+        .library(
+            name: "Notes",
+            targets: ["Notes"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-markdown.git", branch: "main"),
+        .package(url: "https://github.com/idkclub/GRDB.swift", branch: "fts5"),
     ],
     targets: [
+        .target(
+            name: "GRDBPlus",
+            dependencies: [
+                .product(name: "GRDB", package: "GRDB.swift"),
+            ]
+        ),
         .target(
             name: "KitPlus",
             dependencies: []
@@ -38,6 +57,16 @@ let package = Package(
             dependencies: [
                 .product(name: "Markdown", package: "swift-markdown"),
             ]
+        ),
+        .target(
+            name: "Notes",
+            dependencies: [
+                "GRDBPlus",
+            ]
+        ),
+        .target(
+            name: "Paths",
+            dependencies: []
         ),
     ]
 )

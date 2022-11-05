@@ -1,9 +1,9 @@
 import GRDB
-import KitPlus
-import Markdown
+import GRDBPlus
+import Paths
 import UIKit
 
-struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
+public struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     enum Columns {
         static let file = Column(CodingKeys.file)
         static let name = Column(CodingKeys.name)
@@ -15,27 +15,42 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     static let from = hasMany(Link.self, using: Link.toKey).forKey("fromLink")
     static let to = hasMany(Link.self, using: Link.fromKey).forKey("toLink")
 
-    let file: Paths.File.Name
-    let name: String
-    let text: String
-    let modified: Date
+    public let file: File.Name
+    public let name: String
+    public let text: String
+    public let modified: Date
+    
+    public init(file: File.Name, name: String, text: String, modified: Date) {
+        self.file = file
+        self.name = name
+        self.text = text
+        self.modified = modified
+    }
 
-    static func lastModified(db: Database) throws -> [String: Date] {
-        struct File: Codable, FetchableRecord {
+    public static func lastModified(db: Database) throws -> [String: Date] {
+        struct FileDate: Codable, FetchableRecord {
             static let query = Note.select(Note.Columns.file, Note.Columns.modified)
-            let file: Paths.File.Name
+            let file: File.Name
             let modified: Date
         }
 
-        return try File.fetchAll(db, File.query).reduce(into: [:]) {
+        return try FileDate.fetchAll(db, FileDate.query).reduce(into: [:]) {
             $0[$1.file] = $1.modified
         }
     }
+    
+    public static func deleteAll(db: Database, in names: [String]) throws {
+        try Note.filter(names.contains(Note.Columns.file)).deleteAll(db)
+    }
+    
+    public static func deleteAll(db: Database, excluding names: [String]) throws {
+        try Note.filter(!names.contains(Note.Columns.file)).deleteAll(db)
+    }
 
-    struct Search: Query {
+    public struct Search: Query {
         let text: String
 
-        func fetch(db: Database) throws -> [Note] {
+        public func fetch(db: Database) throws -> [Note] {
             if let pattern = FTS5Pattern(matchingAllPrefixesIn: text) {
                 return try Note.fetchAll(db, sql: """
                 select note.* from note
@@ -47,9 +62,13 @@ struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
             return try Note.order(Note.Columns.name.asc).fetchAll(db)
         }
     }
+    
+    public static func search(text: String) -> Search {
+        Search(text: text)
+    }
 }
 
-extension Note {
+public extension Note {
     @dynamicMemberLookup
     struct Entry: Codable, Equatable, FetchableRecord {
         static let query = Note.all()
@@ -64,64 +83,60 @@ extension Note {
                     .order(Note.Columns.name.asc))
                 .forKey("from"))
         let note: Note
-        let to: [Link]
-        let from: [Link]
+        public let to: [Link]
+        public let from: [Link]
 
-        subscript<T>(dynamicMember keyPath: KeyPath<Note, T>) -> T {
+        public subscript<T>(dynamicMember keyPath: KeyPath<Note, T>) -> T {
             note[keyPath: keyPath]
         }
 
-        struct Load: Query {
+        public struct Load: Query {
             let id: ID
 
-            func fetch(db: Database) throws -> Entry? {
+            public func fetch(db: Database) throws -> Entry? {
                 try Entry.fetchOne(db, Entry.query.filter(key: id.file))
             }
         }
+        
+        public static func load(id: ID) -> Load {
+            Load(id: id)
+        }
 
-        struct Link: Codable, Equatable {
-            let text: String
-            let note: ID
-
-            class Cell: UITableViewCell, RenderCell {
-                func render(_ value: (link: Note.Entry.Link, note: String)) {
-                    var content = UIListContentConfiguration.valueCell()
-                    content.text = value.link.note.name
-                    if value.link.note.name != value.link.text,
-                       value.note != value.link.text
-                    {
-                        content.secondaryText = value.link.text
-                    }
-                    contentConfiguration = content
-                }
-            }
+        public struct Link: Codable, Equatable {
+            public let text: String
+            public let note: ID
         }
     }
 }
 
-extension Note {
+public extension Note {
     struct ID: Codable, Equatable, FetchableRecord {
         static let query = Note.select(Note.Columns.file, Note.Columns.name)
 
-        let file: Paths.File.Name
-        let name: String
+        public let file: File.Name
+        public let name: String
+        
+        public init(file: File.Name, name: String) {
+            self.file = file
+            self.name = name
+        }
 
-        static func generate(for name: String) -> ID {
+        public static func generate(for name: String) -> ID {
             ID(file: "/\(Int(Date().timeIntervalSince1970).description).md", name: name)
         }
 
-        struct Search: Query {
-            let pattern: FTS5Pattern?
+        public struct Search: Query {
+            var pattern: FTS5Pattern?
             let limit: Int
             let text: String
 
-            init(text: String, limit: Int = 10) {
+            init(text: String, limit: Int) {
                 self.text = text
                 self.limit = limit
-                pattern = Engine.shared.tokenize(query: text)
+//                pattern = Engine.shared.tokenize(query: text)
             }
 
-            func fetch(db: Database) throws -> [ID] {
+            public func fetch(db: Database) throws -> [ID] {
                 guard let pattern = pattern else {
                     let request = ID.query.order(Note.Columns.modified.desc).limit(limit)
                     return try ID.fetchAll(db, request)
@@ -135,23 +150,18 @@ extension Note {
                 """, arguments: [pattern, limit])
             }
         }
-
-        class Cell: UITableViewCell, RenderCell {
-            func render(_ id: ID) {
-                var content = defaultContentConfiguration()
-                if id.name == "" {
-                    content.text = "Empty Note"
-                    content.textProperties.color = .placeholderText
-                } else {
-                    content.text = id.name
-                }
-                contentConfiguration = content
-            }
+        
+        public static func search(text: String, limit: Int = 10) -> Search {
+            Search(text: text, limit: limit)
         }
     }
 }
 
-extension Note {
+public extension Note.ID.Search? {
+    var valid: Bool { self?.pattern != nil }
+}
+
+public extension Note {
     struct Link: Codable, Equatable, PersistableRecord {
         enum Columns {
             static let from = Column(CodingKeys.from)
@@ -164,8 +174,22 @@ extension Note {
         static let from = belongsTo(Note.self, using: fromKey)
         static let to = belongsTo(Note.self, using: toKey)
 
-        let from: String
-        let to: String
+        let from: File.Name
+        let to: File.Name
         let text: String
+        
+        public init(from: String, to: String, text: String) {
+            self.from = from
+            self.to = to
+            self.text = text
+        }
+        
+        public static func deleteAll(db: Database, in froms: [String]) throws {
+            try Note.Link.filter(froms.contains(Note.Link.Columns.from)).deleteAll(db)
+        }
+        
+        public static func deleteAll(db: Database, excluding froms: [String]) throws {
+            try Note.Link.filter(!froms.contains(Note.Link.Columns.from)).deleteAll(db)
+        }
     }
 }

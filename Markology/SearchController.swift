@@ -1,6 +1,8 @@
 import Combine
 import MarkCell
 import Markdown
+import Notes
+import Paths
 import UIKit
 
 class SearchController: UITableViewController, Bindable {
@@ -19,7 +21,7 @@ class SearchController: UITableViewController, Bindable {
                 return
             }
             title = "Results for \"\(query)\""
-            noteSink = Engine.subscribe(with(\.notes), to: Note.Search(text: query))
+            noteSink = Engine.subscribe(with(\.notes), to: Note.search(text: query))
         }
     }
 
@@ -38,10 +40,10 @@ class SearchController: UITableViewController, Bindable {
     }
 
     class CellDelegate: MarkCellDelegate {
-        var file: Paths.File.Name
+        var file: File.Name
         var controller: UIViewController
 
-        init(file: Paths.File.Name, controller: UIViewController) {
+        init(file: File.Name, controller: UIViewController) {
             self.file = file
             self.controller = controller
         }

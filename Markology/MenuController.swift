@@ -1,4 +1,5 @@
 import Combine
+import Notes
 import UIKit
 
 class MenuController: UIViewController, Bindable {
@@ -54,7 +55,7 @@ class MenuController: UIViewController, Bindable {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings))
-        query = Note.ID.Search(text: "")
+        query = Note.ID.search(text: "")
         let progress = UIProgressView(progressViewStyle: .bar)
         progressSink = Engine.progress.sink {
             progress.progress = $0
@@ -71,7 +72,7 @@ class MenuController: UIViewController, Bindable {
 
 extension MenuController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        query = Note.ID.Search(text: searchText)
+        query = Note.ID.search(text: searchText)
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -111,10 +112,7 @@ extension MenuController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch sections[section] {
         case .notes:
-            if query?.pattern != nil {
-                return "Related"
-            }
-            return "Recent"
+            return query.valid ? "Related" : "Recent"
         case .new:
             return "New"
         }

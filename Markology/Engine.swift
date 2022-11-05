@@ -1,12 +1,10 @@
 import Combine
 import Foundation
 import GRDB
+import GRDBPlus
 import Markdown
-
-protocol Query {
-    associatedtype Value
-    func fetch(db: Database) throws -> Value
-}
+import Notes
+import Paths
 
 @dynamicMemberLookup
 class Engine {
@@ -87,17 +85,16 @@ class Engine {
 }
 
 extension Engine: Monitor {
-    func sync(files: [Paths.File]) {
+    func sync(files: [File]) {
         try? db.write {
             let names = files.map { $0.name }
-            try Note.filter(!names.contains(Note.Columns.file)).deleteAll($0)
-            // TODO: Remove if foreign keys enabled.
-            try Note.Link.filter(!names.contains(Note.Link.Columns.from)).deleteAll($0)
+            try Note.deleteAll(db: $0, excluding: names)
+            try Note.Link.deleteAll(db: $0, excluding: names)
         }
         update(files: files)
     }
 
-    func update(files: [Paths.File]) {
+    func update(files: [File]) {
         let times = try? db.read { try Note.lastModified(db: $0) }
         var completed: Float = 0.0
         for file in files {
@@ -135,21 +132,20 @@ extension Engine: Monitor {
         }
     }
 
-    func delete(files: [Paths.File]) {
+    func delete(files: [File]) {
         try? db.write {
             let names = files.map { $0.name }
-            try Note.filter(names.contains(Note.Columns.file)).deleteAll($0)
-            // TODO: Remove if foreign keys enabled.
-            try Note.Link.filter(names.contains(Note.Link.Columns.from)).deleteAll($0)
+            try Note.deleteAll(db: $0, in: names)
+            try Note.Link.deleteAll(db: $0, in: names)
         }
     }
 
-    func update(file name: Paths.File.Name, with text: String, at modified: Date = Date()) {
+    func update(file name: File.Name, with text: String, at modified: Date = Date()) {
         let doc = Document(parsing: text)
         var walk = NoteWalker(from: name)
         walk.visit(doc)
         try? db.write { db in
-            try Note.Link.filter(Note.Link.Columns.from == name).deleteAll(db)
+            try Note.Link.deleteAll(db: db, in: [name])
             try Note(file: name, name: walk.name, text: text, modified: modified).save(db)
             try walk.links.forEach { try $0.save(db) }
         }
@@ -158,7 +154,7 @@ extension Engine: Monitor {
 
 extension Engine {
     struct NoteWalker: MarkupWalker {
-        var from: Paths.File.Name
+        var from: File.Name
         var context = ""
         var fallback = ""
         var header = ""
@@ -204,12 +200,12 @@ extension Engine {
     }
 }
 
-extension Paths.File.Name {
+extension File.Name {
     var url: URL {
         Engine.paths.locate(file: self).url
     }
 
-    var related: Paths.File.Name? {
+    var related: File.Name? {
         let related = String(dropLast(3))
         if FileManager.default.fileExists(atPath: related.url.path) {
             return related

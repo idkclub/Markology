@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E36BBFE2915D7EF00673B84 /* Notes+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E36BBFD2915D7EF00673B84 /* Notes+.swift */; };
 		4E4583BB28FA88CB00C617BE /* Foundation+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583BA28FA88CB00C617BE /* Foundation+.swift */; };
-		4E4583C628FBB93800C617BE /* Paths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C528FBB93800C617BE /* Paths.swift */; };
 		4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4583C728FBC1CA00C617BE /* SettingsController.swift */; };
 		4E596500291399A2000BB2EC /* ImportController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E5964FF291399A2000BB2EC /* ImportController.swift */; };
 		4E596507291399A2000BB2EC /* Import.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4E5964FD291399A2000BB2EC /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -20,13 +20,12 @@
 		4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F428F46EC100DAEF80 /* AppDelegate.swift */; };
 		4E7776F828F47D0700DAEF80 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F728F47D0700DAEF80 /* Engine.swift */; };
 		4E77770028F47F0E00DAEF80 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7776FF28F47F0E00DAEF80 /* Markdown */; };
-		4E77770228F481F700DAEF80 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770128F481F700DAEF80 /* Note.swift */; };
 		4E77770428F486E900DAEF80 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770328F486E900DAEF80 /* MenuController.swift */; };
 		4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770528F5008C00DAEF80 /* NoteController.swift */; };
-		4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; };
-		4E77771C28F7330600DAEF80 /* GRDB-dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4E77771A28F732EC00DAEF80 /* GRDB-dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
 		4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB692915626700185CA3 /* MarkCell */; };
+		4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB6C2915BE2E00185CA3 /* Paths */; };
+		4E7DBB6F2915D54900185CA3 /* Notes in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB6E2915D54900185CA3 /* Notes */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +56,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				4E77771C28F7330600DAEF80 /* GRDB-dynamic in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,8 +63,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4E36BBFD2915D7EF00673B84 /* Notes+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notes+.swift"; sourceTree = "<group>"; };
 		4E4583BA28FA88CB00C617BE /* Foundation+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Foundation+.swift"; sourceTree = "<group>"; };
-		4E4583C528FBB93800C617BE /* Paths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Paths.swift; sourceTree = "<group>"; };
 		4E4583C728FBC1CA00C617BE /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		4E5964FD291399A2000BB2EC /* Import.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Import.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E5964FF291399A2000BB2EC /* ImportController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportController.swift; sourceTree = "<group>"; };
@@ -79,7 +77,6 @@
 		4E7776F428F46EC100DAEF80 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4E7776F628F46F7100DAEF80 /* Markology.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Markology.entitlements; sourceTree = "<group>"; };
 		4E7776F728F47D0700DAEF80 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
-		4E77770128F481F700DAEF80 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		4E77770328F486E900DAEF80 /* MenuController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		4E77770528F5008C00DAEF80 /* NoteController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteController.swift; sourceTree = "<group>"; };
 		4E77771F28F9B42000DAEF80 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
@@ -99,10 +96,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E7DBB6F2915D54900185CA3 /* Notes in Frameworks */,
 				4E5965332913AB42000BB2EC /* KitPlus in Frameworks */,
 				4E77770028F47F0E00DAEF80 /* Markdown in Frameworks */,
-				4E77771B28F732EC00DAEF80 /* GRDB-dynamic in Frameworks */,
 				4E7DBB6A2915626700185CA3 /* MarkCell in Frameworks */,
+				4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +132,7 @@
 				4E7776E528F46E9C00DAEF80 /* Markology */,
 				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
+				4E7DBB6B2915BE2E00185CA3 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -154,15 +153,21 @@
 				4E7776F728F47D0700DAEF80 /* Engine.swift */,
 				4E4583BA28FA88CB00C617BE /* Foundation+.swift */,
 				4E77770328F486E900DAEF80 /* MenuController.swift */,
-				4E77770128F481F700DAEF80 /* Note.swift */,
 				4E77770528F5008C00DAEF80 /* NoteController.swift */,
 				4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */,
-				4E4583C528FBB93800C617BE /* Paths.swift */,
+				4E36BBFD2915D7EF00673B84 /* Notes+.swift */,
 				4E77771F28F9B42000DAEF80 /* SearchController.swift */,
 				4E4583C728FBC1CA00C617BE /* SettingsController.swift */,
 				4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */,
 			);
 			path = Markology;
+			sourceTree = "<group>";
+		};
+		4E7DBB6B2915BE2E00185CA3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -207,9 +212,10 @@
 			name = Markology;
 			packageProductDependencies = (
 				4E7776FF28F47F0E00DAEF80 /* Markdown */,
-				4E77771A28F732EC00DAEF80 /* GRDB-dynamic */,
 				4E5965322913AB42000BB2EC /* KitPlus */,
 				4E7DBB692915626700185CA3 /* MarkCell */,
+				4E7DBB6C2915BE2E00185CA3 /* Paths */,
+				4E7DBB6E2915D54900185CA3 /* Notes */,
 			);
 			productName = Markology;
 			productReference = 4E7776E328F46E9C00DAEF80 /* Markology.app */;
@@ -290,12 +296,11 @@
 				4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */,
 				4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */,
 				4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */,
+				4E36BBFE2915D7EF00673B84 /* Notes+.swift in Sources */,
 				4E77770428F486E900DAEF80 /* MenuController.swift in Sources */,
 				4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */,
-				4E4583C628FBB93800C617BE /* Paths.swift in Sources */,
 				4E7776F828F47D0700DAEF80 /* Engine.swift in Sources */,
 				4E4583BB28FA88CB00C617BE /* Foundation+.swift in Sources */,
-				4E77770228F481F700DAEF80 /* Note.swift in Sources */,
 				4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -598,14 +603,17 @@
 			package = 4E7776FE28F47F0E00DAEF80 /* XCRemoteSwiftPackageReference "swift-markdown" */;
 			productName = Markdown;
 		};
-		4E77771A28F732EC00DAEF80 /* GRDB-dynamic */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4E77771928F732EC00DAEF80 /* XCRemoteSwiftPackageReference "GRDB" */;
-			productName = "GRDB-dynamic";
-		};
 		4E7DBB692915626700185CA3 /* MarkCell */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MarkCell;
+		};
+		4E7DBB6C2915BE2E00185CA3 /* Paths */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Paths;
+		};
+		4E7DBB6E2915D54900185CA3 /* Notes */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Notes;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

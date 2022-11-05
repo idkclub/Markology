@@ -1,4 +1,6 @@
 import Combine
+import Notes
+import Paths
 import UIKit
 
 @main
@@ -25,7 +27,7 @@ class SceneDelegate: NSObject, UISceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         let split = SplitController(style: .doubleColumn)
         if let state = session.stateRestorationActivity,
-           let file = state.userInfo?["file"] as? Paths.File.Name
+           let file = state.userInfo?["file"] as? File.Name
         {
             split.restore = Note.ID(file: file, name: state.title ?? file)
         }

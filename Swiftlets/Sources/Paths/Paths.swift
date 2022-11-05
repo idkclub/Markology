@@ -1,35 +1,35 @@
 import Combine
 import Foundation
 
-class Paths {
+public class Paths {
     private static let disableKey = "paths.icloud.disable"
     private let id: String
     private let defaults: UserDefaults
 
-    let busy = CurrentValueSubject<Bool, Never>(false)
+    public let busy = CurrentValueSubject<Bool, Never>(false)
 
-    var icloud: Bool = false {
+    public var icloud: Bool = false {
         didSet {
             defaults.set(!icloud, forKey: Paths.disableKey)
             reset()
         }
     }
 
-    var documents: URL!
+    public var documents: URL!
 
-    init(for id: String) {
+    public init(for id: String) {
         self.id = id
         defaults = UserDefaults(suiteName: "group.\(id)")!
         icloud = !defaults.bool(forKey: Paths.disableKey) && icloudAvailable
         reset()
     }
 
-    func locate(file: File.Name) -> File {
+    public func locate(file: File.Name) -> File {
         File(in: documents, named: file)
     }
 
     // TODO: Monitor changes.
-    var icloudAvailable: Bool {
+    public var icloudAvailable: Bool {
         FileManager.default.ubiquityIdentityToken != nil
     }
 
@@ -46,7 +46,7 @@ class Paths {
         FileManager.default.url(forUbiquityContainerIdentifier: "iCloud.\(id)")?.appendingPathComponent("Documents").resolvingSymlinksInPath()
     }
 
-    var monitor: Monitor? {
+    public var monitor: Monitor? {
         didSet {
             reset()
         }
@@ -128,45 +128,8 @@ class Paths {
     }
 }
 
-extension Paths {
-    struct File {
-        typealias Name = String
-        let url: URL
-        let name: Name
-
-        fileprivate init(in container: URL, named: Name) {
-            url = container.appendingPathComponent(named).standardizedFileURL
-            name = named
-        }
-
-        fileprivate init?(in container: URL, from item: NSMetadataItem) {
-            guard let url = item.value(forAttribute: NSMetadataItemURLKey) as? URL else { return nil }
-            self.url = url.resolvingSymlinksInPath()
-            name = String(self.url.path.dropFirst(container.path.count))
-        }
-
-        fileprivate init?(in container: URL, at url: Any) {
-            guard let url = url as? URL else { return nil }
-            self.url = url.resolvingSymlinksInPath()
-            name = String(self.url.path.dropFirst(container.path.count))
-        }
-    }
-}
-
-extension Paths.File.Name {
-    func use(for destination: Paths.File.Name) -> Self? {
-        guard let path = destination.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
-        return use(forEncoded: path)
-    }
-
-    func use(forEncoded path: String) -> Self? {
-        guard let from = addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
-        return URL(string: path, relativeTo: URL(string: from))?.path
-    }
-}
-
-protocol Monitor {
-    func sync(files: [Paths.File])
-    func update(files: [Paths.File])
-    func delete(files: [Paths.File])
+public protocol Monitor {
+    func sync(files: [File])
+    func update(files: [File])
+    func delete(files: [File])
 }

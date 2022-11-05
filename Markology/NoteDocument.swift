@@ -1,10 +1,11 @@
+import Paths
 import UIKit
 
 class NoteDocument: UIDocument {
-    var name: Paths.File.Name
+    var name: File.Name
     var text: String = ""
 
-    init(name: Paths.File.Name) {
+    init(name: File.Name) {
         self.name = name
         super.init(fileURL: name.url)
     }

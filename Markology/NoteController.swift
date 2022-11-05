@@ -3,6 +3,8 @@ import KitPlus
 import MarkCell
 import Markdown
 import MarkView
+import Notes
+import Paths
 import UIKit
 
 class NoteController: UIViewController, Bindable {
@@ -82,7 +84,7 @@ class NoteController: UIViewController, Bindable {
                 linkQuery = nil
                 return
             }
-            linkQuery = Note.ID.Search(text: search, limit: 5)
+            linkQuery = Note.ID.search(text: search, limit: 5)
         }
     }
 
@@ -132,7 +134,7 @@ class NoteController: UIViewController, Bindable {
                 }
                 return
             }
-            entrySink = Engine.subscribe(with(\.entry), to: Note.Entry.Load(id: id))
+            entrySink = Engine.subscribe(with(\.entry), to: Note.Entry.load(id: id))
         }
     }
 
@@ -392,7 +394,7 @@ extension NoteController: UITableViewDataSource {
         case .file:
             return String(entry.file.dropFirst())
         case .edit, .note:
-            return "Last Updated \(date.string(from: entry.note.modified))"
+            return "Last Updated \(date.string(from: entry.modified))"
         case .from:
             return "Linked From"
         case .to:
@@ -466,7 +468,7 @@ extension NoteController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch linkSections[indexPath.section] {
         case .notes:
-            return collectionView.render(linkQuery?.pattern == nil ? "clock" : "magnifyingglass", forHeader: indexPath) as Header
+            return collectionView.render(linkQuery.valid ? "clock" : "magnifyingglass", forHeader: indexPath) as Header
         case .new:
             return collectionView.render("plus", forHeader: indexPath) as Header
         }
@@ -560,7 +562,7 @@ extension NoteController {
             textDisplay.isHidden = true
         }
 
-        func render(_ file: Paths.File.Name) {
+        func render(_ file: File.Name) {
             if let image = UIImage(contentsOfFile: file.url.path) {
                 imageDisplay.image = image
                 imageDisplay.isHidden = false
@@ -583,7 +585,7 @@ extension NoteController {
 
 extension NoteController {
     class EmptyCell: UITableViewCell, RenderCell {
-        func render(_ file: Paths.File.Name) {
+        func render(_ file: File.Name) {
             var content = defaultContentConfiguration()
             content.text = file.isMarkdown ?
                 "\n\n\(file.dropFirst()) wasn't found. Begin editing to create it.\n\n" :
