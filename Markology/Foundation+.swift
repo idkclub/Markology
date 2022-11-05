@@ -5,10 +5,6 @@ extension UIEdgeInsets {
 }
 
 extension URL {
-    var isMarkdown: Bool {
-        pathExtension == "md"
-    }
-
     func open() {
         #if targetEnvironment(macCatalyst)
             UIApplication.shared.open(self)

@@ -16,7 +16,7 @@ UITextView for displaying Markdown.
 
 ## Notes
 
-GRDB structs for notes.
+GRDB structs for storing linked notes.
 
 ## UIKitPlus
 

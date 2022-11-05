@@ -10,10 +10,6 @@ let package = Package(
             targets: ["GRDBPlus"]
         ),
         .library(
-            name: "UIKitPlus",
-            targets: ["UIKitPlus"]
-        ),
-        .library(
             name: "MarkCell",
             targets: ["MarkCell"]
         ),
@@ -22,12 +18,16 @@ let package = Package(
             targets: ["MarkView"]
         ),
         .library(
+            name: "Notes",
+            targets: ["Notes"]
+        ),
+        .library(
             name: "Paths",
             targets: ["Paths"]
         ),
         .library(
-            name: "Notes",
-            targets: ["Notes"]
+            name: "UIKitPlus",
+            targets: ["UIKitPlus"]
         ),
     ],
     dependencies: [
@@ -40,10 +40,6 @@ let package = Package(
             dependencies: [
                 .product(name: "GRDB", package: "GRDB.swift"),
             ]
-        ),
-        .target(
-            name: "UIKitPlus",
-            dependencies: []
         ),
         .target(
             name: "MarkCell",
@@ -66,6 +62,10 @@ let package = Package(
         ),
         .target(
             name: "Paths",
+            dependencies: []
+        ),
+        .target(
+            name: "UIKitPlus",
             dependencies: []
         ),
     ]

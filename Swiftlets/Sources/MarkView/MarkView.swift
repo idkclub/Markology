@@ -107,7 +107,7 @@ extension MarkView {
             }
         }()
 
-        var view = UIScrollView()
+        let view = UIScrollView()
         var table: Markdown.Table?
         convenience init(for table: Markdown.Table) {
             self.init(data: nil, ofType: "net.daringfireball.markdown")

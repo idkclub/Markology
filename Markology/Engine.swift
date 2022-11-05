@@ -72,7 +72,7 @@ extension Engine: Monitor {
                   let modified = attrs.contentModificationDate else { continue }
             if let last = times?[file.name],
                Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
-            if file.url.isMarkdown {
+            if file.name.isMarkdown {
                 var name = file.name
                 if let related = name.related {
                     name = related
