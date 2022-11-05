@@ -6,6 +6,7 @@ import UIKitPlus
 
 public class EditCell: UITableViewCell {
     var delegate: EditCellDelegate?
+    var search: SearchDelegate?
     var previous: UITextRange?
     var dirty = false
     var insertSink: AnyCancellable?
@@ -25,14 +26,15 @@ public class EditCell: UITableViewCell {
 }
 
 extension EditCell: RenderCell {
-    public typealias Value = (text: String, with: EditCellDelegate)
+    public typealias Value = (text: String, with: EditCellDelegate, search: SearchDelegate)
     public func render(_ value: Value) {
         delegate = value.with
+        search = value.search
         if let delegate = delegate as? KeyCommandable {
             markdown.commandable = delegate
         }
-        if let delegate = delegate as? SearchDelegate {
-            insertSink = delegate.addLink.sink { [weak self] in
+        if let search = search {
+            insertSink = search.addLink.sink { [weak self] in
                 guard let markdown = self?.markdown,
                       let selection = markdown.selectedTextRange else { return }
                 if selection.start == selection.end,
@@ -127,16 +129,16 @@ extension EditCell: UITextViewDelegate {
         superview.scrollRectToVisible(rect, animated: false)
         previous = textView.selectedTextRange
 
-        guard let delegate = delegate as? SearchDelegate else { return }
+        guard let search = search else { return }
         if selection.start != selection.end,
            let text = textView.text(in: selection),
            !text.contains(where: \.isNewline)
         {
-            delegate.change(search: text)
+            search.change(search: text)
         } else if let token = textView.tokenizer.rangeEnclosingPosition(position, with: .word, inDirection: .storage(.backward)),
                   let text = textView.text(in: token)
         {
-            delegate.change(search: text)
+            search.change(search: text)
         }
     }
 }

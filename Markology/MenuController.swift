@@ -1,13 +1,11 @@
 import Combine
 import Notes
+import NotesUI
 import UIKit
+import UIKitPlus
 
 class MenuController: UIViewController, Bindable {
-    enum Section {
-        case notes, new
-    }
-
-    var sections: [Section] = []
+    var sections: [LinkSection] = []
     var progressSink: AnyCancellable?
     var searchSink: AnyCancellable?
     var query: ID.Search? {
@@ -16,7 +14,7 @@ class MenuController: UIViewController, Bindable {
                 searchSink = nil
                 return
             }
-            searchSink = Engine.subscribe(with(\.ids), to: query)
+            searchSink = Engine.shared.subscribe(with(\.ids), to: query)
         }
     }
 

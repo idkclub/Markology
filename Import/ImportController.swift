@@ -1,3 +1,4 @@
+import Combine
 import MarkCell
 import UIKit
 import UIKitPlus
@@ -71,6 +72,8 @@ class ImportController: UIViewController {
             try! await loadItems()
         }
     }
+
+    var addLink = PassthroughSubject<(url: String, text: String), Never>()
 }
 
 extension ImportController: EditCellDelegate {
@@ -95,11 +98,15 @@ extension ImportController: UITableViewDataSource {
         case 0:
             return tableView.render(items[indexPath.section].temp, for: indexPath) as FileCell
         default:
-            return tableView.render((text: "", with: self), for: indexPath) as EditCell
+            return tableView.render((text: "", with: self, search: self), for: indexPath) as EditCell
         }
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         items[section].file
     }
+}
+
+extension ImportController: SearchDelegate {
+    func change(search: String) {}
 }

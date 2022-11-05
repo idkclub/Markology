@@ -22,6 +22,10 @@ let package = Package(
             targets: ["Notes"]
         ),
         .library(
+            name: "NotesUI",
+            targets: ["NotesUI"]
+        ),
+        .library(
             name: "Paths",
             targets: ["Paths"]
         ),
@@ -44,8 +48,8 @@ let package = Package(
         .target(
             name: "MarkCell",
             dependencies: [
-                "UIKitPlus",
                 "MarkView",
+                "UIKitPlus",
             ]
         ),
         .target(
@@ -58,6 +62,14 @@ let package = Package(
             name: "Notes",
             dependencies: [
                 "GRDBPlus",
+            ]
+        ),
+        .target(
+            name: "NotesUI",
+            dependencies: [
+                "MarkCell",
+                "Notes",
+                "UIKitPlus",
             ]
         ),
         .target(

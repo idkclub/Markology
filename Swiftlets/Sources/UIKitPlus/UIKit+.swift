@@ -1,6 +1,7 @@
 import UIKit
 
 public extension UIView {
+    @discardableResult
     func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true, layout: Bool = false) -> Self {
         view.addSubview(self)
         let guide = layout ? view.layoutMarginsGuide : view.safeAreaLayoutGuide
@@ -20,12 +21,25 @@ public extension UIView {
         return self
     }
 
+    @discardableResult
     @available(iOS 15.0, *)
     func pinned(toKeyboardAnd view: UIView, withInset: CGFloat = 0, top: Bool = true) -> Self {
         let view = pinned(to: view, withInset: withInset, bottom: false, top: top)
         bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
         return view
     }
+}
+
+public extension UIViewController {
+    func add(_ controller: SubController) {
+        addChild(controller)
+        controller.arrange(in: view)
+        controller.didMove(toParent: self)
+    }
+}
+
+public protocol SubController: UIViewController {
+    func arrange(in parent: UIView)
 }
 
 public extension UITextView {

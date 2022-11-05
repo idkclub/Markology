@@ -3,7 +3,7 @@ import GRDB
 public extension FTS5TokenizerDescriptor {
     func parse(query: String) -> FTS5Pattern? {
         guard !query.isEmpty else { return nil }
-        return (try! DatabaseQueue().inDatabase { db in
+        return (try? DatabaseQueue().inDatabase { db in
             let tokens = try db.makeTokenizer(self).tokenize(query: query).compactMap {
                 $0.flags.contains(.colocated) ? nil : $0.token
             }

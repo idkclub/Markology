@@ -4,6 +4,7 @@ import Markdown
 import Notes
 import Paths
 import UIKit
+import UIKitPlus
 
 class SearchController: UITableViewController, Bindable {
     var noteSink: AnyCancellable?
@@ -21,7 +22,7 @@ class SearchController: UITableViewController, Bindable {
                 return
             }
             title = "Results for \"\(query)\""
-            noteSink = Engine.subscribe(with(\.notes), to: Note.search(text: query))
+            noteSink = Engine.shared.subscribe(with(\.notes), to: Note.search(text: query))
         }
     }
 

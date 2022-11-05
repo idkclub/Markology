@@ -7,13 +7,13 @@ import Notes
 import Paths
 
 @dynamicMemberLookup
-class Engine {
+class Engine: DataSource {
     static let bundle = Bundle.main.bundleIdentifier!
     static let shared = try! Engine()
     let progress = CurrentValueSubject<Float, Never>(1)
     let errors = PassthroughSubject<Error, Never>()
     let paths = Paths(for: bundle)
-    private let db: DatabaseWriter
+    let db: DatabaseWriter
     init() throws {
         let cache = try FileManager.default.url(
             for: .cachesDirectory,
@@ -30,18 +30,6 @@ class Engine {
 
     static subscript<T>(dynamicMember keyPath: KeyPath<Engine, T>) -> T {
         shared[keyPath: keyPath]
-    }
-
-    static func subscribe<T: Query>(_ action: @escaping (T.Value) -> Void, to query: T) -> AnyCancellable where T.Value: Equatable {
-        ValueObservation
-            .tracking(query.fetch)
-            .removeDuplicates()
-            .publisher(in: shared.db, scheduling: .immediate)
-            .sink(receiveCompletion: {
-                if case let .failure(err) = $0 {
-                    errors.send(err)
-                }
-            }, receiveValue: action)
     }
 }
 
