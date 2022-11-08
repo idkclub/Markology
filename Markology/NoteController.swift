@@ -281,13 +281,26 @@ extension NoteController: UIDropInteractionDelegate {
     }
 
     func dropInteraction(_: UIDropInteraction, performDrop session: UIDropSession) {
-        let controller = ImportController()
+        let controller = AttachController()
+        controller.delegate = controller
+        controller.insert = linkController
         present(controller, animated: true)
         controller.load(providers: session.items.map { $0.itemProvider })
     }
 }
 
-extension ImportController: LinkControllerDelegate {
+class AttachController: ImportController, ImportControllerDelegate {
+    var insert: SearchDelegate?
+    func dismiss(importing: [(url: String, text: String)]) {
+        for url in importing {
+            insert?.addLink.send(url)
+        }
+    }
+
+    public func url(file: String) -> URL {
+        file.url
+    }
+
     public func subscribe<T>(_ action: @escaping (T.Value) -> Void, to query: T) -> AnyCancellable where T: GRDBPlus.Query, T.Value: Equatable {
         Engine.shared.subscribe(action, to: query)
     }

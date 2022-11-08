@@ -5,6 +5,7 @@ public class Paths {
     private static let disableKey = "paths.icloud.disable"
     private let id: String
     private let defaults: UserDefaults
+    let inExtension: Bool
 
     public let busy = CurrentValueSubject<Bool, Never>(false)
 
@@ -17,10 +18,12 @@ public class Paths {
 
     public var documents: URL!
 
-    public init(for id: String) {
+    public init(for id: String, inExtension: Bool = false) {
         self.id = id
+        self.inExtension = inExtension
         defaults = UserDefaults(suiteName: "group.\(id)")!
         icloud = !defaults.bool(forKey: Paths.disableKey) && icloudAvailable
+        migrate()
         reset()
     }
 
@@ -35,6 +38,10 @@ public class Paths {
 
     private var groupURL: URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.\(id)")?.resolvingSymlinksInPath()
+    }
+
+    private var groupDocuments: URL? {
+        groupURL?.appendingPathComponent("Documents")
     }
 
     public func cached(file: String) -> URL? {
@@ -59,8 +66,22 @@ public class Paths {
     private var fileDescriptor: Int32?
     private var objectSource: DispatchSourceFileSystemObject?
 
+    private func migrate() {
+        guard !inExtension,
+              let groupDocuments = groupDocuments,
+              let enumerator = FileManager.default.enumerator(at: groupDocuments, includingPropertiesForKeys: nil) else { return }
+        busy.send(true)
+        defer { busy.send(false) }
+        enumerator.forEach {
+            guard let file = File(in: groupDocuments, at: $0) else { return }
+            try? FileManager.default.moveItem(at: file.url, to: localURL!.appendingPathComponent(file.name))
+        }
+    }
+
     private func reset() {
-        documents = icloud ? icloudURL : localURL
+        documents = icloud ?
+            icloudURL :
+            inExtension ? groupDocuments : localURL
         metadataQuery?.stop()
         metadataQuery = nil
         objectSource?.cancel()
@@ -91,7 +112,9 @@ public class Paths {
         source.resume()
         fileDescriptor = file
         objectSource = source
-        local()
+        DispatchQueue.global(qos: .utility).async {
+            self.local()
+        }
     }
 
     private func local() {

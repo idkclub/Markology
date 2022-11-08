@@ -120,13 +120,6 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
-		4E70747A29166A1600FB00D4 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		4E7776DA28F46E9C00DAEF80 = {
 			isa = PBXGroup;
 			children = (
@@ -134,7 +127,6 @@
 				4E7776E528F46E9C00DAEF80 /* Markology */,
 				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
-				4E70747A29166A1600FB00D4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};

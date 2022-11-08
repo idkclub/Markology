@@ -8,7 +8,7 @@ import Paths
 class Engine: DataSource {
     static let shared = try! Engine()
     let errors = PassthroughSubject<Error, Never>()
-    let paths = Paths(for: (Bundle.main.bundleIdentifier! as NSString).deletingPathExtension)
+    let paths = Paths(for: (Bundle.main.bundleIdentifier! as NSString).deletingPathExtension, inExtension: true)
     let db: DatabaseWriter
     init() throws {
         let cache = paths.cached(file: "note.db")!

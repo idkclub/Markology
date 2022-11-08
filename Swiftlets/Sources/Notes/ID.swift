@@ -18,6 +18,10 @@ public struct ID: Codable, Equatable, FetchableRecord {
         ID(file: "/\(Int(Date().timeIntervalSince1970).description).md", name: name)
     }
 
+    public static func exists(db: Database, file: String) throws -> Bool {
+        try ID.query.filter(key: file).fetchCount(db) > 0
+    }
+
     public struct Search: Query {
         let pattern: FTS5Pattern?
         let limit: Int

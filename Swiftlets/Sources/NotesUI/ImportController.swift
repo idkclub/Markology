@@ -1,6 +1,7 @@
 import Combine
 import GRDBPlus
 import MarkCell
+import Markdown
 import UIKit
 import UIKitPlus
 
@@ -15,24 +16,47 @@ open class ImportController: UIViewController {
     }()
 
     let linkController = LinkController()
+    public var delegate: ImportControllerDelegate? {
+        didSet {
+            linkController.delegate = delegate
+        }
+    }
 
     class Item {
         let temp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         var name: String
+        var text: String = ""
         let ext: String
+        let delegate: ImportControllerDelegate
 
         var file: String { "\(name).\(ext)" }
+        var exists: Bool {
+            delegate.exists(file: file)
+        }
 
-        init(url: URL) throws {
+        var url: URL {
+            delegate.url(file: file)
+        }
+
+        init(delegate: ImportControllerDelegate, url: URL) throws {
+            self.delegate = delegate
             try FileManager.default.copyItem(at: url, to: temp)
             name = url.deletingPathExtension().lastPathComponent
             ext = url.pathExtension.lowercased()
         }
 
-        init(image: UIImage, name: String) throws {
+        init(delegate: ImportControllerDelegate, image: UIImage, name: String) throws {
+            self.delegate = delegate
             self.name = name
             ext = "png"
             try image.pngData()?.write(to: temp)
+        }
+
+        func save() throws {
+            try FileManager.default.moveItem(at: temp, to: url)
+            if !text.isEmpty {
+                try text.write(to: url.appendingPathExtension("md"), atomically: true, encoding: .utf8)
+            }
         }
     }
 
@@ -43,6 +67,7 @@ open class ImportController: UIViewController {
     }
 
     public func load(providers: [NSItemProvider]) {
+        guard let delegate = delegate else { return }
         let group = DispatchGroup()
         var items: [Item] = []
         for (id, provider) in providers.enumerated() {
@@ -58,12 +83,12 @@ open class ImportController: UIViewController {
                     do {
                         switch data {
                         case let data as URL:
-                            items.append(try Item(url: data))
+                            items.append(try Item(delegate: delegate, url: data))
                         case let data as UIImage:
-                            items.append(try Item(image: data, name: provider.suggestedName ?? fallback))
+                            items.append(try Item(delegate: delegate, image: data, name: provider.suggestedName ?? fallback))
                         case let data as Data:
                             guard let image = UIImage(data: data) else { break }
-                            items.append(try Item(image: image, name: provider.suggestedName ?? fallback))
+                            items.append(try Item(delegate: delegate, image: image, name: provider.suggestedName ?? fallback))
                         default:
                             break
                         }
@@ -78,30 +103,62 @@ open class ImportController: UIViewController {
         }
     }
 
+    lazy var importButton = UIBarButtonItem(title: "Import", style: .done, target: self, action: #selector(save))
+
     override open func viewDidLoad() {
         super.viewDidLoad()
         let toolbar = UIToolbar().pinned(toKeyboardAnd: view, top: false)
         toolbar.items = [
             .flexibleSpace(),
-            UIBarButtonItem(title: "Import", style: .done, target: self, action: #selector(save)),
+            importButton,
             UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancel)),
         ]
         toolbar.backgroundColor = .systemBackground
         tableView.bottomAnchor.constraint(equalTo: toolbar.topAnchor).isActive = true
-        if let self = self as? LinkControllerDelegate {
-            linkController.delegate = self
-            add(linkController)
-            linkController.view.pinned(to: view, bottom: false, top: false)
-            linkController.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor).isActive = true
+        add(linkController)
+        linkController.view.pinned(to: view, bottom: false, top: false)
+        linkController.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor).isActive = true
+    }
+
+    @objc func save() {
+        do {
+            try items.forEach { try $0.save() }
+        } catch {
+            alert(error: error)
         }
+        dismiss(animated: true)
+        delegate?.dismiss(importing: items.map {
+            let url = "/\($0.file)"
+            guard !$0.text.isEmpty else { return (url: url, text: $0.file) }
+            let doc = Document(parsing: $0.text)
+            var walk = NoteWalker(from: "/\($0.file)")
+            walk.visit(doc)
+            return (url: url, text: walk.name)
+        })
     }
 
-    @objc open func save() {
+    @objc func cancel() {
         dismiss(animated: true)
+        delegate?.dismiss(importing: [])
     }
+}
 
-    @objc open func cancel() {
-        dismiss(animated: true)
+extension ImportController.Item: EditCellDelegate {
+    func change(text: String) {
+        self.text = text
+    }
+}
+
+public protocol ImportControllerDelegate: LinkControllerDelegate {
+    func exists(file: String) -> Bool
+    func url(file: String) -> URL
+    func validate()
+    func dismiss(importing: [(url: String, text: String)])
+}
+
+public extension ImportControllerDelegate {
+    func exists(file: String) -> Bool {
+        return FileManager.default.fileExists(atPath: url(file: file).path)
     }
 }
 
@@ -110,10 +167,10 @@ public extension ImportController {
         tableView.contentInset.bottom = offset
         tableView.verticalScrollIndicatorInsets.bottom = offset
     }
-}
 
-extension ImportController: EditCellDelegate {
-    public func change(text: String) {}
+    func validate() {
+        importButton.isEnabled = items.allSatisfy { $0.name != "" && !$0.exists } && Set(items.map { $0.name }).count == items.count
+    }
 }
 
 extension ImportController {
@@ -138,11 +195,18 @@ extension ImportController {
             name.text = item.name
             ext.text = ".\(item.ext)"
             self.item = item
+            rename()
+        }
+
+        var exists: Bool {
+            item?.exists ?? false
         }
 
         @objc func rename() {
             guard let item = item else { return }
             item.name = name.text ?? ""
+            name.textColor = exists ? .systemRed : .label
+            item.delegate.validate()
         }
     }
 }
@@ -157,13 +221,14 @@ extension ImportController: UITableViewDataSource {
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let item = items[indexPath.section]
         switch indexPath.row {
         case 0:
-            return tableView.render(items[indexPath.section].temp, for: indexPath) as FileCell
+            return tableView.render(item.temp, for: indexPath) as FileCell
         case 1:
-            return tableView.render(items[indexPath.section], for: indexPath) as ItemCell
+            return tableView.render(item, for: indexPath) as ItemCell
         default:
-            return tableView.render((text: "", with: self, search: linkController), for: indexPath) as EditCell
+            return tableView.render((text: item.text, with: item, search: linkController), for: indexPath) as EditCell
         }
     }
 
