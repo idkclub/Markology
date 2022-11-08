@@ -2,14 +2,17 @@ import UIKit
 
 public extension UIView {
     @discardableResult
-    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true, layout: Bool = false) -> Self {
+    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true, leading: Bool = true, trailing: Bool = true, layout: Bool = false) -> Self {
         view.addSubview(self)
         let guide = layout ? view.layoutMarginsGuide : view.safeAreaLayoutGuide
         translatesAutoresizingMaskIntoConstraints = false
-        var constraints = [
-            leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: withInset),
-            trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -withInset),
-        ]
+        var constraints: [NSLayoutConstraint] = []
+        if leading {
+            constraints.append(leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: withInset))
+        }
+        if trailing {
+            constraints.append(trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -withInset))
+        }
         if top {
             constraints.append(topAnchor.constraint(equalTo: guide.topAnchor, constant: withInset))
         }
@@ -22,7 +25,6 @@ public extension UIView {
     }
 
     @discardableResult
-    @available(iOS 15.0, *)
     func pinned(toKeyboardAnd view: UIView, withInset: CGFloat = 0, top: Bool = true) -> Self {
         let view = pinned(to: view, withInset: withInset, bottom: false, top: top)
         bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
@@ -31,9 +33,8 @@ public extension UIView {
 }
 
 public extension UIViewController {
-    func add(_ controller: SubController) {
+    func add(_ controller: UIViewController) {
         addChild(controller)
-        controller.arrange(in: view)
         controller.didMove(toParent: self)
     }
 
@@ -44,10 +45,6 @@ public extension UIViewController {
             self.present(alert, animated: true)
         }
     }
-}
-
-public protocol SubController: UIViewController {
-    func arrange(in parent: UIView)
 }
 
 public extension UITextView {

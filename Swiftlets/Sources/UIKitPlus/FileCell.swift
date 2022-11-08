@@ -23,21 +23,25 @@ public class FileCell: UITableViewCell, RenderCell {
     }
 
     public func render(_ url: URL) {
-        if let image = UIImage(contentsOfFile: url.path) {
-            imageDisplay.image = image
-            imageDisplay.isHidden = false
-            if let height = height {
-                imageDisplay.removeConstraint(height)
+        // TODO: Add a spinner.
+        var error: NSError?
+        NSFileCoordinator().coordinate(readingItemAt: url, error: &error) { url in
+            if let image = UIImage(contentsOfFile: url.path) {
+                imageDisplay.image = image
+                imageDisplay.isHidden = false
+                if let height = height {
+                    imageDisplay.removeConstraint(height)
+                }
+                height = imageDisplay.heightAnchor.constraint(equalTo: imageDisplay.widthAnchor, multiplier: image.size.height / image.size.width)
+                height?.isActive = true
+                height?.priority = .defaultHigh
             }
-            height = imageDisplay.heightAnchor.constraint(equalTo: imageDisplay.widthAnchor, multiplier: image.size.height / image.size.width)
-            height?.isActive = true
-            height?.priority = .defaultHigh
-        }
-        if let text = try? String(contentsOf: url) {
-            textDisplay.text = text
-            textDisplay.font = .monospacedSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize, weight: .regular)
-            textDisplay.isHidden = false
-            return
+            if let text = try? String(contentsOf: url) {
+                textDisplay.text = text
+                textDisplay.font = .monospacedSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize, weight: .regular)
+                textDisplay.isHidden = false
+                return
+            }
         }
     }
 }

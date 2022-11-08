@@ -162,6 +162,7 @@ class NoteController: UIViewController, Bindable {
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         linkController.delegate = self
         add(linkController)
+        linkController.view.pinned(toKeyboardAnd: view, top: false)
         loaded = true
     }
 
@@ -270,6 +271,28 @@ class NoteController: UIViewController, Bindable {
     }
 }
 
+extension NoteController: UIDropInteractionDelegate {
+    func dropInteraction(_: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
+        session.hasItemsConforming(toTypeIdentifiers: ["public.image"])
+    }
+
+    func dropInteraction(_: UIDropInteraction, sessionDidUpdate _: UIDropSession) -> UIDropProposal {
+        UIDropProposal(operation: .copy)
+    }
+
+    func dropInteraction(_: UIDropInteraction, performDrop session: UIDropSession) {
+        let controller = ImportController()
+        present(controller, animated: true)
+        controller.load(providers: session.items.map { $0.itemProvider })
+    }
+}
+
+extension ImportController: LinkControllerDelegate {
+    public func subscribe<T>(_ action: @escaping (T.Value) -> Void, to query: T) -> AnyCancellable where T: GRDBPlus.Query, T.Value: Equatable {
+        Engine.shared.subscribe(action, to: query)
+    }
+}
+
 extension NoteController: LinkControllerDelegate {
     func subscribe<T>(_ action: @escaping (T.Value) -> Void, to query: T) -> AnyCancellable where T: GRDBPlus.Query, T.Value: Equatable {
         Engine.shared.subscribe(action, to: query)
@@ -358,7 +381,7 @@ extension NoteController: UITableViewDataSource {
             return tableView.render(id!.file.url, for: indexPath) as FileCell
         case .note:
             if entry == nil || (!id!.file.isMarkdown && entry?.text == ""), document == nil {
-                return tableView.render(id!.file, for: indexPath) as EmptyCell
+                return tableView.render(id?.file ?? "", for: indexPath) as EmptyCell
             }
             return tableView.render((text: text, with: self), for: indexPath) as MarkCell
         case .edit:

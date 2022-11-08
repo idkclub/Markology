@@ -10,6 +10,7 @@ public enum LinkSection {
 }
 
 public class LinkController: UIViewController, Bindable {
+    let size = 40.0
     private var linkSink: AnyCancellable?
     private var linkQuery: ID.Search? {
         didSet {
@@ -24,7 +25,7 @@ public class LinkController: UIViewController, Bindable {
     private var showLinks: Bool = false {
         didSet {
             collectionView.isHidden = !showLinks
-            delegate?.adjustInset(by: showLinks ? 50.0 : 0)
+            delegate?.adjustInset(by: showLinks ? size : 0)
         }
     }
 
@@ -53,7 +54,6 @@ public class LinkController: UIViewController, Bindable {
     }
 
     lazy var collectionView: UICollectionView = {
-        let size = 40.0
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.estimatedItemSize = CGSize(width: size, height: size)
@@ -73,13 +73,6 @@ public class LinkController: UIViewController, Bindable {
 
     override public func loadView() {
         view = collectionView
-    }
-}
-
-@available(macCatalyst 15.0, *)
-extension LinkController: SubController {
-    public func arrange(in parent: UIView) {
-        view.pinned(toKeyboardAnd: parent, top: false)
     }
 }
 
@@ -106,7 +99,7 @@ extension LinkController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch linkSections[indexPath.section] {
         case .notes:
-            return collectionView.render(linkQuery.valid ?  "magnifyingglass" : "clock", forHeader: indexPath) as Header
+            return collectionView.render(linkQuery.valid ? "magnifyingglass" : "clock", forHeader: indexPath) as Header
         case .new:
             return collectionView.render("plus", forHeader: indexPath) as Header
         }

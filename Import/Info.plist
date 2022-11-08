@@ -15,7 +15,7 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).ImportController</string>
+		<string>$(PRODUCT_MODULE_NAME).ShareController</string>
 	</dict>
 </dict>
 </plist>

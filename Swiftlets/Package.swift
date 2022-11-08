@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "Swiftlets",
+    platforms: [.iOS(.v15)],
     products: [
         .library(
             name: "GRDBPlus",

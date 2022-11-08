@@ -34,6 +34,9 @@ extension EditCell: RenderCell {
         if let delegate = delegate as? KeyCommandable {
             markdown.commandable = delegate
         }
+        if let delegate = delegate as? UIDropInteractionDelegate {
+            markdown.addInteraction(UIDropInteraction(delegate: delegate))
+        }
         if let search = search {
             insertSink = search.addLink.sink { [weak self] in
                 guard let markdown = self?.markdown,

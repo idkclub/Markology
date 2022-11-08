@@ -12,6 +12,7 @@ public class MarkView: UITextView {
         layoutManager.delegate = self
         linkTextAttributes = [:]
         smartDashesType = .no
+        backgroundColor = .clear
     }
 
     override public var keyCommands: [UIKeyCommand] {
