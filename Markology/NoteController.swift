@@ -72,6 +72,7 @@ class NoteController: UIViewController, Bindable {
 
     lazy var tableView: UITableView = {
         let tableView = UITableView().pinned(toKeyboardAnd: view, top: false)
+        tableView.register(header: TappableHeader.self)
         tableView.register(FileCell.self)
         tableView.register(EditCell.self)
         tableView.register(EmptyCell.self)
@@ -391,9 +392,7 @@ extension NoteController: UITableViewDelegate {
         let dest: ID
         switch dataSource.itemIdentifier(for: indexPath) {
         case .file:
-            let controller = QLPreviewController()
-            controller.dataSource = self
-            splitViewController?.show(controller, sender: self)
+            open()
             return
         case .note:
             edit = true
@@ -406,9 +405,27 @@ extension NoteController: UITableViewDelegate {
         }
         navigate(to: dest)
     }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        tableView.render {
+            switch self.dataSource.sectionIdentifier(for: section) {
+            case .file:
+                self.open()
+                return
+            default:
+                break
+            }
+        } as TappableHeader
+    }
 }
 
 extension NoteController: QLPreviewControllerDataSource {
+    func open() {
+        let controller = QLPreviewController()
+        controller.dataSource = self
+        splitViewController?.show(controller, sender: self)
+    }
+
     func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
         1
     }
