@@ -34,7 +34,7 @@ public struct Entry: Codable, Equatable, FetchableRecord {
         Load(id: id)
     }
 
-    public struct Link: Codable, Equatable {
+    public struct Link: Codable, Equatable, Hashable {
         public let text: String
         public let note: ID
     }

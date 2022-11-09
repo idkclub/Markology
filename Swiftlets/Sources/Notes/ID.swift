@@ -3,7 +3,7 @@ import GRDB
 import GRDBPlus
 import Paths
 
-public struct ID: Codable, Equatable, FetchableRecord {
+public struct ID: Codable, Equatable, Hashable, FetchableRecord {
     static let query = Note.select(Note.Columns.file, Note.Columns.name)
 
     public let file: File.Name

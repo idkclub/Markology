@@ -18,25 +18,61 @@ class NoteController: UIViewController, Bindable {
         return note
     }
 
-    private enum Section: Equatable {
-        case file
-        case note, edit
-        case from(Int), to(Int)
-
-        var count: Int {
-            switch self {
-            case .file, .note, .edit:
-                return 1
-            case let .from(count), let .to(count):
-                return count
-            }
-        }
-    }
-
     private(set) var document: NoteDocument?
     private var entrySink: AnyCancellable?
     private var entry: Entry? {
         didSet { reload() }
+    }
+
+    enum Section: Hashable {
+        case file(String)
+        case note(String)
+        case from, to
+    }
+
+    enum Item: Hashable {
+        case file(URL)
+        case note(String)
+        case edit
+        case empty(String)
+        case link(Entry.Link)
+    }
+
+    class DataSource: UITableViewDiffableDataSource<Section, Item> {
+        override init(tableView: UITableView, cellProvider: @escaping UITableViewDiffableDataSource<NoteController.Section, NoteController.Item>.CellProvider) {
+            super.init(tableView: tableView, cellProvider: cellProvider)
+            defaultRowAnimation = .fade
+        }
+
+        override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+            switch sectionIdentifier(for: section) {
+            case let .file(file):
+                return file
+            case let .note(date):
+                return date
+            case .from:
+                return "Linked From"
+            case .to:
+                return "Linked To"
+            case .none:
+                return nil
+            }
+        }
+    }
+
+    private lazy var dataSource = DataSource(tableView: tableView) { tableView, indexPath, itemIdentifier in
+        switch itemIdentifier {
+        case let .file(url):
+            return tableView.render((url: url, parent: self), for: indexPath) as FileCell
+        case let .note(text):
+            return tableView.render((text: text, with: self), for: indexPath) as MarkCell
+        case .edit:
+            return tableView.render((text: self.text, with: self, search: self.linkController), for: indexPath) as EditCell
+        case let .empty(file):
+            return tableView.render(file, for: indexPath) as EmptyCell
+        case let .link(link):
+            return tableView.render((link: link, note: self.entry!.name), for: indexPath) as Entry.Link.Cell
+        }
     }
 
     lazy var tableView: UITableView = {
@@ -46,8 +82,6 @@ class NoteController: UIViewController, Bindable {
         tableView.register(EmptyCell.self)
         tableView.register(MarkCell.self)
         tableView.register(Entry.Link.Cell.self)
-        tableView.delegate = self
-        tableView.dataSource = self
         return tableView
     }()
 
@@ -156,15 +190,16 @@ class NoteController: UIViewController, Bindable {
         present(menu, animated: true)
     }
 
-    var loaded = false
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        tableView.dataSource = dataSource
+        tableView.delegate = self
         linkController.delegate = self
         add(linkController)
         linkController.view.pinned(toKeyboardAnd: view, top: false)
-        loaded = true
+        reload(initial: true)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -181,15 +216,18 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
-    private func reload() {
+    var loaded = false
+    private func reload(initial: Bool = false) {
         title = entry?.name ?? id?.name
+        guard loaded || initial else { return }
+        loaded = true
         guard edit, document == nil else {
-            layout()
+            snapshot()
             return
         }
         Task {
             await openDocument()
-            layout()
+            snapshot()
         }
     }
 
@@ -216,58 +254,48 @@ class NoteController: UIViewController, Bindable {
         self.document = document
     }
 
-    private func layout() {
-        var sections: [Section] = []
-        if id?.file.isMarkdown == false {
-            sections.append(.file)
-        }
-        sections.append(edit ? .edit : .note)
-        if let count = entry?.from.count, count > 0 {
-            sections.append(.from(count))
-        }
-        if let count = entry?.to.count, count > 0 {
-            sections.append(.to(count))
-        }
+    private var date: DateFormatter {
+        let date = DateFormatter()
+        date.dateStyle = .short
+        date.timeStyle = .short
+        return date
+    }
+
+    private func snapshot() {
         var items: [UIBarButtonItem] = []
         if entry != nil || document != nil {
             items.append(menuButton)
         }
         items.append(UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)))
         navigationItem.rightBarButtonItems = items
-        reloadTable(with: sections)
-    }
-
-    private var sections: [Section] = []
-    private func reloadTable(with sections: [Section]) {
-        guard loaded else {
-            self.sections = sections
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+        defer { dataSource.apply(snapshot) }
+        guard let id = id else { return }
+        if !id.file.isMarkdown {
+            let section = Section.file(String(id.file.dropFirst()))
+            snapshot.appendSections([section])
+            snapshot.appendItems([.file(id.file.url)], toSection: section)
+        }
+        guard let entry = entry else {
+            let section = Section.note("New Note")
+            snapshot.appendSections([section])
+            snapshot.appendItems([edit ? .edit : .empty(id.file)], toSection: section)
             return
         }
-        let last = self.sections
-        tableView.performBatchUpdates {
-            self.sections = sections
-            if last.count > sections.count {
-                self.tableView.deleteSections(IndexSet(integersIn: sections.count ..< last.count), with: .fade)
-            } else if sections.count > last.count {
-                self.tableView.insertSections(IndexSet(integersIn: last.count ..< sections.count), with: .fade)
-            }
-            for (index, section) in sections.enumerated() {
-                if index >= last.count {
-                    self.tableView.insertRows(at: (0 ..< section.count).map { IndexPath(row: $0, section: index) }, with: .automatic)
-                    continue
-                }
-                if section.count > last[index].count {
-                    self.tableView.insertRows(at: (last[index].count ..< section.count).map { IndexPath(row: $0, section: index) }, with: .fade)
-                } else if section.count < last[index].count {
-                    self.tableView.deleteRows(at: (section.count ..< last[index].count).map { IndexPath(row: $0, section: index) }, with: .fade)
-                }
-                if section != last[index] {
-                    let index = (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }
-                    self.tableView.reloadRows(at: index, with: .automatic)
-                } else if section != .edit {
-                    self.tableView.reloadRows(at: (0 ..< min(section.count, last[index].count)).map { IndexPath(row: $0, section: index) }, with: .automatic)
-                }
-            }
+        let section = Section.note("Last Updated \(date.string(from: entry.modified))")
+        snapshot.appendSections([section])
+        if !id.file.isMarkdown, entry.text == "", document == nil {
+            snapshot.appendItems([.empty(id.file)], toSection: section)
+        } else {
+            snapshot.appendItems([edit ? .edit : .note(text)], toSection: section)
+        }
+        if entry.from.count > 0 {
+            snapshot.appendSections([.from])
+            snapshot.appendItems(entry.from.map { .link($0) }, toSection: .from)
+        }
+        if entry.to.count > 0 {
+            snapshot.appendSections([.to])
+            snapshot.appendItems(entry.to.map { .link($0) }, toSection: .to)
         }
     }
 }
@@ -363,59 +391,10 @@ extension NoteController: KeyCommandable {
     }
 }
 
-extension NoteController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        sections.count
-    }
-
-    private var date: DateFormatter {
-        let date = DateFormatter()
-        date.dateStyle = .short
-        date.timeStyle = .short
-        return date
-    }
-
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        guard let entry = entry else { return nil }
-        switch sections[section] {
-        case .file:
-            return String(entry.file.dropFirst())
-        case .edit, .note:
-            return "Last Updated \(date.string(from: entry.modified))"
-        case .from:
-            return "Linked From"
-        case .to:
-            return "Linked To"
-        }
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch sections[indexPath.section] {
-        case .file:
-            return tableView.render((url: id!.file.url, parent: self), for: indexPath) as FileCell
-        case .note:
-            if entry == nil || (!id!.file.isMarkdown && entry?.text == ""), document == nil {
-                return tableView.render(id?.file ?? "", for: indexPath) as EmptyCell
-            }
-            return tableView.render((text: text, with: self), for: indexPath) as MarkCell
-        case .edit:
-            return tableView.render((text: text, with: self, search: linkController), for: indexPath) as EditCell
-        case .from:
-            return tableView.render((link: entry!.from[indexPath.row], note: entry!.name), for: indexPath) as Entry.Link.Cell
-        case .to:
-            return tableView.render((link: entry!.to[indexPath.row], note: entry!.name), for: indexPath) as Entry.Link.Cell
-        }
-    }
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        sections[section].count
-    }
-}
-
 extension NoteController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let dest: ID
-        switch sections[indexPath.section] {
+        switch dataSource.itemIdentifier(for: indexPath) {
         case .file:
             let controller = QLPreviewController()
             controller.dataSource = self
@@ -425,10 +404,8 @@ extension NoteController: UITableViewDelegate {
             edit = true
             reload()
             return
-        case .from:
-            dest = entry!.from[indexPath.row].note
-        case .to:
-            dest = entry!.to[indexPath.row].note
+        case let .link(link):
+            dest = link.note
         default:
             return
         }
