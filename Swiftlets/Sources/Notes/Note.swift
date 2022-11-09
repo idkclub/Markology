@@ -64,7 +64,7 @@ public struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
         public func fetch(db: Database) throws -> [Note] {
             if let pattern = pattern {
                 return try Note.fetchAll(db, sql: """
-                select note.* from note
+                select note.file, note.modified, note.name, snippet(note_search, -1, '', '', '…', 10) as text from note
                 join note_search on note.rowid = note_search.rowid
                     and note_search match ?
                 order by \(searchRank)
