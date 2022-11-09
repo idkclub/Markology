@@ -5,7 +5,6 @@ import UIKit
 import UIKitPlus
 
 class MenuController: UIViewController, Bindable {
-    var sections: [LinkSection] = []
     var progressSink: AnyCancellable?
     var searchSink: AnyCancellable?
     var query: ID.Search? {
@@ -19,7 +18,7 @@ class MenuController: UIViewController, Bindable {
     }
 
     var ids: [ID] = [] {
-        didSet { reload() }
+        didSet { snapshot() }
     }
 
     lazy var search: UISearchBar = {
@@ -31,31 +30,54 @@ class MenuController: UIViewController, Bindable {
         return search
     }()
 
-    lazy var table: UITableView = {
+    lazy var tableView: UITableView = {
         let table = UITableView()
         table.keyboardDismissMode = .onDrag
-        table.dataSource = self
         table.delegate = self
         table.register(header: TappableHeader.self)
         table.register(ID.Cell.self)
         return table
     }()
 
-    func reload() {
-        sections = []
-        if ids.count > 0 {
-            sections.append(.notes)
+    class DataSource: FadingTableSource<LinkSection, ID> {
+        override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+            switch sectionIdentifier(for: section) {
+            case let .notes(valid, limited):
+                return valid
+                    ? "Related"
+                    : limited ? "Recent" : "All"
+            case .new:
+                return "New"
+            case .none:
+                return nil
+            }
         }
-        sections.append(.new)
-        table.reloadData()
+    }
+
+    lazy var dataSource = DataSource(tableView: tableView) { tableView, indexPath, itemIdentifier in
+        tableView.render(itemIdentifier, for: indexPath) as ID.Cell
+    }
+
+    var loaded = false
+    func snapshot(initial: Bool = true) {
+        guard loaded || initial else { return }
+        loaded = true
+        var snapshot = NSDiffableDataSourceSnapshot<LinkSection, ID>()
+        if ids.count > 0 {
+            let section = LinkSection.notes(valid: query.valid, limited: query.limited)
+            snapshot.appendSections([section])
+            snapshot.appendItems(ids, toSection: section)
+        }
+        snapshot.appendSections([.new])
+        snapshot.appendItems([ID(file: "", name: search.text ?? "")], toSection: .new)
+        dataSource.apply(snapshot)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard let selected = table.indexPathForSelectedRow else { return }
-        // Jank version of clearsSelectionOnViewWillAppear.
+        guard let selected = tableView.indexPathForSelectedRow else { return }
         UIView.animate(withDuration: 0.25, animations: {
-            self.table.deselectRow(at: selected, animated: true)
+            self.tableView.deselectRow(at: selected, animated: true)
         })
     }
 
@@ -68,7 +90,8 @@ class MenuController: UIViewController, Bindable {
         progressSink = Engine.progress.sink {
             progress.progress = $0
         }
-        let stack = UIStackView(arrangedSubviews: [search, progress, table])
+        tableView.dataSource = dataSource
+        let stack = UIStackView(arrangedSubviews: [search, progress, tableView])
             .pinned(to: view)
         stack.axis = .vertical
     }
@@ -93,65 +116,24 @@ extension MenuController: UISearchBarDelegate {
     }
 }
 
-extension MenuController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        sections.count
-    }
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch sections[section] {
-        case .notes:
-            return ids.count
-        case .new:
-            return 1
-        }
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch sections[indexPath.section] {
-        case .notes:
-            return tableView.render(ids[indexPath.row], for: indexPath) as ID.Cell
-        case .new:
-            let id = ID(file: "", name: search.text ?? "")
-            return tableView.render(id, for: indexPath) as ID.Cell
-        }
-    }
-
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch sections[section] {
-        case .notes:
-            return query.valid
-                ? "Related"
-                : query.limited ? "Recent" : "All"
-        case .new:
-            return "New"
-        }
+extension MenuController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let split = splitViewController,
+              let nav = split.viewController(for: .secondary) as? UINavigationController,
+              let id = dataSource.itemIdentifier(for: indexPath) else { return }
+        let edit = dataSource.sectionIdentifier(for: indexPath.section) == .new
+        nav.viewControllers = [NoteController.with(id: id, edit: edit)]
+        split.show(.secondary)
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         tableView.render {
-            switch self.sections[section] {
+            switch self.dataSource.sectionIdentifier(for: section) {
             case .notes:
                 self.query?.toggleLimit()
             default:
                 break
             }
         } as TappableHeader
-    }
-}
-
-extension MenuController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let split = splitViewController,
-              let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
-        let controller: NoteController
-        switch sections[indexPath.section] {
-        case .notes:
-            controller = .with(id: ids[indexPath.row])
-        case .new:
-            controller = .with(id: ID.generate(for: search.text ?? ""), edit: true)
-        }
-        nav.viewControllers = [controller]
-        split.show(.secondary)
     }
 }

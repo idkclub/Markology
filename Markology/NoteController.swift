@@ -38,12 +38,7 @@ class NoteController: UIViewController, Bindable {
         case link(Entry.Link)
     }
 
-    class DataSource: UITableViewDiffableDataSource<Section, Item> {
-        override init(tableView: UITableView, cellProvider: @escaping UITableViewDiffableDataSource<NoteController.Section, NoteController.Item>.CellProvider) {
-            super.init(tableView: tableView, cellProvider: cellProvider)
-            defaultRowAnimation = .fade
-        }
-
+    class DataSource: FadingTableSource<Section, Item> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch sectionIdentifier(for: section) {
             case let .file(file):

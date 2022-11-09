@@ -5,8 +5,8 @@ import Notes
 import UIKit
 import UIKitPlus
 
-public enum LinkSection {
-    case notes, new
+public enum LinkSection: Hashable {
+    case notes(valid: Bool, limited: Bool), new
 }
 
 public class LinkController: UIViewController, Bindable {
@@ -86,7 +86,7 @@ extension LinkController: UICollectionViewDataSource {
     var linkSections: [LinkSection] {
         var sections: [LinkSection] = []
         if link.count > 0 {
-            sections.append(.notes)
+            sections.append(.notes(valid: linkQuery.valid, limited: linkQuery.limited))
         }
         sections.append(.new)
         return sections
