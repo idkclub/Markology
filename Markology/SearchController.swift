@@ -86,7 +86,7 @@ class SearchController: UITableViewController, Bindable {
 
         func openLink(to url: URL, with text: String) -> Bool {
             guard url.host == nil else { return true }
-            guard let relative = file.use(forEncoded: url.path),
+            guard let relative = file.use(for: url.path),
                   let nav = controller.navigationController else { return false }
             nav.show(NoteController.with(id: ID(file: relative, name: text)), sender: self)
             return false
