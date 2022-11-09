@@ -50,6 +50,15 @@ class MenuController: UIViewController, Bindable {
         table.reloadData()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let selected = table.indexPathForSelectedRow else { return }
+        // Jank version of clearsSelectionOnViewWillAppear.
+        UIView.animate(withDuration: 0.25, animations: {
+            self.table.deselectRow(at: selected, animated: true)
+        })
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
