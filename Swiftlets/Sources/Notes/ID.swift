@@ -23,20 +23,24 @@ public struct ID: Codable, Equatable, FetchableRecord {
     }
 
     public struct Search: Query {
-        let pattern: FTS5Pattern?
-        let limit: Int
-        let text: String
-
-        init(text: String, limit: Int) {
-            self.text = text
-            self.limit = limit
-            pattern = Note.tokenizer.parse(query: text)
+        public var text: String {
+            didSet {
+                pattern = Note.tokenizer.parse(query: text)
+            }
         }
+
+        var limit: Int
+        public mutating func toggleLimit() {
+            limit = -limit
+        }
+
+        var pattern: FTS5Pattern?
 
         public func fetch(db: Database) throws -> [ID] {
             guard let pattern = pattern else {
-                let request = ID.query.order(Note.Columns.modified.desc).limit(limit)
-                return try ID.fetchAll(db, request)
+                return try ID.fetchAll(db, limit > 0 ?
+                    ID.query.order(Note.Columns.modified.desc).limit(limit) :
+                    ID.query.order(Note.Columns.name.asc))
             }
             return try ID.fetchAll(db, sql: """
             select note.file, note.name from note
@@ -49,10 +53,11 @@ public struct ID: Codable, Equatable, FetchableRecord {
     }
 
     public static func search(text: String, limit: Int = 10) -> Search {
-        Search(text: text, limit: limit)
+        Search(text: text, limit: limit, pattern: Note.tokenizer.parse(query: text))
     }
 }
 
 public extension ID.Search? {
     var valid: Bool { self?.pattern != nil }
+    var limited: Bool { self?.limit ?? 1 > 0 }
 }

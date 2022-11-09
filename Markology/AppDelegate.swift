@@ -66,7 +66,6 @@ class SplitController: UISplitViewController {
         history.viewControllers = [controller]
         primaryBackgroundStyle = .sidebar
         delegate = self
-
         errors = Engine.errors.sink(receiveValue: alert)
     }
 }

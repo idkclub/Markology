@@ -66,6 +66,16 @@ public extension UITableView {
         cell.render(value)
         return cell
     }
+
+    func register<T: RenderCell>(header: T.Type) {
+        register(T.self, forHeaderFooterViewReuseIdentifier: T.reuse)
+    }
+
+    func render<T: RenderCell>(header value: T.Value) -> T {
+        let header = dequeueReusableHeaderFooterView(withIdentifier: T.reuse) as! T
+        header.render(value)
+        return header
+    }
 }
 
 public extension UICollectionView {

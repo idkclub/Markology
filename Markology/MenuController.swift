@@ -36,6 +36,7 @@ class MenuController: UIViewController, Bindable {
         table.keyboardDismissMode = .onDrag
         table.dataSource = self
         table.delegate = self
+        table.register(header: TappableHeader.self)
         table.register(ID.Cell.self)
         return table
     }()
@@ -70,7 +71,7 @@ class MenuController: UIViewController, Bindable {
 
 extension MenuController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        query = ID.search(text: searchText)
+        query?.text = searchText
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -110,10 +111,23 @@ extension MenuController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch sections[section] {
         case .notes:
-            return query.valid ? "Related" : "Recent"
+            return query.valid
+                ? "Related"
+                : query.limited ? "Recent" : "All"
         case .new:
             return "New"
         }
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        tableView.render {
+            switch self.sections[section] {
+            case .notes:
+                self.query?.toggleLimit()
+            default:
+                break
+            }
+        } as TappableHeader
     }
 }
 
