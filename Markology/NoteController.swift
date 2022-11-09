@@ -408,14 +408,7 @@ extension NoteController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch sections[section] {
-        case .file, .note, .edit:
-            return 1
-        case .from:
-            return entry?.from.count ?? 0
-        case .to:
-            return entry?.to.count ?? 0
-        }
+        sections[section].count
     }
 }
 
