@@ -6,6 +6,7 @@ import MarkView
 import Notes
 import NotesUI
 import Paths
+import QuickLook
 import UIKit
 import UIKitPlus
 
@@ -391,7 +392,7 @@ extension NoteController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch sections[indexPath.section] {
         case .file:
-            return tableView.render(id!.file.url, for: indexPath) as FileCell
+            return tableView.render((url: id!.file.url, parent: self), for: indexPath) as FileCell
         case .note:
             if entry == nil || (!id!.file.isMarkdown && entry?.text == ""), document == nil {
                 return tableView.render(id?.file ?? "", for: indexPath) as EmptyCell
@@ -422,6 +423,11 @@ extension NoteController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let dest: ID
         switch sections[indexPath.section] {
+        case .file:
+            let controller = QLPreviewController()
+            controller.dataSource = self
+            splitViewController?.show(controller, sender: self)
+            return
         case .note:
             edit = true
             reload()
@@ -434,6 +440,22 @@ extension NoteController: UITableViewDelegate {
             return
         }
         navigate(to: dest)
+    }
+}
+
+extension NoteController: QLPreviewControllerDataSource {
+    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+        1
+    }
+
+    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        self
+    }
+}
+
+extension NoteController: QLPreviewItem {
+    var previewItemURL: URL? {
+        id?.file.url
     }
 }
 

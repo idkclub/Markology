@@ -23,7 +23,7 @@ open class ImportController: UIViewController {
     }
 
     class Item {
-        let temp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        lazy var temp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension(ext)
         var name: String
         var text: String = ""
         let ext: String
@@ -40,9 +40,9 @@ open class ImportController: UIViewController {
 
         init(delegate: ImportControllerDelegate, url: URL) throws {
             self.delegate = delegate
-            try FileManager.default.copyItem(at: url, to: temp)
             name = url.deletingPathExtension().lastPathComponent
             ext = url.pathExtension.lowercased()
+            try FileManager.default.copyItem(at: url, to: temp)
         }
 
         init(delegate: ImportControllerDelegate, image: UIImage, name: String) throws {
@@ -138,6 +138,9 @@ open class ImportController: UIViewController {
     }
 
     @objc func cancel() {
+        try? items.forEach {
+            try FileManager.default.removeItem(at: $0.temp)
+        }
         dismiss(animated: true)
         delegate?.dismiss(importing: [])
     }
@@ -224,7 +227,7 @@ extension ImportController: UITableViewDataSource {
         let item = items[indexPath.section]
         switch indexPath.row {
         case 0:
-            return tableView.render(item.temp, for: indexPath) as FileCell
+            return tableView.render((url: item.temp, parent: self), for: indexPath) as FileCell
         case 1:
             return tableView.render(item, for: indexPath) as ItemCell
         default:

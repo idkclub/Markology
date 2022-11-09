@@ -21,6 +21,7 @@ extension ID {
     class Cell: UITableViewCell, RenderCell {
         func render(_ id: ID) {
             var content = defaultContentConfiguration()
+            content.image = UIImage(systemName: "chevron.forward")
             if id.name == "" {
                 content.text = "Empty Note"
                 content.textProperties.color = .placeholderText

@@ -28,6 +28,10 @@ public struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
         self.modified = modified
     }
 
+    public var id: ID {
+        ID(file: file, name: name)
+    }
+
     public static func lastModified(db: Database) throws -> [String: Date] {
         struct FileDate: Codable, FetchableRecord {
             static let query = Note.select(Note.Columns.file, Note.Columns.modified)
