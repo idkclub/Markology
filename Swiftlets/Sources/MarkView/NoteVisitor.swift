@@ -13,7 +13,12 @@ struct NoteVisitor: MarkupVisitor {
     }
 
     mutating func block(_ markup: Markdown.Markup, rendered: NSMutableAttributedString? = nil) -> NSMutableAttributedString {
-        let result = rendered != nil ? rendered! : defaultVisit(markup)
+        let result: NSMutableAttributedString
+        if let rendered = rendered {
+            result = rendered
+        } else {
+            result = defaultVisit(markup)
+        }
         guard markup.indexInParent + 1 != markup.parent?.childCount else { return result }
         return result
             .newline

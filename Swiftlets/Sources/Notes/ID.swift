@@ -10,7 +10,7 @@ public struct ID: Codable, Equatable, Hashable, FetchableRecord {
     public let name: String
 
     public init(file: File.Name, name: String) {
-        self.file = file
+        self.file = file.decomposedStringWithCanonicalMapping
         self.name = name
     }
 

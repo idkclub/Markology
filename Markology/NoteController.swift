@@ -82,7 +82,7 @@ class NoteController: UIViewController, Bindable {
         case let .empty(file):
             return tableView.render(file, for: indexPath) as EmptyCell
         case let .link(link):
-            return tableView.render((link: link, note: self.entry!.name), for: indexPath) as Entry.Link.Cell
+            return tableView.render((link: link, note: self.entry?.name ?? ""), for: indexPath) as Entry.Link.Cell
         case let .connection(connection):
             return tableView.render(connection, for: indexPath) as ConnectionCell
         }
@@ -199,34 +199,34 @@ class NoteController: UIViewController, Bindable {
                         _ = await document.close()
                     }
                     self?.document = nil
+                    self?.id = nil
                     let file = Engine.paths.locate(file: id.file)
-                    DispatchQueue.main.async {
-                        var error: NSError?
-                        NSFileCoordinator().coordinate(writingItemAt: file.url, options: .forDeleting, error: &error) {
+                    Task.detached {
+                        var nsError: NSError?
+                        NSFileCoordinator().coordinate(writingItemAt: file.url, options: .forDeleting, error: &nsError) {
                             do {
                                 try FileManager.default.removeItem(at: $0)
                             } catch {
                                 Engine.errors.send(error)
                             }
                         }
-                        if let error = error {
+                        if let error = nsError {
                             Engine.errors.send(error)
                         }
                         if !file.name.isMarkdown {
-                            NSFileCoordinator().coordinate(writingItemAt: file.name.markdown.url, options: .forDeleting, error: &error) {
+                            NSFileCoordinator().coordinate(writingItemAt: file.name.markdown.url, options: .forDeleting, error: &nsError) {
                                 do {
                                     try FileManager.default.removeItem(at: $0)
                                 } catch {
                                     Engine.errors.send(error)
                                 }
                             }
-                            if let error = error {
+                            if let error = nsError {
                                 Engine.errors.send(error)
                             }
                         }
+                        Engine.shared.delete(files: [file])
                     }
-                    Engine.shared.delete(files: [file])
-                    self?.id = nil
                 }
             })
             self?.present(confirm, animated: true)
@@ -452,7 +452,7 @@ extension NoteController: UITableViewDelegate {
         case .file:
             open()
             return
-        case .note:
+        case .note, .empty:
             edit = true
             reload()
             return

@@ -17,7 +17,12 @@ extension URLish {
     }
 
     var encoded: String? {
-        url?.addingPercentEncoding(withAllowedCharacters: Link.urlCharacters)
+        guard let url = url else { return nil }
+        // Assume already encoded for non-crashing URLs.
+        if url.smallestEncoding == .ascii {
+            return url
+        }
+        return url.addingPercentEncoding(withAllowedCharacters: Link.urlCharacters)
     }
 }
 
