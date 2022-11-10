@@ -9,7 +9,9 @@ public class FileCell: UITableViewCell, RenderCell {
         let controller = QLPreviewController()
         controller.dataSource = self
         controller.view.pinned(to: contentView)
-        controller.view.heightAnchor.constraint(equalToConstant: 300).isActive = true
+        let height = contentView.heightAnchor.constraint(equalToConstant: 300)
+        height.priority = .defaultHigh
+        height.isActive = true
         return controller
     }()
 
