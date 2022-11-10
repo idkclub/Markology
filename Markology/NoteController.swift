@@ -21,13 +21,20 @@ class NoteController: UIViewController, Bindable {
     private(set) var document: NoteDocument?
     private var entrySink: AnyCancellable?
     private var entry: Entry? {
-        didSet { reload() }
+        didSet {
+            if oldValue?.from != entry?.from || oldValue?.to != entry?.to {
+                connections = []
+                radar()
+            }
+            reload()
+        }
     }
 
     enum Section: Hashable {
         case file(String)
         case note(String)
         case from, to
+        case connection(Int)
     }
 
     enum Item: Hashable {
@@ -36,9 +43,16 @@ class NoteController: UIViewController, Bindable {
         case edit
         case empty(String)
         case link(Entry.Link)
+        case connection(ID.Connection)
     }
 
     class DataSource: FadingTableSource<Section, Item> {
+        weak var controller: NoteController?
+        init(controller: NoteController, tableView: UITableView, cellProvider: @escaping UITableViewDiffableDataSource<NoteController.Section, NoteController.Item>.CellProvider) {
+            self.controller = controller
+            super.init(tableView: tableView, cellProvider: cellProvider)
+        }
+
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch sectionIdentifier(for: section) {
             case let .file(file):
@@ -49,13 +63,15 @@ class NoteController: UIViewController, Bindable {
                 return "Linked From"
             case .to:
                 return "Linked To"
-            case .none:
+            case let .connection(level):
+                return "\(level + 2) Degrees Out"
+            default:
                 return nil
             }
         }
     }
 
-    private lazy var dataSource = DataSource(tableView: tableView) { tableView, indexPath, itemIdentifier in
+    private lazy var dataSource = DataSource(controller: self, tableView: tableView) { tableView, indexPath, itemIdentifier in
         switch itemIdentifier {
         case let .file(url):
             return tableView.render((url: url, parent: self), for: indexPath) as FileCell
@@ -67,6 +83,8 @@ class NoteController: UIViewController, Bindable {
             return tableView.render(file, for: indexPath) as EmptyCell
         case let .link(link):
             return tableView.render((link: link, note: self.entry!.name), for: indexPath) as Entry.Link.Cell
+        case let .connection(connection):
+            return tableView.render(connection, for: indexPath) as ConnectionCell
         }
     }
 
@@ -78,6 +96,7 @@ class NoteController: UIViewController, Bindable {
         tableView.register(EmptyCell.self)
         tableView.register(MarkCell.self)
         tableView.register(Entry.Link.Cell.self)
+        tableView.register(ConnectionCell.self)
         return tableView
     }()
 
@@ -117,6 +136,38 @@ class NoteController: UIViewController, Bindable {
 
     var text: String {
         document?.text ?? entry?.text ?? ""
+    }
+
+    var radarLoading = false
+    var connections: [[ID.Connection]] = []
+    func radar() {
+        guard !radarLoading, let entry = entry else { return }
+        if let last = connections.last, last.isEmpty { return }
+        radarLoading = true
+        DispatchQueue.global(qos: .utility).async {
+            defer { self.radarLoading = false }
+            var source: [ID]
+            var exclude: [ID]
+            if self.connections.isEmpty {
+                source = [entry.from, entry.to].joined().map { $0.note }
+                exclude = [entry.id]
+            } else {
+                source = self.connections.last?.map { $0.id } ?? []
+                exclude = [entry.id] + [entry.from, entry.to].joined().map { $0.note } + self.connections.joined().map { $0.id }
+            }
+            guard !source.isEmpty else { return }
+            do {
+                let connections = try Engine.shared.db.read {
+                    try ID.connections(db: $0, of: source, excluding: exclude)
+                }
+                self.connections.append(connections)
+                DispatchQueue.main.async {
+                    self.snapshot()
+                }
+            } catch {
+                self.alert(error: error)
+            }
+        }
     }
 
     func navigate(to id: ID) {
@@ -196,6 +247,7 @@ class NoteController: UIViewController, Bindable {
         add(linkController)
         linkController.view.pinned(toKeyboardAnd: view, top: false)
         reload(initial: true)
+        radar()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -292,6 +344,12 @@ class NoteController: UIViewController, Bindable {
         if entry.to.count > 0 {
             snapshot.appendSections([.to])
             snapshot.appendItems(entry.to.map { .link($0) }, toSection: .to)
+        }
+        for (index, connection) in connections.enumerated() {
+            guard !connection.isEmpty else { break }
+            let section = Section.connection(index)
+            snapshot.appendSections([section])
+            snapshot.appendItems(connection.map { .connection($0) }, toSection: section)
         }
     }
 }
@@ -400,6 +458,8 @@ extension NoteController: UITableViewDelegate {
             return
         case let .link(link):
             dest = link.note
+        case let .connection(connection):
+            dest = connection.id
         default:
             return
         }
@@ -407,7 +467,12 @@ extension NoteController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        tableView.render {
+        if case let .connection(level) = dataSource.sectionIdentifier(for: section),
+           connections.count - 1 == level
+        {
+            radar()
+        }
+        return tableView.render {
             switch self.dataSource.sectionIdentifier(for: section) {
             case .file:
                 self.open()
@@ -438,6 +503,17 @@ extension NoteController: QLPreviewControllerDataSource {
 extension NoteController: QLPreviewItem {
     var previewItemURL: URL? {
         id?.file.url
+    }
+}
+
+extension NoteController {
+    class ConnectionCell: UITableViewCell, RenderCell {
+        func render(_ connection: ID.Connection) {
+            var content = UIListContentConfiguration.valueCell()
+            content.text = connection.id.name
+            content.secondaryText = (connection.from.map { "← \($0.name)" } + connection.to.map { "→ \($0.name)" }).joined(separator: "\n")
+            contentConfiguration = content
+        }
     }
 }
 

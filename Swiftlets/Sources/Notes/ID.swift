@@ -61,3 +61,33 @@ public extension ID.Search? {
     var valid: Bool { self?.pattern != nil }
     var limited: Bool { self?.limit ?? 1 > 0 }
 }
+
+public extension ID {
+    struct Connection: Codable, Hashable, FetchableRecord {
+        public let id: ID
+        public let from: [ID]
+        public let to: [ID]
+    }
+
+    static func connections(db: Database, of sources: [ID], excluding: [ID]) throws -> [Connection] {
+        let files = sources.map { $0.file }
+        let exclusions = files + excluding.map { $0.file }
+        return try Connection.fetchAll(
+            db,
+            ID.query.filter(
+                Note.filter(!exclusions.contains(Note.Columns.file))
+                    .having(!Note.from.filter(files.contains(Link.Columns.from)).isEmpty || !Note.to.filter(files.contains(Link.Columns.to)).isEmpty)
+                    .select(Note.Columns.file)
+                    .contains(Note.Columns.file))
+                .including(all: Note.toNote.selectID.filter(keys: files).distinct().order(Note.Columns.name.asc).forKey("to"))
+                .including(all: Note.fromNote.selectID.filter(keys: files).distinct().order(Note.Columns.name.asc).forKey("from"))
+                .order(Note.Columns.name.asc)
+        )
+    }
+}
+
+extension HasManyThroughAssociation<Note, BelongsToAssociation<Link, Note>.RowDecoder> {
+    var selectID: Self {
+        select(Note.Columns.file, Note.Columns.name)
+    }
+}

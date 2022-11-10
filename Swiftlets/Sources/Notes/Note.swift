@@ -14,7 +14,9 @@ public struct Note: Codable, Equatable, FetchableRecord, PersistableRecord {
     static let tokenizer = FTS5TokenizerDescriptor.unicode61(categories: "L* N* S* Co", tokenCharacters: Set("#"))
     static let searchRank = "round(bm25(note_search, 50)), note.modified desc"
     static let from = hasMany(Link.self, using: Link.toKey).forKey("fromLink")
+    static let fromNote = hasMany(Note.self, through: from, using: Link.from)
     static let to = hasMany(Link.self, using: Link.fromKey).forKey("toLink")
+    static let toNote = hasMany(Note.self, through: to, using: Link.to)
 
     public let file: File.Name
     public let name: String

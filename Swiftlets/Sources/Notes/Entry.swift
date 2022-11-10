@@ -5,13 +5,11 @@ import GRDBPlus
 public struct Entry: Codable, Equatable, FetchableRecord {
     static let query = Note.all()
         .including(all: Note.to.select(Notes.Link.Columns.text)
-            .including(required: Notes.Link.to
-                .select(Note.Columns.name, Note.Columns.file)
+            .including(required: Notes.Link.to.selectID
                 .order(Note.Columns.name.asc))
             .forKey("to"))
         .including(all: Note.from.select(Notes.Link.Columns.text)
-            .including(required: Notes.Link.from
-                .select(Note.Columns.name, Note.Columns.file)
+            .including(required: Notes.Link.from.selectID
                 .order(Note.Columns.name.asc))
             .forKey("from"))
     let note: Note
@@ -37,5 +35,11 @@ public struct Entry: Codable, Equatable, FetchableRecord {
     public struct Link: Codable, Equatable, Hashable {
         public let text: String
         public let note: ID
+    }
+}
+
+extension BelongsToAssociation<Link, Note> {
+    var selectID: Self {
+        select(Note.Columns.file, Note.Columns.name)
     }
 }

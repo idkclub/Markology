@@ -70,6 +70,7 @@ extension Engine: Monitor {
                 }
                 continue
             }
+            if times?[file.name] != nil { continue }
             try? db.write { db in
                 try Note(file: file.name, name: String(file.name.dropFirst()), text: "", modified: modified).insert(db, onConflict: .ignore)
             }

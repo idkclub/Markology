@@ -121,8 +121,9 @@ extension MenuController: UITableViewDelegate {
         guard let split = splitViewController,
               let nav = split.viewController(for: .secondary) as? UINavigationController,
               let id = dataSource.itemIdentifier(for: indexPath) else { return }
+        let target = id.file == "" ? ID.generate(for: id.name) : id
         let edit = dataSource.sectionIdentifier(for: indexPath.section) == .new
-        nav.viewControllers = [NoteController.with(id: id, edit: edit)]
+        nav.viewControllers = [NoteController.with(id: target, edit: edit)]
         split.show(.secondary)
     }
 
