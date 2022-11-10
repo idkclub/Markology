@@ -18,6 +18,14 @@ UITextView for displaying Markdown.
 
 GRDB structs for storing linked notes.
 
+## NotesUI
+
+Helper views for working with `Notes`.
+
+## Paths
+
+Abstractions for cloud and local file handling.
+
 ## UIKitPlus
 
 UIKit helper extensions.
