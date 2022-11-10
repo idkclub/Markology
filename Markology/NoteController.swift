@@ -202,6 +202,7 @@ class NoteController: UIViewController, Bindable {
                     self?.id = nil
                     let file = Engine.paths.locate(file: id.file)
                     Task.detached {
+                        defer { Engine.shared.delete(files: [file]) }
                         var nsError: NSError?
                         NSFileCoordinator().coordinate(writingItemAt: file.url, options: .forDeleting, error: &nsError) {
                             do {
@@ -213,19 +214,19 @@ class NoteController: UIViewController, Bindable {
                         if let error = nsError {
                             Engine.errors.send(error)
                         }
-                        if !file.name.isMarkdown {
-                            NSFileCoordinator().coordinate(writingItemAt: file.name.markdown.url, options: .forDeleting, error: &nsError) {
-                                do {
-                                    try FileManager.default.removeItem(at: $0)
-                                } catch {
-                                    Engine.errors.send(error)
-                                }
-                            }
-                            if let error = nsError {
+                        guard !file.name.isMarkdown else { return }
+                        let note = file.name.markdown.url
+                        guard FileManager.default.fileExists(atPath: note.path) else { return }
+                        NSFileCoordinator().coordinate(writingItemAt: note, options: .forDeleting, error: &nsError) {
+                            do {
+                                try FileManager.default.removeItem(at: $0)
+                            } catch {
                                 Engine.errors.send(error)
                             }
                         }
-                        Engine.shared.delete(files: [file])
+                        if let error = nsError {
+                            Engine.errors.send(error)
+                        }
                     }
                 }
             })
@@ -260,7 +261,16 @@ class NoteController: UIViewController, Bindable {
            let document = document,
            document.hasUnsavedChanges
         {
-            Engine.shared.update(file: id.file, with: text)
+            Task {
+                do {
+                    try await document.savePresentedItemChanges()
+                } catch {
+                    alert(error: error)
+                }
+                Task.detached {
+                    Engine.shared.update(files: [Engine.paths.locate(file: id.file)])
+                }
+            }
         }
     }
 

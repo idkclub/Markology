@@ -79,6 +79,8 @@ public class Paths {
     }
 
     private func reset() {
+        busy.send(true)
+        defer { busy.send(false) }
         documents = icloud ?
             icloudURL :
             inExtension ? groupDocuments : localURL
@@ -98,6 +100,7 @@ public class Paths {
             query.operationQueue?.maxConcurrentOperationCount = 1
             query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
             query.predicate = NSPredicate(value: true)
+            query.notificationBatchingInterval = 0.1
             NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: query, queue: query.operationQueue, using: initial)
             NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidUpdate, object: query, queue: query.operationQueue, using: update)
             query.enableUpdates()

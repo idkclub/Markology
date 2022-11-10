@@ -53,6 +53,7 @@ open class ImportController: UIViewController {
         }
 
         func save() throws {
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try FileManager.default.moveItem(at: temp, to: url)
             if !text.isEmpty {
                 try text.write(to: url.appendingPathExtension("md"), atomically: true, encoding: .utf8)
