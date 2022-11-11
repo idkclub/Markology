@@ -177,7 +177,7 @@ class NoteController: UIViewController, Bindable {
 
     @objc func menu() {
         guard let id = id else { return }
-        let menu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let menu = UIAlertController()
         if !text.isEmpty {
             menu.addAction(UIAlertAction(title: "Share Note", style: .default) { _ in
                 let activityVc = UIActivityViewController(activityItems: [self.text], applicationActivities: nil)
