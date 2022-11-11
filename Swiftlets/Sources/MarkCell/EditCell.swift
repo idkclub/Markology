@@ -9,7 +9,6 @@ public class EditCell: UITableViewCell {
     var search: SearchDelegate?
     var previous: UITextRange?
     var dirty = false
-    var insertSink: AnyCancellable?
 
     lazy var markdown = {
         let view = MarkView().pinned(to: contentView, layout: true)
@@ -37,27 +36,36 @@ extension EditCell: RenderCell {
         if let delegate = delegate as? UIDropInteractionDelegate {
             markdown.addInteraction(UIDropInteraction(delegate: delegate))
         }
-        if let search = search {
-            insertSink = search.addLink.sink { [weak self] in
-                guard let markdown = self?.markdown,
-                      let selection = markdown.selectedTextRange else { return }
-                if selection.start == selection.end,
-                   let token = markdown.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
-                {
-                    markdown.selectedTextRange = token
-                }
-                if ["gif", "jpg", "jpeg", "png"].contains(($0.url as NSString).pathExtension.lowercased()) {
-                    markdown.insertText("![\($0.text)](\($0.url))")
-                } else {
-                    markdown.insertText("[\($0.text)](\($0.url))")
-                }
-            }
-        }
         render(value.text)
     }
 }
 
+extension EditCell: SearchReceiver {
+    public func add(link: (url: String, text: String), replace: Bool) {
+        guard let selection = markdown.selectedTextRange else { return }
+        if replace,
+           selection.start == selection.end,
+           let token = markdown.tokenizer.rangeEnclosingPosition(selection.start, with: .word, inDirection: .storage(.backward))
+        {
+            markdown.selectedTextRange = token
+        }
+        if ["gif", "jpg", "jpeg", "png"].contains((link.url as NSString).pathExtension.lowercased()) {
+            markdown.insertText("![\(link.text)](\(link.url))")
+        } else {
+            markdown.insertText("[\(link.text)](\(link.url))")
+        }
+    }
+}
+
 extension EditCell: UITextViewDelegate {
+    public func textViewDidBeginEditing(_ textView: UITextView) {
+        search?.receiver = self
+    }
+
+    public func textViewDidEndEditing(_ textView: UITextView) {
+        search?.change(search: nil)
+    }
+
     public func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         guard let range = textView.range(for: characterRange),
               let text = textView.text(in: range) else { return false }
@@ -155,8 +163,12 @@ public protocol EditCellDelegate {
 }
 
 public protocol SearchDelegate {
-    var addLink: PassthroughSubject<(url: String, text: String), Never> { get }
-    func change(search: String)
+    func change(search: String?)
+    var receiver: SearchReceiver? { get set }
+}
+
+public protocol SearchReceiver {
+    func add(link: (url: String, text: String), replace: Bool)
 }
 
 extension EditCell {

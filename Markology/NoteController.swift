@@ -386,7 +386,7 @@ class AttachController: ImportController, ImportControllerDelegate {
     var insert: SearchDelegate?
     func dismiss(importing: [(url: String, text: String)]) {
         for url in importing {
-            insert?.addLink.send(url)
+            insert?.receiver?.add(link: url, replace: false)
         }
     }
 

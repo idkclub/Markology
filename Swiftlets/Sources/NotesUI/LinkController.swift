@@ -39,7 +39,7 @@ public class LinkController: UIViewController, Bindable {
 
     public var delegate: LinkControllerDelegate?
 
-    public var addLink = PassthroughSubject<(url: String, text: String), Never>()
+    public var receiver: SearchReceiver?
 
     public var search: String? {
         didSet {
@@ -77,7 +77,7 @@ public class LinkController: UIViewController, Bindable {
 }
 
 extension LinkController: SearchDelegate {
-    public func change(search: String) {
+    public func change(search: String?) {
         self.search = search
     }
 }
@@ -126,6 +126,7 @@ extension LinkController: UICollectionViewDataSource {
 
 extension LinkController: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let receiver = receiver else { return }
         let target: ID
         switch linkSections[indexPath.section] {
         case .notes:
@@ -135,7 +136,7 @@ extension LinkController: UICollectionViewDelegate {
             target = .generate(for: search)
         }
         guard let url = target.file.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return }
-        addLink.send((url: url, text: target.name))
+        receiver.add(link: (url: url, text: target.name), replace: true)
     }
 }
 
