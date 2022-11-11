@@ -119,19 +119,27 @@ class NoteController: UIViewController, Bindable {
             if id != oldValue {
                 document = nil
             }
-            guard let id = id else {
-                guard let split = splitViewController,
-                      let nav = navigationController else { return }
-                if nav.viewControllers.count > 1 {
-                    nav.popViewController(animated: true)
-                } else {
-                    nav.viewControllers = [EmptyController()]
-                    split.show(.primary)
-                }
-                return
+            guard id == nil else { return }
+            guard let split = splitViewController,
+                  let nav = navigationController else { return }
+            if nav.viewControllers.count > 1 {
+                nav.popViewController(animated: true)
+            } else {
+                nav.viewControllers = [EmptyController()]
+                split.show(.primary)
             }
-            entrySink = Engine.shared.subscribe(with(\.entry), to: Entry.load(id: id))
         }
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let id = id else { return }
+        entrySink = Engine.shared.subscribe(with(\.entry), to: Entry.load(id: id))
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        entrySink?.cancel()
     }
 
     var text: String {
@@ -195,36 +203,26 @@ class NoteController: UIViewController, Bindable {
             confirm.addAction(UIAlertAction(title: "Cancel", style: .cancel))
             confirm.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
                 Task {
-                    if let document = self?.document {
-                        _ = await document.close()
+                    guard let self = self else { fatalError("lost self") }
+                    if let document = self.document {
+                        await document.close()
                     }
-                    self?.document = nil
-                    self?.id = nil
+                    self.document = nil
+                    self.id = nil
                     let file = Engine.paths.locate(file: id.file)
                     Task.detached {
                         defer { Engine.shared.delete(files: [file]) }
-                        var nsError: NSError?
-                        NSFileCoordinator().coordinate(writingItemAt: file.url, options: .forDeleting, error: &nsError) {
-                            do {
-                                try FileManager.default.removeItem(at: $0)
-                            } catch {
-                                Engine.errors.send(error)
-                            }
-                        }
-                        if let error = nsError {
+                        do {
+                            try FileManager.default.removeItem(at: file.url)
+                        } catch {
                             Engine.errors.send(error)
                         }
                         guard !file.name.isMarkdown else { return }
                         let note = file.name.markdown.url
                         guard FileManager.default.fileExists(atPath: note.path) else { return }
-                        NSFileCoordinator().coordinate(writingItemAt: note, options: .forDeleting, error: &nsError) {
-                            do {
-                                try FileManager.default.removeItem(at: $0)
-                            } catch {
-                                Engine.errors.send(error)
-                            }
-                        }
-                        if let error = nsError {
+                        do {
+                            try FileManager.default.removeItem(at: note)
+                        } catch {
                             Engine.errors.send(error)
                         }
                     }
@@ -247,7 +245,7 @@ class NoteController: UIViewController, Bindable {
         linkController.delegate = self
         add(linkController)
         linkController.view.pinned(toKeyboardAnd: view, top: false)
-        reload(initial: true)
+        reload()
         radar()
     }
 
@@ -274,11 +272,9 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
-    var loaded = false
-    private func reload(initial: Bool = false) {
-        title = entry?.name ?? id?.name
-        guard loaded || initial, id != nil else { return }
-        loaded = true
+    private func reload() {
+        guard let id = id else { return }
+        title = entry?.name ?? id.name
         guard edit, document == nil else {
             snapshot()
             return
