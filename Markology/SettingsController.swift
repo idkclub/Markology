@@ -2,21 +2,20 @@ import Combine
 import UIKit
 
 class SettingsController: UIViewController {
+    let toggle = UISwitch()
     var busySink: AnyCancellable?
     var progressSink: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .secondarySystemBackground
-        let toggle = UISwitch()
-        toggle.isOn = Engine.paths.icloud
         toggle.addTarget(self, action: #selector(icloud), for: .valueChanged)
         let label = UILabel()
         label.text = "Use iCloud"
         let enable = UIStackView(arrangedSubviews: [label, toggle])
         busySink = Engine.paths.busy.sink { busy in
             DispatchQueue.main.async {
-                toggle.isEnabled = Engine.paths.icloudAvailable && !busy
+                self.reset(busy: busy)
             }
         }
 
@@ -39,13 +38,17 @@ class SettingsController: UIViewController {
         stack.axis = .vertical
         stack.isLayoutMarginsRelativeArrangement = true
         stack.spacing = 5
+        reset()
+    }
+
+    func reset(busy: Bool = false) {
+        toggle.isOn = Engine.paths.icloudAvailable && Engine.paths.icloud
+        toggle.isEnabled = Engine.paths.icloudAvailable && !busy
     }
 
     @objc func icloud(sender: UISwitch) {
         Engine.paths.icloud = sender.isOn
     }
-
-    @objc func sync() {}
 
     @objc func folder() {
         Engine.paths.documents.open()

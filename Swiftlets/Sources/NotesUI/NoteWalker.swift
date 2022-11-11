@@ -1,13 +1,20 @@
 import Markdown
-import Paths
 
-// TODO: Dedupe with Engine.NoteWalker?
-struct NoteWalker: MarkupWalker {
-    var from: File.Name
+struct NoteWalker: ContextWalker {
+    var from: String
     var context = ""
     var fallback = ""
     var header = ""
+}
 
+public protocol ContextWalker: MarkupWalker {
+    var from: String { get }
+    var context: String { get set }
+    var fallback: String { get set }
+    var header: String { get set }
+}
+
+public extension ContextWalker {
     var name: String {
         if header != "" {
             return header

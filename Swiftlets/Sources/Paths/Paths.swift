@@ -22,16 +22,17 @@ public class Paths {
         self.id = id
         self.inExtension = inExtension
         defaults = UserDefaults(suiteName: "group.\(id)")!
-        icloud = !defaults.bool(forKey: Paths.disableKey) && icloudAvailable
+        icloud = !defaults.bool(forKey: Paths.disableKey)
         migrate()
         reset()
+
+        NotificationCenter.default.addObserver(forName: .NSUbiquityIdentityDidChange, object: self, queue: .main, using: change)
     }
 
     public func locate(file: File.Name) -> File {
         File(in: documents, named: file)
     }
 
-    // TODO: Monitor changes.
     public var icloudAvailable: Bool {
         FileManager.default.ubiquityIdentityToken != nil
     }
@@ -78,9 +79,14 @@ public class Paths {
         }
     }
 
+    private func change(_: Notification) {
+        reset()
+    }
+
     private func reset() {
         busy.send(true)
         defer { busy.send(false) }
+        let icloud = self.icloud && icloudAvailable
         documents = icloud ?
             icloudURL :
             inExtension ? groupDocuments : localURL
@@ -109,7 +115,7 @@ public class Paths {
             return
         }
         let file = open(documents.path, O_EVTONLY)
-        // TODO: This only monitors the top level folder.
+        // NOTE: This only monitors the top level folder.
         let source = DispatchSource.makeFileSystemObjectSource(fileDescriptor: file, eventMask: .write, queue: .global())
         source.setEventHandler(handler: local)
         source.resume()

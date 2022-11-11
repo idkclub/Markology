@@ -53,7 +53,6 @@ struct NoteVisitor: MarkupVisitor {
 
     mutating func visitImage(_ image: Image) -> NSMutableAttributedString {
         guard let source = image.source,
-              // TODO: Load remote images?
               !image.absolute,
               let url = resolver?.resolve(path: source),
               let image = UIImage(contentsOfFile: url) else { return defaultVisit(image) }

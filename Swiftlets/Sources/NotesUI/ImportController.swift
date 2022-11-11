@@ -180,7 +180,10 @@ public extension ImportController {
 extension ImportController {
     class ItemCell: UITableViewCell, RenderCell {
         lazy var name = {
-            let field = UITextField().pinned(to: contentView, trailing: false, layout: true)
+            let field = UITextField().pinned(to: contentView, leading: false, trailing: false, layout: true)
+            let leading = field.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.leadingAnchor)
+            leading.priority = .defaultLow
+            leading.isActive = true
             field.trailingAnchor.constraint(equalTo: ext.leadingAnchor).isActive = true
             field.textAlignment = NSTextAlignment.right
             field.addTarget(self, action: #selector(rename), for: .editingChanged)
@@ -188,7 +191,6 @@ extension ImportController {
         }()
 
         lazy var ext = {
-            // TODO: See if can keep from being pushed offscreen.
             let label = UILabel().pinned(to: contentView, leading: false, layout: true)
             label.textColor = .secondaryLabel
             return label

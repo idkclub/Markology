@@ -4,6 +4,7 @@ import GRDB
 import GRDBPlus
 import Markdown
 import Notes
+import NotesUI
 import Paths
 
 @dynamicMemberLookup
@@ -101,29 +102,12 @@ extension Engine: Monitor {
 }
 
 extension Engine {
-    struct NoteWalker: MarkupWalker {
+    struct NoteWalker: ContextWalker {
         var from: File.Name
         var context = ""
         var fallback = ""
         var header = ""
         var links: [Notes.Link] = []
-
-        var name: String {
-            if header != "" {
-                return header
-            }
-            if fallback != "" {
-                return fallback
-            }
-            return String(from.dropFirst())
-        }
-
-        mutating func visitHeading(_ heading: Heading) {
-            context = heading.plainText
-            defaultVisit(heading)
-            guard header == "" else { return }
-            header = context
-        }
 
         mutating func visitLink(_ link: Markdown.Link) {
             guard let destination = link.destination,
@@ -137,13 +121,6 @@ extension Engine {
                   !image.absolute,
                   let to = from.use(for: source)?.removingPercentEncoding else { return }
             links.append(Link(from: from, to: to, text: context))
-        }
-
-        mutating func visitParagraph(_ paragraph: Paragraph) {
-            context = paragraph.plainText
-            defaultVisit(paragraph)
-            guard fallback == "" else { return }
-            fallback = context
         }
     }
 }
