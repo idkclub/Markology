@@ -162,7 +162,7 @@ class NoteController: UIViewController, Bindable {
                 }
                 self.connections.append(connections)
                 DispatchQueue.main.async {
-                    self.snapshot()
+                    self.reload()
                 }
             } catch {
                 self.alert(error: error)
