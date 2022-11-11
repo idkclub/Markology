@@ -277,7 +277,7 @@ class NoteController: UIViewController, Bindable {
     var loaded = false
     private func reload(initial: Bool = false) {
         title = entry?.name ?? id?.name
-        guard loaded || initial else { return }
+        guard loaded || initial, id != nil else { return }
         loaded = true
         guard edit, document == nil else {
             snapshot()

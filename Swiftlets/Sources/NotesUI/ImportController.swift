@@ -128,8 +128,8 @@ open class ImportController: UIViewController {
             alert(error: error)
         }
         dismiss(animated: true)
-        delegate?.dismiss(importing: items.map {
-            let url = "/\($0.file)"
+        delegate?.dismiss(importing: items.compactMap {
+            guard let url = "/\($0.file)".addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else { return nil }
             guard !$0.text.isEmpty else { return (url: url, text: $0.file) }
             let doc = Document(parsing: $0.text)
             var walk = NoteWalker(from: "/\($0.file)")
