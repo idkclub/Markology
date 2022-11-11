@@ -131,15 +131,21 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
+    var offscreen: Bool = true
+    var animating: Bool = false
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let id = id else { return }
+        offscreen = false
+        animating = false
         entrySink = Engine.shared.subscribe(with(\.entry), to: Entry.load(id: id))
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        offscreen = true
         entrySink?.cancel()
+        sync()
     }
 
     var text: String {
@@ -249,11 +255,6 @@ class NoteController: UIViewController, Bindable {
         radar()
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        sync()
-    }
-
     private func sync() {
         if let id = id,
            let document = document,
@@ -273,7 +274,7 @@ class NoteController: UIViewController, Bindable {
     }
 
     private func reload() {
-        guard let id = id else { return }
+        guard let id = id, !offscreen else { return }
         title = entry?.name ?? id.name
         guard edit, document == nil else {
             snapshot()
@@ -323,7 +324,10 @@ class NoteController: UIViewController, Bindable {
         items.append(UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)))
         navigationItem.rightBarButtonItems = items
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
-        defer { dataSource.apply(snapshot) }
+        defer {
+            dataSource.apply(snapshot, animatingDifferences: animating)
+            animating = true
+        }
         guard let id = id else { return }
         if !id.file.isMarkdown {
             let section = Section.file(String(id.file.dropFirst()))
@@ -438,9 +442,8 @@ extension NoteController: CheckboxDelegate {
             lines[line - 1] = current.replacingCharacters(in: index ... index, with: current[index] == " " ? "x" : " ")
             document.text = lines.joined(separator: "\n")
             document.updateChangeCount(.done)
-            UIView.performWithoutAnimation {
-                reload()
-            }
+            animating = false
+            reload()
         }
     }
 }
