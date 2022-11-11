@@ -111,7 +111,7 @@ struct NoteVisitor: MarkupVisitor {
         default:
             return body
         }
-        if checkbox, let lower = listItem.range?.lowerBound {
+        if checkbox, !box.isEmpty, let lower = listItem.range?.lowerBound {
             bullet = bullet.adding(key: .link, value: "\(MarkView.checkboxScheme)://\(lower.line)")
         }
         return bullet

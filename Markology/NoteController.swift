@@ -321,7 +321,9 @@ class NoteController: UIViewController, Bindable {
         if entry != nil || document != nil {
             items.append(menuButton)
         }
-        items.append(UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit)))
+        let toggle = UIBarButtonItem(image: edit ? UIImage(systemName: "checkmark") : UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(toggleEdit))
+        toggle.title = "Toggle Editing"
+        items.append(toggle)
         navigationItem.rightBarButtonItems = items
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         defer {

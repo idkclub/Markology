@@ -25,7 +25,6 @@ public class Paths {
         icloud = !defaults.bool(forKey: Paths.disableKey)
         migrate()
         reset()
-
         NotificationCenter.default.addObserver(forName: .NSUbiquityIdentityDidChange, object: self, queue: .main, using: change)
     }
 
@@ -34,7 +33,12 @@ public class Paths {
     }
 
     public var icloudAvailable: Bool {
-        FileManager.default.ubiquityIdentityToken != nil
+        #if DEBUG
+            if let icloud = ProcessInfo.processInfo.environment["PATHS_ICLOUD"] {
+                return icloud == "1"
+            }
+        #endif
+        return FileManager.default.ubiquityIdentityToken != nil
     }
 
     private var groupURL: URL? {

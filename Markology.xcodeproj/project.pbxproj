@@ -16,6 +16,7 @@
 		4E7074762916693600FB00D4 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7074752916693600FB00D4 /* Engine.swift */; };
 		4E707479291669A000FB00D4 /* NotesUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E707478291669A000FB00D4 /* NotesUI */; };
 		4E70747C29166A1600FB00D4 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E70747B29166A1600FB00D4 /* Paths */; };
+		4E7107EF291EF3E800AAEC92 /* SnapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7107EE291EF3E800AAEC92 /* SnapTests.swift */; };
 		4E7776EB28F46E9E00DAEF80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */; };
 		4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F428F46EC100DAEF80 /* AppDelegate.swift */; };
 		4E7776F828F47D0700DAEF80 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F728F47D0700DAEF80 /* Engine.swift */; };
@@ -32,6 +33,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4E5964FC291399A2000BB2EC;
 			remoteInfo = Import;
+		};
+		4E7107F0291EF3E800AAEC92 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E7776DB28F46E9C00DAEF80 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4E7776E228F46E9C00DAEF80;
+			remoteInfo = Markology;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -70,6 +78,8 @@
 		4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDocument.swift; sourceTree = "<group>"; };
 		4E7074752916693600FB00D4 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
 		4E7107D6291EC08600AAEC92 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4E7107EA291EF3E800AAEC92 /* MarkologyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarkologyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E7107EE291EF3E800AAEC92 /* SnapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapTests.swift; sourceTree = "<group>"; };
 		4E7776E328F46E9C00DAEF80 /* Markology.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markology.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4E7776F428F46EC100DAEF80 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -87,6 +97,13 @@
 			files = (
 				4E707479291669A000FB00D4 /* NotesUI in Frameworks */,
 				4E70747C29166A1600FB00D4 /* Paths in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E7107E7291EF3E800AAEC92 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,12 +138,21 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		4E7107EB291EF3E800AAEC92 /* MarkologyUITests */ = {
+			isa = PBXGroup;
+			children = (
+				4E7107EE291EF3E800AAEC92 /* SnapTests.swift */,
+			);
+			path = MarkologyUITests;
+			sourceTree = "<group>";
+		};
 		4E7776DA28F46E9C00DAEF80 = {
 			isa = PBXGroup;
 			children = (
 				4E5964FE291399A2000BB2EC /* Import */,
 				4E7776E528F46E9C00DAEF80 /* Markology */,
 				4E59652F2913AA0A000BB2EC /* Packages */,
+				4E7107EB291EF3E800AAEC92 /* MarkologyUITests */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -136,6 +162,7 @@
 			children = (
 				4E7776E328F46E9C00DAEF80 /* Markology.app */,
 				4E5964FD291399A2000BB2EC /* Import.appex */,
+				4E7107EA291EF3E800AAEC92 /* MarkologyUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -182,6 +209,24 @@
 			productReference = 4E5964FD291399A2000BB2EC /* Import.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		4E7107E9291EF3E800AAEC92 /* MarkologyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E7107F4291EF3E800AAEC92 /* Build configuration list for PBXNativeTarget "MarkologyUITests" */;
+			buildPhases = (
+				4E7107E6291EF3E800AAEC92 /* Sources */,
+				4E7107E7291EF3E800AAEC92 /* Frameworks */,
+				4E7107E8291EF3E800AAEC92 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4E7107F1291EF3E800AAEC92 /* PBXTargetDependency */,
+			);
+			name = MarkologyUITests;
+			productName = MarkologyUITests;
+			productReference = 4E7107EA291EF3E800AAEC92 /* MarkologyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		4E7776E228F46E9C00DAEF80 /* Markology */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4E7776F128F46E9E00DAEF80 /* Build configuration list for PBXNativeTarget "Markology" */;
@@ -213,11 +258,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
+				LastSwiftUpdateCheck = 1410;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					4E5964FC291399A2000BB2EC = {
 						CreatedOnToolsVersion = 14.0.1;
+					};
+					4E7107E9291EF3E800AAEC92 = {
+						CreatedOnToolsVersion = 14.1;
+						TestTargetID = 4E7776E228F46E9C00DAEF80;
 					};
 					4E7776E228F46E9C00DAEF80 = {
 						CreatedOnToolsVersion = 14.0.1;
@@ -243,12 +292,20 @@
 			targets = (
 				4E7776E228F46E9C00DAEF80 /* Markology */,
 				4E5964FC291399A2000BB2EC /* Import */,
+				4E7107E9291EF3E800AAEC92 /* MarkologyUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4E5964FB291399A2000BB2EC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E7107E8291EF3E800AAEC92 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -275,6 +332,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4E7107E6291EF3E800AAEC92 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E7107EF291EF3E800AAEC92 /* SnapTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4E7776DF28F46E9C00DAEF80 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -297,6 +362,11 @@
 			isa = PBXTargetDependency;
 			target = 4E5964FC291399A2000BB2EC /* Import */;
 			targetProxy = 4E596505291399A2000BB2EC /* PBXContainerItemProxy */;
+		};
+		4E7107F1291EF3E800AAEC92 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4E7776E228F46E9C00DAEF80 /* Markology */;
+			targetProxy = 4E7107F0291EF3E800AAEC92 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -342,6 +412,30 @@
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		4E7107F2291EF3E800AAEC92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = club.idk.MarkologyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_TARGET_NAME = Markology;
+			};
+			name = Debug;
+		};
+		4E7107F3291EF3E800AAEC92 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = club.idk.MarkologyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_TARGET_NAME = Markology;
 			};
 			name = Release;
 		};
@@ -527,6 +621,15 @@
 			buildConfigurations = (
 				4E59650A291399A2000BB2EC /* Debug */,
 				4E59650B291399A2000BB2EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4E7107F4291EF3E800AAEC92 /* Build configuration list for PBXNativeTarget "MarkologyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E7107F2291EF3E800AAEC92 /* Debug */,
+				4E7107F3291EF3E800AAEC92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
