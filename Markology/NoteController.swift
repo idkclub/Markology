@@ -42,7 +42,8 @@ class NoteController: UIViewController, Bindable {
         case note(String)
         case edit
         case empty(String)
-        case link(Entry.Link)
+        // The same link can appear in both.
+        case from(Entry.Link), to(Entry.Link)
         case connection(ID.Connection)
     }
 
@@ -81,16 +82,36 @@ class NoteController: UIViewController, Bindable {
             return tableView.render((text: self.text, with: self, search: self.linkController), for: indexPath) as EditCell
         case let .empty(file):
             return tableView.render(file, for: indexPath) as EmptyCell
-        case let .link(link):
+        case let .from(link), let .to(link):
             return tableView.render((link: link, note: self.entry?.name ?? ""), for: indexPath) as Entry.Link.Cell
         case let .connection(connection):
             return tableView.render(connection, for: indexPath) as ID.Connection.Cell
         }
     }
 
+    var keyboardSink: AnyCancellable?
+    lazy var keyboard = {
+        let keyboard = KeyboardGuide.within(view: view)
+        keyboardSink = keyboard.offset.sink { self.keyboardOffset = $0 }
+        return keyboard
+    }()
+
+    var keyboardOffset = 0.0 {
+        didSet { offset() }
+    }
+
+    var linkOffset = 0.0 {
+        didSet { offset() }
+    }
+
+    func offset() {
+        let offset = keyboardOffset + linkOffset
+        tableView.contentInset.bottom = offset
+        tableView.verticalScrollIndicatorInsets.bottom = offset
+    }
+
     lazy var tableView: UITableView = {
-        // TODO: Adjust offsets?
-        let tableView = UITableView().pinned(toKeyboardAnd: view, top: false)
+        let tableView = UITableView().pinned(to: view, top: false)
         tableView.register(header: TappableHeader.self)
         tableView.register(FileCell.self)
         tableView.register(EditCell.self)
@@ -251,7 +272,8 @@ class NoteController: UIViewController, Bindable {
         tableView.delegate = self
         linkController.delegate = self
         add(linkController)
-        linkController.view.pinned(toKeyboardAnd: view, top: false)
+        linkController.view.pinned(to: view, bottom: false, top: false)
+        linkController.view.bottomAnchor.constraint(equalTo: keyboard.topAnchor).isActive = true
         reload()
         radar()
     }
@@ -345,11 +367,11 @@ class NoteController: UIViewController, Bindable {
         }
         if entry.from.count > 0 {
             snapshot.appendSections([.from])
-            snapshot.appendItems(entry.from.map { .link($0) }, toSection: .from)
+            snapshot.appendItems(entry.from.map { .from($0) }, toSection: .from)
         }
         if entry.to.count > 0 {
             snapshot.appendSections([.to])
-            snapshot.appendItems(entry.to.map { .link($0) }, toSection: .to)
+            snapshot.appendItems(entry.to.map { .to($0) }, toSection: .to)
         }
         for (index, connection) in connections.enumerated() {
             guard !connection.isEmpty else { break }
@@ -401,8 +423,7 @@ extension NoteController: LinkControllerDelegate {
     }
 
     func adjustInset(by offset: CGFloat) {
-        tableView.contentInset.bottom = offset
-        tableView.verticalScrollIndicatorInsets.bottom = offset
+        linkOffset = offset
     }
 }
 
@@ -461,7 +482,7 @@ extension NoteController: UITableViewDelegate {
             edit = true
             reload()
             return
-        case let .link(link):
+        case let .from(link), let .to(link):
             dest = link.note
         case let .connection(connection):
             dest = connection.id

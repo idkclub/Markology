@@ -108,17 +108,21 @@ open class ImportController: UIViewController {
 
     override open func viewDidLoad() {
         super.viewDidLoad()
-        let toolbar = UIToolbar().pinned(toKeyboardAnd: view, top: false)
+        let keyboard = KeyboardGuide.within(view: view)
+        let toolbar = UIToolbar().pinned(to: view, bottom: false, top: false)
         toolbar.items = [
             .flexibleSpace(),
             importButton,
             UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancel)),
         ]
         toolbar.backgroundColor = .systemBackground
-        tableView.bottomAnchor.constraint(equalTo: toolbar.topAnchor).isActive = true
         add(linkController)
         linkController.view.pinned(to: view, bottom: false, top: false)
-        linkController.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            toolbar.bottomAnchor.constraint(equalTo: keyboard.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: toolbar.topAnchor),
+            linkController.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor),
+        ])
     }
 
     @objc func save() {

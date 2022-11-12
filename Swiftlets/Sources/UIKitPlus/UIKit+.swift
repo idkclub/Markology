@@ -23,13 +23,6 @@ public extension UIView {
         NSLayoutConstraint.activate(constraints)
         return self
     }
-
-    @discardableResult
-    func pinned(toKeyboardAnd view: UIView, withInset: CGFloat = 0, top: Bool = true) -> Self {
-        let view = pinned(to: view, withInset: withInset, bottom: false, top: top)
-        bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
-        return view
-    }
 }
 
 public extension UIViewController {
