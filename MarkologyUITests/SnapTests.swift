@@ -34,26 +34,29 @@ final class SnapTests: XCTestCase {
         """)
         app.navigationBars.buttons.matching(identifier: "Toggle Editing").firstMatch.tap()
         app.links.matching(identifier: "☐").allElementsBoundByIndex.reversed().forEach { $0.tap() }
-        snap(app: app)
+        snap(app: app, name: "Page 1")
         app.links.matching(identifier: "personal").firstMatch.tap()
+        // Avoid toggling before navigation.
+        app.navigationBars.staticTexts["personal"].tap()
         app.buttons.matching(identifier: "Toggle Editing").firstMatch.tap()
         app.textViews.firstMatch.typeText("""
         > On device, or in iCloud
         Plain text files
         No analytics, no tracking
         """)
-        snap(app: app)
+        snap(app: app, name: "Page 2")
         for _ in 1...3 {
             app.navigationBars.buttons.matching(identifier: "more").firstMatch.tap()
             app.buttons.matching(identifier: "Delete Note").firstMatch.tap()
             app.buttons.matching(identifier: "Delete").firstMatch.tap()
         }
-        snap(app: app)
+        snap(app: app, name: "Menu")
     }
 
-    func snap(app: XCUIApplication) {
+    func snap(app: XCUIApplication, name: String) {
         let attachment = XCTAttachment(screenshot: app.windows.firstMatch.screenshot())
         attachment.lifetime = .keepAlways
+        attachment.name = name
         add(attachment)
     }
 }
