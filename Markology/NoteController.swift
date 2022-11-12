@@ -32,7 +32,7 @@ class NoteController: UIViewController, Bindable {
 
     enum Section: Hashable {
         case file(String)
-        case note(String)
+        case note
         case from, to
         case connection(Int)
     }
@@ -57,8 +57,8 @@ class NoteController: UIViewController, Bindable {
             switch sectionIdentifier(for: section) {
             case let .file(file):
                 return file
-            case let .note(date):
-                return date
+            case .note:
+                return nil
             case .from:
                 return "Linked From"
             case .to:
@@ -84,11 +84,12 @@ class NoteController: UIViewController, Bindable {
         case let .link(link):
             return tableView.render((link: link, note: self.entry?.name ?? ""), for: indexPath) as Entry.Link.Cell
         case let .connection(connection):
-            return tableView.render(connection, for: indexPath) as ConnectionCell
+            return tableView.render(connection, for: indexPath) as ID.Connection.Cell
         }
     }
 
     lazy var tableView: UITableView = {
+        // TODO: Adjust offsets?
         let tableView = UITableView().pinned(toKeyboardAnd: view, top: false)
         tableView.register(header: TappableHeader.self)
         tableView.register(FileCell.self)
@@ -96,7 +97,7 @@ class NoteController: UIViewController, Bindable {
         tableView.register(EmptyCell.self)
         tableView.register(MarkCell.self)
         tableView.register(Entry.Link.Cell.self)
-        tableView.register(ConnectionCell.self)
+        tableView.register(ID.Connection.Cell.self)
         return tableView
     }()
 
@@ -273,9 +274,11 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
+    private var header: TappableHeader?
     private func reload() {
         guard let id = id, !offscreen else { return }
         title = entry?.name ?? id.name
+        header?.render(date: entry?.modified)
         guard edit, document == nil else {
             snapshot()
             return
@@ -309,13 +312,6 @@ class NoteController: UIViewController, Bindable {
         self.document = document
     }
 
-    private var date: DateFormatter {
-        let date = DateFormatter()
-        date.dateStyle = .short
-        date.timeStyle = .short
-        return date
-    }
-
     private func snapshot() {
         var items: [UIBarButtonItem] = []
         if entry != nil || document != nil {
@@ -337,17 +333,15 @@ class NoteController: UIViewController, Bindable {
             snapshot.appendItems([.file(id.file.url)], toSection: section)
         }
         guard let entry = entry else {
-            let section = Section.note("New Note")
-            snapshot.appendSections([section])
-            snapshot.appendItems([edit ? .edit : .empty(id.file)], toSection: section)
+            snapshot.appendSections([.note])
+            snapshot.appendItems([edit ? .edit : .empty(id.file)], toSection: .note)
             return
         }
-        let section = Section.note("Last Updated \(date.string(from: entry.modified))")
-        snapshot.appendSections([section])
+        snapshot.appendSections([.note])
         if !id.file.isMarkdown, entry.text == "", document == nil {
-            snapshot.appendItems([.empty(id.file)], toSection: section)
+            snapshot.appendItems([.empty(id.file)], toSection: .note)
         } else {
-            snapshot.appendItems([edit ? .edit : .note(text)], toSection: section)
+            snapshot.appendItems([edit ? .edit : .note(text)], toSection: .note)
         }
         if entry.from.count > 0 {
             snapshot.appendSections([.from])
@@ -478,12 +472,7 @@ extension NoteController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if case let .connection(level) = dataSource.sectionIdentifier(for: section),
-           connections.count - 1 == level
-        {
-            radar()
-        }
-        return tableView.render {
+        let header = tableView.render {
             switch self.dataSource.sectionIdentifier(for: section) {
             case .file:
                 self.open()
@@ -492,6 +481,19 @@ extension NoteController: UITableViewDelegate {
                 break
             }
         } as TappableHeader
+        switch dataSource.sectionIdentifier(for: section) {
+        // TODO: See if this is cached across connection resets.
+        case let .connection(level):
+            if level == connections.count - 1 {
+                radar()
+            }
+        case .note:
+            header.render(date: entry?.modified)
+            self.header = header
+        default:
+            break
+        }
+        return header
     }
 }
 
@@ -518,17 +520,6 @@ extension NoteController: QLPreviewItem {
 }
 
 extension NoteController {
-    class ConnectionCell: UITableViewCell, RenderCell {
-        func render(_ connection: ID.Connection) {
-            var content = UIListContentConfiguration.valueCell()
-            content.text = connection.id.name
-            content.secondaryText = (connection.from.map { "← \($0.name)" } + connection.to.map { "→ \($0.name)" }).joined(separator: "\n")
-            contentConfiguration = content
-        }
-    }
-}
-
-extension NoteController {
     class EmptyCell: UITableViewCell, RenderCell {
         func render(_ file: File.Name) {
             var content = defaultContentConfiguration()
@@ -539,5 +530,22 @@ extension NoteController {
             content.textProperties.alignment = .center
             contentConfiguration = content
         }
+    }
+}
+
+extension TappableHeader {
+    private var date: DateFormatter {
+        let date = DateFormatter()
+        date.dateStyle = .short
+        date.timeStyle = .short
+        return date
+    }
+
+    func render(date: Date?) {
+        guard let date = date else {
+            render(text: "New Note")
+            return
+        }
+        render(text: "Last Updated \(self.date.string(from: date))")
     }
 }

@@ -32,3 +32,14 @@ extension ID {
         }
     }
 }
+
+extension ID.Connection {
+    class Cell: UITableViewCell, RenderCell {
+        func render(_ connection: ID.Connection) {
+            var content = UIListContentConfiguration.valueCell()
+            content.text = connection.id.name
+            content.secondaryText = (connection.from.map { "← \($0.name)" } + connection.to.map { "→ \($0.name)" }).joined(separator: "\n")
+            contentConfiguration = content
+        }
+    }
+}

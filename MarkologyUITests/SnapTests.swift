@@ -45,7 +45,7 @@ final class SnapTests: XCTestCase {
         No analytics, no tracking
         """)
         snap(app: app, name: "Page 2")
-        for _ in 1...3 {
+        for _ in 1 ... 3 {
             app.navigationBars.buttons.matching(identifier: "more").firstMatch.tap()
             app.buttons.matching(identifier: "Delete Note").firstMatch.tap()
             app.buttons.matching(identifier: "Delete").firstMatch.tap()

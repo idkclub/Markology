@@ -9,6 +9,7 @@ class MenuController: UIViewController, Bindable {
     var searchSink: AnyCancellable?
     var query: ID.Search? {
         didSet {
+            guard query != oldValue else { return }
             guard let query = query else {
                 searchSink = nil
                 return
@@ -58,10 +59,7 @@ class MenuController: UIViewController, Bindable {
         tableView.render(itemIdentifier, for: indexPath) as ID.Cell
     }
 
-    var loaded = false
-    func snapshot(initial: Bool = true) {
-        guard loaded || initial else { return }
-        loaded = true
+    func snapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<LinkSection, ID>()
         if ids.count > 0 {
             let section = LinkSection.notes(valid: query.valid, limited: query.limited)
@@ -70,15 +68,26 @@ class MenuController: UIViewController, Bindable {
         }
         snapshot.appendSections([.new])
         snapshot.appendItems([ID(file: "", name: search.text ?? "")], toSection: .new)
-        dataSource.apply(snapshot)
+        dataSource.apply(snapshot, animatingDifferences: animating)
+        animating = true
     }
 
+    var animating: Bool = false
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        animating = false
+        if let query = query {
+            searchSink = Engine.shared.subscribe(with(\.ids), to: query)
+        }
         guard let selected = tableView.indexPathForSelectedRow else { return }
         UIView.animate(withDuration: 0.25, animations: {
             self.tableView.deselectRow(at: selected, animated: true)
         })
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        searchSink = nil
     }
 
     override func viewDidLoad() {

@@ -22,7 +22,11 @@ public struct ID: Codable, Equatable, Hashable, FetchableRecord {
         try ID.query.filter(key: file).fetchCount(db) > 0
     }
 
-    public struct Search: Query {
+    public struct Search: Equatable, Query {
+        public static func == (lhs: ID.Search, rhs: ID.Search) -> Bool {
+            lhs.text == rhs.text && lhs.limit == rhs.limit
+        }
+
         public var text: String {
             didSet {
                 pattern = Note.tokenizer.parse(query: text)
