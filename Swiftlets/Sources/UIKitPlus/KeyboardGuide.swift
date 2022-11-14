@@ -8,31 +8,30 @@ public class KeyboardGuide: UILayoutGuide {
     var showObserver: NSObjectProtocol?
     var view: UIView?
     public static func within(view: UIView) -> KeyboardGuide {
-        let guide = KeyboardGuide()
-        view.addLayoutGuide(guide)
-        guide.install(in: view)
-        return guide
+        KeyboardGuide().install(in: view)
     }
 
-    func install(in view: UIView) {
+    func install(in view: UIView) -> Self {
         self.view = view
+        view.addLayoutGuide(self)
         NSLayoutConstraint.activate([
             height,
             bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
         hideObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil, using: change)
         showObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil, using: change)
+        return self
     }
 
     func change(for notification: Notification) {
         var delta = 0.0
         if let view = view,
            let window = view.window,
-           let screen = notification.object as? UIScreen,
            let keyboard = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)
         {
+            let screen = notification.object as? UIScreen
             let frame = window.convert(keyboard, from: UIScreen.main.coordinateSpace)
-            if frame.width == screen.bounds.width {
+            if screen == nil || frame.width == screen?.bounds.width {
                 delta = max(window.bounds.maxY - frame.minY - view.safeAreaInsets.bottom, 0)
             }
         }

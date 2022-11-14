@@ -11,6 +11,7 @@ time='2021-03-14T11:23:58-04:00'
 for target in "${targets[@]}"
 do
   xcrun simctl bootstatus "$target" -b
+  xcrun simctl status_bar "$target" override --time $time --batteryState charged --batteryLevel 100 --operatorName idk --cellularBars 4 --dataNetwork 'hide'
   xcrun simctl ui "$target" appearance dark
   xcrun simctl io "$target" recordVideo --codec=h264 "$target.mp4" &
   RECORD_PID=$!

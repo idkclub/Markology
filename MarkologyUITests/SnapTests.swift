@@ -1,9 +1,9 @@
 import XCTest
 
 final class SnapTests: XCTestCase {
-//    override class var runsForEachTargetApplicationUIConfiguration: Bool {
-//        true
-//    }
+    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+        true
+    }
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -13,6 +13,9 @@ final class SnapTests: XCTestCase {
         let app = XCUIApplication()
         app.launchEnvironment["PATHS_TEST"] = "1"
         app.launch()
+        if !app.staticTexts["Empty Note"].exists {
+            app.buttons["ToggleSidebar"].tap()
+        }
         app.staticTexts["Empty Note"].tap()
         app.textViews.firstMatch.typeText("This is a Note")
         app.collectionViews.staticTexts["Note"].firstMatch.tap()

@@ -1,29 +1,81 @@
 import UIKit
 
 public extension UIView {
+    enum Anchor {
+        case inherit, view, layout, none
+        case against(Guide)
+
+        func resolve(from anchor: Anchor, with view: UIView) -> Guide? {
+            let target: Anchor
+            if case .inherit = self {
+                target = anchor
+            } else {
+                target = self
+            }
+            switch target {
+            case .view:
+                return view
+            case .layout:
+                return view.layoutMarginsGuide
+            case let .against(guide):
+                return InvertedGuide(guide: guide)
+            default:
+                return nil
+            }
+        }
+    }
+
     @discardableResult
-    func pinned(to view: UIView, withInset: CGFloat = 0, bottom: Bool = true, top: Bool = true, leading: Bool = true, trailing: Bool = true, layout: Bool = false) -> Self {
+    func pinned(to view: UIView, anchor: Anchor = .layout, bottom: Anchor = .inherit, top: Anchor = .inherit, leading: Anchor = .inherit, trailing: Anchor = .inherit, layout: Anchor = .inherit) -> Self {
         view.addSubview(self)
-        let guide = layout ? view.layoutMarginsGuide : view.safeAreaLayoutGuide
         translatesAutoresizingMaskIntoConstraints = false
         var constraints: [NSLayoutConstraint] = []
-        if leading {
-            constraints.append(leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: withInset))
+        if let guide = bottom.resolve(from: anchor, with: view) {
+            constraints.append(bottomAnchor.constraint(equalTo: guide.bottomAnchor))
         }
-        if trailing {
-            constraints.append(trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -withInset))
+        if let guide = top.resolve(from: anchor, with: view) {
+            constraints.append(topAnchor.constraint(equalTo: guide.topAnchor))
         }
-        if top {
-            constraints.append(topAnchor.constraint(equalTo: guide.topAnchor, constant: withInset))
+        if let guide = leading.resolve(from: anchor, with: view) {
+            constraints.append(leadingAnchor.constraint(equalTo: guide.leadingAnchor))
         }
-        if bottom {
-            constraints.append(
-                bottomAnchor.constraint(equalTo: guide.bottomAnchor, constant: -withInset))
+        if let guide = trailing.resolve(from: anchor, with: view) {
+            constraints.append(trailingAnchor.constraint(equalTo: guide.trailingAnchor))
         }
         NSLayoutConstraint.activate(constraints)
         return self
     }
 }
+
+public protocol Guide {
+    var leadingAnchor: NSLayoutXAxisAnchor { get }
+    var trailingAnchor: NSLayoutXAxisAnchor { get }
+    var topAnchor: NSLayoutYAxisAnchor { get }
+    var bottomAnchor: NSLayoutYAxisAnchor { get }
+}
+
+struct InvertedGuide: Guide {
+    let guide: Guide
+
+    var leadingAnchor: NSLayoutXAxisAnchor {
+        guide.trailingAnchor
+    }
+
+    var trailingAnchor: NSLayoutXAxisAnchor {
+        guide.leadingAnchor
+    }
+
+    var topAnchor: NSLayoutYAxisAnchor {
+        guide.bottomAnchor
+    }
+
+    var bottomAnchor: NSLayoutYAxisAnchor {
+        guide.topAnchor
+    }
+}
+
+extension UILayoutGuide: Guide {}
+extension UIView: Guide {}
 
 public extension UIViewController {
     func add(_ controller: UIViewController) {

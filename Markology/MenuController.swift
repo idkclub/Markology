@@ -101,7 +101,7 @@ class MenuController: UIViewController, Bindable {
         }
         tableView.dataSource = dataSource
         let stack = UIStackView(arrangedSubviews: [search, progress, tableView])
-            .pinned(to: view)
+            .pinned(to: view, anchor: .view, top: .layout)
         stack.axis = .vertical
     }
 

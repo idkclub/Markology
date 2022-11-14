@@ -7,11 +7,11 @@ import UIKitPlus
 
 open class ImportController: UIViewController {
     lazy var tableView = {
-        let view = UITableView().pinned(to: self.view, bottom: false)
-        view.register(FileCell.self)
-        view.register(ItemCell.self)
-        view.register(EditCell.self)
-        return view
+        let tableView = UITableView()
+        tableView.register(FileCell.self)
+        tableView.register(ItemCell.self)
+        tableView.register(EditCell.self)
+        return tableView
     }()
 
     let linkController = LinkController()
@@ -109,20 +109,16 @@ open class ImportController: UIViewController {
         super.viewDidLoad()
         tableView.dataSource = self
         let keyboard = KeyboardGuide.within(view: view)
-        let toolbar = UIToolbar().pinned(to: view, bottom: false, top: false)
+        let toolbar = UIToolbar().pinned(to: view, anchor: .view, bottom: .against(keyboard), top: .none)
         toolbar.items = [
             .flexibleSpace(),
             importButton,
             UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancel)),
         ]
         toolbar.backgroundColor = .systemBackground
+        tableView.pinned(to: view, anchor: .view, bottom: .against(toolbar))
         add(linkController)
-        linkController.view.pinned(to: view, bottom: false, top: false)
-        NSLayoutConstraint.activate([
-            toolbar.bottomAnchor.constraint(equalTo: keyboard.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: toolbar.topAnchor),
-            linkController.view.bottomAnchor.constraint(equalTo: toolbar.topAnchor),
-        ])
+        linkController.view.pinned(to: view, anchor: .view, bottom: .against(toolbar), top: .none)
     }
 
     @objc func save() {
@@ -184,18 +180,17 @@ public extension ImportController {
 extension ImportController {
     class ItemCell: UITableViewCell, RenderCell {
         lazy var name = {
-            let field = UITextField().pinned(to: contentView, leading: false, trailing: false, layout: true)
+            let field = UITextField().pinned(to: contentView, leading: .none, trailing: .against(ext))
             let leading = field.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.leadingAnchor)
             leading.priority = .defaultLow
             leading.isActive = true
-            field.trailingAnchor.constraint(equalTo: ext.leadingAnchor).isActive = true
             field.textAlignment = NSTextAlignment.right
             field.addTarget(self, action: #selector(rename), for: .editingChanged)
             return field
         }()
 
         lazy var ext = {
-            let label = UILabel().pinned(to: contentView, leading: false, layout: true)
+            let label = UILabel().pinned(to: contentView, leading: .none)
             label.textColor = .secondaryLabel
             return label
         }()

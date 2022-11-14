@@ -111,7 +111,7 @@ class NoteController: UIViewController, Bindable {
     }
 
     lazy var tableView: UITableView = {
-        let tableView = UITableView().pinned(to: view, top: false)
+        let tableView = UITableView().pinned(to: view, anchor: .view)
         tableView.register(header: DateHeader.self)
         tableView.register(header: TappableHeader.self)
         tableView.register(FileCell.self)
@@ -268,13 +268,11 @@ class NoteController: UIViewController, Bindable {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.dataSource = dataSource
         tableView.delegate = self
         linkController.delegate = self
         add(linkController)
-        linkController.view.pinned(to: view, bottom: false, top: false)
-        linkController.view.bottomAnchor.constraint(equalTo: keyboard.topAnchor).isActive = true
+        linkController.view.pinned(to: view, anchor: .view, bottom: .against(keyboard), top: .none)
         reload()
         radar()
     }

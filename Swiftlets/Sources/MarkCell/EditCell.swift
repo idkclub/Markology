@@ -11,7 +11,7 @@ public class EditCell: UITableViewCell {
     var dirty = false
 
     lazy var markdown = {
-        let view = MarkView().pinned(to: contentView, layout: true)
+        let view = MarkView().pinned(to: contentView)
         view.isScrollEnabled = false
         view.isEditable = true
         view.delegate = self

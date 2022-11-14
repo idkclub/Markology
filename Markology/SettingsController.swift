@@ -34,7 +34,7 @@ class SettingsController: UIViewController {
         }
 
         let stack = UIStackView(arrangedSubviews: views)
-            .pinned(to: view, bottom: false, layout: true)
+            .pinned(to: view, bottom: .none)
         stack.axis = .vertical
         stack.isLayoutMarginsRelativeArrangement = true
         stack.spacing = 5
