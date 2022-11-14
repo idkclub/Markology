@@ -112,6 +112,7 @@ class NoteController: UIViewController, Bindable {
 
     lazy var tableView: UITableView = {
         let tableView = UITableView().pinned(to: view, top: false)
+        tableView.register(header: DateHeader.self)
         tableView.register(header: TappableHeader.self)
         tableView.register(FileCell.self)
         tableView.register(EditCell.self)
@@ -296,11 +297,11 @@ class NoteController: UIViewController, Bindable {
         }
     }
 
-    private var header: TappableHeader?
+    private var header: DateHeader?
     private func reload() {
         guard let id = id, !offscreen else { return }
         title = entry?.name ?? id.name
-        header?.render(date: entry?.modified)
+        header?.render(entry?.modified)
         guard edit, document == nil else {
             snapshot()
             return
@@ -493,28 +494,23 @@ extension NoteController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = tableView.render {
-            switch self.dataSource.sectionIdentifier(for: section) {
-            case .file:
-                self.open()
-                return
-            default:
-                break
-            }
-        } as TappableHeader
         switch dataSource.sectionIdentifier(for: section) {
+        case .note:
+            let header = tableView.render(header: entry?.modified) as DateHeader
+            self.header = header
+            return header
         // TODO: See if this is cached across connection resets.
         case let .connection(level):
             if level == connections.count - 1 {
                 radar()
             }
-        case .note:
-            header.render(date: entry?.modified)
-            self.header = header
         default:
             break
         }
-        return header
+        return tableView.render {
+            guard case .file = self.dataSource.sectionIdentifier(for: section) else { return }
+            self.open()
+        } as TappableHeader
     }
 }
 
@@ -554,19 +550,27 @@ extension NoteController {
     }
 }
 
-extension TappableHeader {
-    private var date: DateFormatter {
-        let date = DateFormatter()
-        date.dateStyle = .short
-        date.timeStyle = .short
-        return date
-    }
-
-    func render(date: Date?) {
-        guard let date = date else {
-            render(text: "New Note")
-            return
+extension NoteController {
+    class DateHeader: UITableViewHeaderFooterView, RenderCell {
+        private var date: DateFormatter {
+            let date = DateFormatter()
+            date.dateStyle = .short
+            date.timeStyle = .short
+            return date
         }
-        render(text: "Last Updated \(self.date.string(from: date))")
+
+        func render(_ date: Date?) {
+            guard let date = date else {
+                render(text: "New Note")
+                return
+            }
+            render(text: "Last Updated \(self.date.string(from: date))")
+        }
+
+        func render(text: String) {
+            var content = defaultContentConfiguration()
+            content.text = text
+            contentConfiguration = content
+        }
     }
 }

@@ -29,7 +29,8 @@ public class KeyboardGuide: UILayoutGuide {
         if let view = view,
            let window = view.window,
            let screen = notification.object as? UIScreen,
-           let keyboard = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) {
+           let keyboard = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)
+        {
             let frame = window.convert(keyboard, from: UIScreen.main.coordinateSpace)
             if frame.width == screen.bounds.width {
                 delta = max(window.bounds.maxY - frame.minY - view.safeAreaInsets.bottom, 0)

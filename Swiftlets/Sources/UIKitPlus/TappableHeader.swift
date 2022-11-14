@@ -14,12 +14,6 @@ public class TappableHeader: UITableViewHeaderFooterView, RenderCell {
         self.action = action
     }
 
-    public func render(text: String) {
-        var content = defaultContentConfiguration()
-        content.text = text
-        contentConfiguration = content
-    }
-
     @objc private func onTap() {
         action?()
     }
