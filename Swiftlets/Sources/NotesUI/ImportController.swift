@@ -46,7 +46,7 @@ open class ImportController: UIViewController {
 
         init(delegate: ImportControllerDelegate, image: UIImage, name: String) throws {
             self.delegate = delegate
-            self.name = name
+            self.name = (name as NSString).deletingPathExtension
             ext = "png"
             try image.pngData()?.write(to: temp)
         }
@@ -79,7 +79,7 @@ open class ImportController: UIViewController {
                         self.alert(error: error)
                         return
                     }
-                    let fallback = "\(Int(Date().timeIntervalSince1970).description).\(id)"
+                    let fallback = "\(Int(Date().timeIntervalSince1970).description)_\(id)"
                     do {
                         switch data {
                         case let data as URL:
