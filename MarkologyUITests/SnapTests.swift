@@ -11,7 +11,7 @@ final class SnapTests: XCTestCase {
 
     func testLaunch() throws {
         let app = XCUIApplication()
-        app.launchEnvironment["PATHS_ICLOUD"] = "0"
+        app.launchEnvironment["PATHS_TEST"] = "1"
         app.launch()
         app.staticTexts["Empty Note"].tap()
         app.textViews.firstMatch.typeText("This is a Note")
@@ -36,8 +36,7 @@ final class SnapTests: XCTestCase {
         app.links.matching(identifier: "☐").allElementsBoundByIndex.reversed().forEach { $0.tap() }
         snap(app: app, name: "Page 1")
         app.links.matching(identifier: "personal").firstMatch.tap()
-        // Avoid toggling before navigation.
-        app.navigationBars.staticTexts["personal"].tap()
+        _ = app.navigationBars.staticTexts["personal"].waitForExistence(timeout: 0.5)
         app.buttons.matching(identifier: "Toggle Editing").firstMatch.tap()
         app.textViews.firstMatch.typeText("""
         > On device, or in iCloud

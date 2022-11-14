@@ -422,7 +422,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = club.idk.MarkologyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
 				TEST_TARGET_NAME = Markology;
 			};
 			name = Debug;
@@ -434,7 +433,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = club.idk.MarkologyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
 				TEST_TARGET_NAME = Markology;
 			};
 			name = Release;

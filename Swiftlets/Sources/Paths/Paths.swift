@@ -33,11 +33,6 @@ public class Paths {
     }
 
     public var icloudAvailable: Bool {
-        #if DEBUG
-            if let icloud = ProcessInfo.processInfo.environment["PATHS_ICLOUD"] {
-                return icloud == "1"
-            }
-        #endif
         return FileManager.default.ubiquityIdentityToken != nil
     }
 
@@ -90,10 +85,17 @@ public class Paths {
     private func reset() {
         busy.send(true)
         defer { busy.send(false) }
-        let icloud = self.icloud && icloudAvailable
+        var icloud = self.icloud && icloudAvailable
         documents = icloud ?
             icloudURL :
             inExtension ? groupDocuments : localURL
+        #if DEBUG
+            if ProcessInfo.processInfo.environment["PATHS_TEST"] == "1" {
+                icloud = false
+                documents = cached(file: "test")
+                try! FileManager.default.createDirectory(at: documents, withIntermediateDirectories: true)
+            }
+        #endif
         metadataQuery?.stop()
         metadataQuery = nil
         objectSource?.cancel()
