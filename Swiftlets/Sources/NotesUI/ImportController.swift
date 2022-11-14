@@ -11,7 +11,6 @@ open class ImportController: UIViewController {
         view.register(FileCell.self)
         view.register(ItemCell.self)
         view.register(EditCell.self)
-        view.dataSource = self
         return view
     }()
 
@@ -108,6 +107,7 @@ open class ImportController: UIViewController {
 
     override open func viewDidLoad() {
         super.viewDidLoad()
+        tableView.dataSource = self
         let keyboard = KeyboardGuide.within(view: view)
         let toolbar = UIToolbar().pinned(to: view, bottom: false, top: false)
         toolbar.items = [
