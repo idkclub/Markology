@@ -20,22 +20,25 @@ public class KeyboardGuide: UILayoutGuide {
             height,
             bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
-        hideObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil, using: { [weak self] notification in
-            self?.change(to: 0, notification: notification)
-        })
-        showObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil, using: { [weak self] notification in
-            guard let keyboard = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-                  let window = view.window else { return }
-            let frame = window.convert(keyboard, from: UIScreen.main.coordinateSpace)
-            self?.change(to: max(window.bounds.maxY - frame.minY - view.safeAreaInsets.bottom, 0), notification: notification)
-        })
+        hideObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil, using: change)
+        showObserver = NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil, using: change)
     }
 
-    func change(to: CGFloat, notification: Notification? = nil) {
-        let duration = notification?.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0
-        offset.send(to)
+    func change(for notification: Notification) {
+        var delta = 0.0
+        if let view = view,
+           let window = view.window,
+           let screen = notification.object as? UIScreen,
+           let keyboard = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) {
+            let frame = window.convert(keyboard, from: UIScreen.main.coordinateSpace)
+            if frame.width == screen.bounds.width {
+                delta = max(window.bounds.maxY - frame.minY - view.safeAreaInsets.bottom, 0)
+            }
+        }
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0
+        offset.send(delta)
         UIView.animate(withDuration: duration, animations: {
-            self.height.constant = to
+            self.height.constant = delta
             self.view?.layoutIfNeeded()
         })
     }
