@@ -93,6 +93,9 @@ public class Paths {
             if ProcessInfo.processInfo.environment["PATHS_TEST"] == "1" {
                 icloud = false
                 documents = cached(file: "test")
+                if FileManager.default.fileExists(atPath: documents.path) {
+                    try! FileManager.default.removeItem(at: documents)
+                }
                 try! FileManager.default.createDirectory(at: documents, withIntermediateDirectories: true)
             }
         #endif

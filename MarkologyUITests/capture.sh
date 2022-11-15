@@ -1,8 +1,9 @@
 #!/bin/sh
 
+# TODO: `xcrun simctl create $target $target` if missing.
 if [ "$#" -eq 0 ]
 then
-  targets=('iPhone 14 Plus')
+  targets=('iPhone 14 Plus' 'iPhone 8 Plus' 'iPad Pro (12.9-inch) (6th generation)' 'iPad Pro (12.9-inch) (2nd generation)')
 else
   targets=("${@}")
 fi
