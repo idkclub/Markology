@@ -516,7 +516,11 @@ extension NoteController: QLPreviewControllerDataSource {
     func open() {
         let controller = QLPreviewController()
         controller.dataSource = self
-        splitViewController?.show(controller, sender: self)
+        #if os(iOS)
+            navigationController?.show(controller, sender: self)
+        #else
+            splitViewController?.show(controller, sender: self)
+        #endif
     }
 
     func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
