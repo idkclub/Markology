@@ -13,6 +13,9 @@
 		4E596507291399A2000BB2EC /* Import.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4E5964FD291399A2000BB2EC /* Import.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4E59A2D2291657AE0038D4C0 /* NotesUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E59A2D1291657AE0038D4C0 /* NotesUI */; };
 		4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */; };
+		4E6B70D02964867D0073977E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6B70CF2964867D0073977E /* SceneDelegate.swift */; };
+		4E6B70D2296486D60073977E /* SplitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6B70D1296486D60073977E /* SplitController.swift */; };
+		4E6B70D4296487020073977E /* EmptyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6B70D3296487020073977E /* EmptyController.swift */; };
 		4E7074762916693600FB00D4 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7074752916693600FB00D4 /* Engine.swift */; };
 		4E707479291669A000FB00D4 /* NotesUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E707478291669A000FB00D4 /* NotesUI */; };
 		4E70747C29166A1600FB00D4 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E70747B29166A1600FB00D4 /* Paths */; };
@@ -76,6 +79,9 @@
 		4E596508291399A2000BB2EC /* Import.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Import.entitlements; sourceTree = "<group>"; };
 		4E5965342913B073000BB2EC /* Swiftlets */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Swiftlets; sourceTree = "<group>"; };
 		4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDocument.swift; sourceTree = "<group>"; };
+		4E6B70CF2964867D0073977E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		4E6B70D1296486D60073977E /* SplitController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitController.swift; sourceTree = "<group>"; };
+		4E6B70D3296487020073977E /* EmptyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyController.swift; sourceTree = "<group>"; };
 		4E7074752916693600FB00D4 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
 		4E7107D6291EC08600AAEC92 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4E7107EA291EF3E800AAEC92 /* MarkologyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarkologyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,16 +176,19 @@
 		4E7776E528F46E9C00DAEF80 /* Markology */ = {
 			isa = PBXGroup;
 			children = (
-				4E7107D6291EC08600AAEC92 /* Info.plist */,
 				4E7776F628F46F7100DAEF80 /* Markology.entitlements */,
+				4E7107D6291EC08600AAEC92 /* Info.plist */,
 				4E7776F428F46EC100DAEF80 /* AppDelegate.swift */,
+				4E6B70D3296487020073977E /* EmptyController.swift */,
 				4E7776F728F47D0700DAEF80 /* Engine.swift */,
 				4E77770328F486E900DAEF80 /* MenuController.swift */,
 				4E77770528F5008C00DAEF80 /* NoteController.swift */,
 				4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */,
 				4E36BBFD2915D7EF00673B84 /* Notes+.swift */,
+				4E6B70CF2964867D0073977E /* SceneDelegate.swift */,
 				4E77771F28F9B42000DAEF80 /* SearchController.swift */,
 				4E4583C728FBC1CA00C617BE /* SettingsController.swift */,
+				4E6B70D1296486D60073977E /* SplitController.swift */,
 				4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */,
 			);
 			path = Markology;
@@ -346,6 +355,9 @@
 			files = (
 				4E6A3A6C28FF3E82005CCE32 /* NoteDocument.swift in Sources */,
 				4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */,
+				4E6B70D4296487020073977E /* EmptyController.swift in Sources */,
+				4E6B70D2296486D60073977E /* SplitController.swift in Sources */,
+				4E6B70D02964867D0073977E /* SceneDelegate.swift in Sources */,
 				4E4583C828FBC1CA00C617BE /* SettingsController.swift in Sources */,
 				4E36BBFE2915D7EF00673B84 /* Notes+.swift in Sources */,
 				4E77770428F486E900DAEF80 /* MenuController.swift in Sources */,
