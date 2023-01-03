@@ -133,7 +133,8 @@ extension EditCell: UITextViewDelegate {
         }
 
         var rect = textView.convert(textView.caretRect(for: position), to: superview)
-        if rect.origin.y == .infinity {
+        // Handle spurious values as jump to bottom (e.g. line wrapping on last line).
+        if rect.origin.y == .infinity || rect.size.height < 2 {
             rect = convert(bounds, to: superview)
             rect.origin.y = rect.minY + rect.height
             rect.size.height = 50
