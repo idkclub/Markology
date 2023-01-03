@@ -157,8 +157,8 @@
 			children = (
 				4E5964FE291399A2000BB2EC /* Import */,
 				4E7776E528F46E9C00DAEF80 /* Markology */,
-				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7107EB291EF3E800AAEC92 /* MarkologyUITests */,
+				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
 			);
 			sourceTree = "<group>";

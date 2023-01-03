@@ -36,7 +36,11 @@ final class SnapTests: XCTestCase {
         Zettelkästen-inspired, Markdown-powered
         """)
         app.navigationBars.buttons.matching(identifier: "Toggle Editing").firstMatch.tap()
-        app.links.matching(identifier: "☐").allElementsBoundByIndex.reversed().forEach { $0.tap() }
+        let checkboxes = app.links.matching(identifier: "☐")
+        for _ in 1 ... checkboxes.count {
+            checkboxes.firstMatch.tap()
+        }
+        _ = app.links.matching(identifier: "☑").element(boundBy: 2).waitForExistence(timeout: 0.5)
         snap(app: app, name: "Page 1")
         app.links.matching(identifier: "personal").firstMatch.tap()
         _ = app.navigationBars.staticTexts["personal"].waitForExistence(timeout: 0.5)
