@@ -1,18 +1,17 @@
-# [Markology](https://idk.club/markology) [![Download on the App Store](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-US?size=250x83)](https://apps.apple.com/us/app/markology/id1553649446?itsct=apps_box)
+# [Markology](https://idk.club/markology) [![Download on the App Store](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-US)](https://apps.apple.com/us/app/markology/id1553649446)
 
-![Markology on macOS and iOS](https://idk.club/assets/markology.png)
+![Markology on macOS and iOS](preview.png)
 
-An opinionated, zettelkasten-inspired note creation and linking tool.
+## Useful for
 
-## Supports:
+- [x] Organizing thoughts *without* a heirarchy
+- [x] Discovering **connections**
+- [x] Carrying a personal `knowledge base` everywhere you go
 
-- Markdown (via [Down](https://github.com/johnxnguyen/Down)).
-- Offline usage and search (via [GRDB](https://github.com/groue/GRDB.swift)).
-- iCloud syncing.
+---
 
-## Why?
+## Zettelkästen-inspired, Markdown-powered
 
-- To recall a concept, while only remembering what it related to.
-- To organize thoughts, without needing a heirarchy.
-- To create and discover interesting connections.
-- To track new knowledge, in a way that makes it easy to build on.
+- On device, or in iCloud
+- Plain text files
+- No analytics, no tracking

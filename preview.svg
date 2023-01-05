@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 800">
+  <defs>
+    <clipPath id="mac">
+      <rect width="1024" height="768" rx="15"/>
+    </clipPath>
+    <clipPath id="phone">
+      <rect width="370" height="800" rx="15"/>
+    </clipPath>
+  </defs>
+  <image xlink:href="Screenshots/Mac.png" transform="translate(0 16)" clip-path="url(#mac)" />
+  <image xlink:href="Screenshots/iPhone.png" transform="translate(830 0)" width="370" height="800" clip-path="url(#phone)" />
+</svg>

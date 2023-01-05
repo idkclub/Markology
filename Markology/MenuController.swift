@@ -1,193 +1,149 @@
 import Combine
-import GRDB
+import Notes
+import NotesUI
 import UIKit
-import Utils
+import UIKitPlus
 
-class MenuController: UIViewController {
-    let table: UITableView
-    let showCancel: Bool
-    let showCreateEmpty: Bool
-    let delegate: MenuDelegate
-    var query: String = ""
-    var notes: [Reference] = []
-    var notesQuery: DatabaseCancellable?
-    var includeAll = false
-
-    init(style: UITableView.Style = .insetGrouped, initial: String = "", showCancel: Bool = false, showCreateEmpty: Bool = true, delegate: MenuDelegate) {
-        self.showCancel = showCancel
-        self.showCreateEmpty = showCreateEmpty
-        self.delegate = delegate
-        query = initial
-        table = UITableView(frame: .zero, style: style)
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private enum Section: Int, CaseIterable {
-        case recent, new
-    }
-
-    private var sections: [Section] {
-        var sections: [Section] = []
-        if notes.count > 0 {
-            sections.append(.recent)
+class MenuController: UIViewController, Bindable {
+    var progressSink: AnyCancellable?
+    var searchSink: AnyCancellable?
+    var query: ID.Search? {
+        didSet {
+            guard query != oldValue else { return }
+            guard let query = query else {
+                searchSink = nil
+                return
+            }
+            searchSink = Engine.shared.subscribe(with(\.ids), to: query)
         }
-        if showCreateEmpty || query != "" {
-            sections.append(.new)
-        }
-        return sections
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Markology"
-        view.backgroundColor = .systemGroupedBackground
-        navigationItem.setRightBarButton(.init(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings)), animated: true)
-        let progress = SyncProgress().anchored(to: view, horizontal: true, top: true)
+    var ids: [ID] = [] {
+        didSet { snapshot() }
+    }
 
-        let searchBar = UISearchBar().anchored(to: view, horizontal: true)
-        searchBar.text = query
-        searchBar.placeholder = "Search or Create"
-        searchBar.delegate = self
-        searchBar.enablesReturnKeyAutomatically = false
-        #if !targetEnvironment(macCatalyst)
-            searchBar.showsCancelButton = showCancel
-        #endif
+    lazy var search: UISearchBar = {
+        let search = UISearchBar()
+        search.placeholder = "Search or Create"
+        search.enablesReturnKeyAutomatically = false
+        search.searchBarStyle = .minimal
+        search.delegate = self
+        return search
+    }()
 
-        table.anchored(to: view, horizontal: true, bottom: true)
+    lazy var tableView: UITableView = {
+        let table = UITableView()
         table.keyboardDismissMode = .onDrag
-        table.dataSource = self
         table.delegate = self
-        table.register(TappableHeader.self, forHeaderFooterViewReuseIdentifier: TappableHeader.id)
-        table.register(ReferenceCell.self, forCellReuseIdentifier: ReferenceCell.id)
-        NSLayoutConstraint.activate([
-            searchBar.topAnchor.constraint(equalTo: progress.bottomAnchor),
-            table.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
-        ])
-        reloadQuery()
+        table.register(header: TappableHeader.self)
+        table.register(ID.Cell.self)
+        return table
+    }()
+
+    class DataSource: FadingTableSource<LinkSection, ID> {
+        override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+            switch sectionIdentifier(for: section) {
+            case let .notes(valid, limited):
+                return valid
+                    ? "Related"
+                    : limited ? "Recent" : "All"
+            case .new:
+                return "New"
+            case .none:
+                return nil
+            }
+        }
     }
 
+    lazy var dataSource = DataSource(tableView: tableView) { tableView, indexPath, itemIdentifier in
+        tableView.render(itemIdentifier, for: indexPath) as ID.Cell
+    }
+
+    func snapshot() {
+        var snapshot = NSDiffableDataSourceSnapshot<LinkSection, ID>()
+        if ids.count > 0 {
+            let section = LinkSection.notes(valid: query.valid, limited: query.limited)
+            snapshot.appendSections([section])
+            snapshot.appendItems(ids, toSection: section)
+        }
+        snapshot.appendSections([.new])
+        snapshot.appendItems([ID(file: "", name: search.text ?? "")], toSection: .new)
+        dataSource.apply(snapshot, animatingDifferences: animating)
+        animating = true
+    }
+
+    var animating: Bool = false
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard let selected = table.indexPathForSelectedRow else { return }
-        // Jank version of clearsSelectionOnViewWillAppear.
+        animating = false
+        if let query = query {
+            searchSink = Engine.shared.subscribe(with(\.ids), to: query)
+        }
+        guard let selected = tableView.indexPathForSelectedRow else { return }
         UIView.animate(withDuration: 0.25, animations: {
-            self.table.deselectRow(at: selected, animated: true)
+            self.tableView.deselectRow(at: selected, animated: true)
         })
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        view.endEditing(true)
+        searchSink = nil
     }
 
-    func reloadQuery() {
-        notesQuery = World.shared.search(query: query, recent: !includeAll) { [weak self] (notes: [Reference]) in
-            guard let self = self else { return }
-            self.notes = notes
-            self.table.reloadData()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(settings))
+        query = ID.search(text: "")
+        let progress = UIProgressView(progressViewStyle: .bar)
+        progressSink = Engine.progress.sink {
+            progress.progress = $0
         }
+        tableView.dataSource = dataSource
+        let stack = UIStackView(arrangedSubviews: [search, progress, tableView])
+            .pinned(to: view, anchor: .view, top: .layout)
+        stack.axis = .vertical
     }
 
-    @objc private func settings() {
-        show(SettingsController(style: .insetGrouped), sender: self)
-    }
-
-    @objc private func sync() {
-        World.shared.sync(force: true)
+    @objc func settings() {
+        show(SettingsController(), sender: self)
     }
 }
 
 extension MenuController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange _: String) {
-        query = searchBar.text ?? ""
-        reloadQuery()
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        query?.text = searchText
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        delegate.search(query: searchBar.text ?? "")
+        guard let split = splitViewController,
+              let nav = split.viewController(for: .secondary) as? UINavigationController else { return }
+        let controller = SearchController()
+        nav.viewControllers = [controller]
+        controller.query = searchBar.text ?? ""
+        split.show(.secondary)
     }
-
-    // https://stackoverflow.com/questions/58468235/uisearchcontroller-uisearchbar-behaves-differently-under-macos-than-ios
-    #if !targetEnvironment(macCatalyst)
-        func searchBarCancelButtonClicked(_: UISearchBar) {
-            dismiss(animated: true)
-        }
-    #endif
 }
 
 extension MenuController: UITableViewDelegate {
-    func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch sections[section] {
-        case .recent:
-            return includeAll ? "All" : "Most Recent"
-        case .new:
-            return "New"
-        }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let split = splitViewController,
+              let nav = split.viewController(for: .secondary) as? UINavigationController,
+              let id = dataSource.itemIdentifier(for: indexPath) else { return }
+        let target = id.file == "" ? ID.generate(for: id.name) : id
+        let edit = dataSource.sectionIdentifier(for: indexPath.section) == .new
+        nav.viewControllers = [NoteController.with(id: target, edit: edit)]
+        split.show(.secondary)
     }
 
-    func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch sections[indexPath.section] {
-        case .recent:
-            delegate.select(note: notes[indexPath.row])
-        case .new:
-            delegate.create(query: query)
-        }
-    }
-}
-
-extension MenuController: UITableViewDataSource {
-    func numberOfSections(in _: UITableView) -> Int {
-        sections.count
-    }
-
-    func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch sections[section] {
-        case .recent:
-            return notes.count
-        case .new:
-            return 1
-        }
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ReferenceCell.id, for: indexPath) as! ReferenceCell
-        switch sections[indexPath.section] {
-        case .recent:
-            cell.render(name: notes[indexPath.row].name)
-        case .new:
-            cell.render(name: query)
-        }
-        return cell
-    }
-
-    func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = table.dequeueReusableHeaderFooterView(withIdentifier: TappableHeader.id) as? TappableHeader else { return nil }
-        switch sections[section] {
-        case .recent:
-            header.onTap = { [weak self] in
-                guard let self = self else { return }
-                self.includeAll = !self.includeAll
-                self.reloadQuery()
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        tableView.render {
+            switch self.dataSource.sectionIdentifier(for: section) {
+            case .notes:
+                self.query?.toggleLimit()
+            default:
+                break
             }
-        case .new:
-            header.onTap = nil
-        }
-        return header
+        } as TappableHeader
     }
-}
-
-protocol MenuDelegate {
-    func select(note: Reference)
-    func create(query: String)
-    func search(query: String)
-}
-
-extension MenuDelegate {
-    func search(query _: String) {}
 }

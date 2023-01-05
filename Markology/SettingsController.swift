@@ -1,61 +1,56 @@
+import Combine
 import UIKit
-import Utils
 
-class SettingsController: UITableViewController {
-    private enum Section: Int {
-        case cloud, progress, sync
-    }
-
-    private let sections: [Section] = [.cloud, .progress, .sync]
-    private let toggle = UISwitch()
+class SettingsController: UIViewController {
+    let toggle = UISwitch()
+    var busySink: AnyCancellable?
+    var progressSink: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.allowsSelection = false
-        title = "Settings"
-    }
-
-    override func numberOfSections(in _: UITableView) -> Int {
-        1
-    }
-
-    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        sections.count
-    }
-
-    override func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        switch sections[indexPath.row] {
-        case .cloud:
-            toggle.isOn = Container.icloud
-            toggle.isEnabled = Container.icloudEnabled
-            toggle.addTarget(self, action: #selector(icloud), for: .valueChanged)
-            cell.textLabel?.text = toggle.isEnabled ? "Use iCloud Sync" : "Sign in to iCloud to Sync"
-            cell.accessoryView = toggle
-        case .progress:
-            SyncProgress().anchored(to: cell.contentView, horizontal: true, top: true, bottom: true)
-        case .sync:
-            let button = UIButton(type: .system).anchored(to: cell.contentView, horizontal: true, top: true, bottom: true)
-            button.setTitle("Force Sync", for: .normal)
-            button.addTarget(self, action: #selector(sync), for: .touchUpInside)
+        view.backgroundColor = .secondarySystemBackground
+        toggle.addTarget(self, action: #selector(icloud), for: .valueChanged)
+        let label = UILabel()
+        label.text = "Use iCloud"
+        let enable = UIStackView(arrangedSubviews: [label, toggle])
+        busySink = Engine.paths.busy.sink { busy in
+            DispatchQueue.main.async {
+                self.reset(busy: busy)
+            }
         }
-        return cell
-    }
 
-    @objc private func icloud() {
-        toggle.isEnabled = false
-        do {
-            try World.shared.syncSync(force: true)
-            try Container.setCloud(enabled: toggle.isOn)
-        } catch {
-            navigationController?.splitViewController?.errorAlert(for: error)
+        let progress = UIProgressView(progressViewStyle: .bar)
+        progressSink = Engine.progress.sink {
+            progress.progress = $0
         }
-        toggle.isOn = Container.icloud
-        World.shared.sync()
-        toggle.isEnabled = Container.icloudEnabled
+
+        var views = [enable, progress]
+
+        if FileManager.default.fileExists(atPath: Engine.paths.documents.path) {
+            let cloudButton = UIButton(type: .system)
+            cloudButton.setTitle("Open Folder", for: .normal)
+            cloudButton.addTarget(self, action: #selector(folder), for: .touchUpInside)
+            views.append(cloudButton)
+        }
+
+        let stack = UIStackView(arrangedSubviews: views)
+            .pinned(to: view, bottom: .none)
+        stack.axis = .vertical
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.spacing = 5
+        reset()
     }
 
-    @objc private func sync() {
-        World.shared.sync(force: true)
+    func reset(busy: Bool = false) {
+        toggle.isOn = Engine.paths.icloudAvailable && Engine.paths.icloud
+        toggle.isEnabled = Engine.paths.icloudAvailable && !busy
+    }
+
+    @objc func icloud(sender: UISwitch) {
+        Engine.paths.icloud = sender.isOn
+    }
+
+    @objc func folder() {
+        Engine.paths.documents.open()
     }
 }
