@@ -13,13 +13,27 @@ public struct File {
     init?(in container: URL, from item: NSMetadataItem) {
         guard let url = item.value(forAttribute: NSMetadataItemURLKey) as? URL else { return nil }
         self.url = url.resolvingSymlinksInPath()
-        name = String(self.url.path.dropFirst(container.path.count))
+        name = self.url.path(from: container)
     }
 
     init?(in container: URL, at url: Any) {
         guard let url = url as? URL else { return nil }
         self.url = url.resolvingSymlinksInPath()
-        name = String(self.url.path.dropFirst(container.path.count))
+        name = self.url.path(from: container)
+    }
+}
+
+extension URL {
+    func path(from container: URL) -> String {
+        var base = container.path
+        if base.hasPrefix("/private") {
+            base = String(base.dropFirst(8))
+        }
+        var drop = base.count
+        if path.hasPrefix("/private") {
+            drop += 8
+        }
+        return String(path.dropFirst(drop))
     }
 }
 

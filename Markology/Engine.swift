@@ -56,21 +56,19 @@ extension Engine: Monitor {
                         progressUpdate = now + updatePeriod
                     }
                 }
-                guard !file.url.pathComponents.contains(where: { $0.hasPrefix(".") }),
-                      let attrs = try? file.url.resourceValues(forKeys: [.contentModificationDateKey, .isDirectoryKey, .isHiddenKey]),
-                      attrs.isDirectory == false,
-                      attrs.isHidden == false,
-                      let modified = attrs.contentModificationDate else { continue }
-                if let last = times?[file.name],
-                   Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
+                guard !file.url.pathComponents.contains(where: { $0.hasPrefix(".") }) else { continue }
                 if file.name.isMarkdown {
-                    var name = file.name
-                    if let related = name.related {
-                        name = related
-                    }
                     var error: NSError?
                     NSFileCoordinator().coordinate(readingItemAt: file.url, error: &error) {
+                        guard let attrs = try? file.url.resourceValues(forKeys: [.contentModificationDateKey]),
+                              let modified = attrs.contentModificationDate else { return }
+                        if let last = times?[file.name],
+                           Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { return }
                         guard let text = try? String(contentsOf: $0).replacingOccurrences(of: "\r\n", with: "\n") else { return }
+                        var name = file.name
+                        if let related = name.related {
+                            name = related
+                        }
                         let doc = Document(parsing: text)
                         var walk = NoteWalker(from: name)
                         walk.visit(doc)
@@ -83,7 +81,13 @@ extension Engine: Monitor {
                     }
                     continue
                 }
-                if times?[file.name] != nil { continue }
+                let attrs = try? file.url.resourceValues(forKeys: [.contentModificationDateKey, .isDirectoryKey])
+                if attrs?.isDirectory == true {
+                    continue
+                }
+                let modified = attrs?.contentModificationDate ?? .distantPast
+                if let last = times?[file.name],
+                   Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
                 try? Note(file: file.name, name: String(file.name.dropFirst()), text: "", modified: modified).insert(db, onConflict: .ignore)
             }
         }
