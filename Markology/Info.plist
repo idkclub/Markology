@@ -4,6 +4,8 @@
 <dict>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIImageName</key>
