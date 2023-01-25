@@ -86,7 +86,8 @@ extension Engine: Monitor {
                     }
                     continue
                 }
-                try? Note(file: file.name, name: String(file.name.dropFirst()), text: "", modified: attrs?.contentModificationDate ?? .distantPast).insert(db, onConflict: .ignore)
+                if times?[file.name] != nil && attrs?.contentModificationDate == nil { continue }
+                try? Note(file: file.name, name: String(file.name.dropFirst()), text: "", modified: attrs?.contentModificationDate ?? .distantPast).insert(db, onConflict: .replace)
             }
         }
         DispatchQueue.main.async {

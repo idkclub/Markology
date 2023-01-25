@@ -4,8 +4,15 @@ import UIKit
 public class FileCell: UITableViewCell, RenderCell {
     var height: NSLayoutConstraint?
     var url: URL?
+    var timer: Timer? {
+        didSet {
+            oldValue?.invalidate()
+        }
+    }
 
-    public lazy var quicklook = {
+    lazy var progress = UIActivityIndicatorView().pinned(to: contentView, top: .none)
+
+    lazy var quicklook = {
         let controller = QLPreviewController()
         controller.dataSource = self
         controller.view.pinned(to: contentView, anchor: .view)
@@ -16,9 +23,22 @@ public class FileCell: UITableViewCell, RenderCell {
     }()
 
     public func render(_ value: (url: URL, parent: UIViewController)) {
+        timer = nil
         url = value.url
         if quicklook.parent != value.parent {
             value.parent.add(quicklook)
+        }
+        let attrs = try? value.url.resourceValues(forKeys: [.isUbiquitousItemKey, .ubiquitousItemDownloadingStatusKey])
+        if attrs?.isUbiquitousItem == true, attrs?.ubiquitousItemDownloadingStatus != .current {
+            progress.startAnimating()
+            try? FileManager.default.startDownloadingUbiquitousItem(at: value.url)
+            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                if (try? value.url.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey]).ubiquitousItemDownloadingStatus) == .current {
+                    self.timer = nil
+                    self.progress.stopAnimating()
+                    self.quicklook.reloadData()
+                }
+            }
         }
         quicklook.reloadData()
     }
@@ -26,7 +46,7 @@ public class FileCell: UITableViewCell, RenderCell {
 
 extension FileCell: QLPreviewControllerDataSource {
     public func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
-        1
+        timer != nil ? 0 : 1
     }
 
     public func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {

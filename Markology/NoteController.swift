@@ -516,10 +516,10 @@ extension NoteController: QLPreviewControllerDataSource {
     func open() {
         let controller = QLPreviewController()
         controller.dataSource = self
-        #if os(iOS)
-            navigationController?.show(controller, sender: self)
-        #else
+        #if targetEnvironment(macCatalyst)
             splitViewController?.show(controller, sender: self)
+        #else
+            navigationController?.show(controller, sender: self)
         #endif
     }
 
