@@ -160,9 +160,13 @@ public class Paths {
         busy.send(true)
         defer { busy.send(false) }
         guard let monitor = monitor,
+              let added = note.userInfo?["kMDQueryUpdateAddedItems"] as? [NSMetadataItem],
               let changed = note.userInfo?["kMDQueryUpdateChangedItems"] as? [NSMetadataItem],
               let deleted = note.userInfo?["kMDQueryUpdateRemovedItems"] as? [NSMetadataItem],
               let icloudURL = icloudURL else { return }
+        if added.count > 0 {
+            monitor.update(files: added.compactMap { File(in: icloudURL, from: $0) })
+        }
         if changed.count > 0 {
             monitor.update(files: changed.compactMap { File(in: icloudURL, from: $0) })
         }
