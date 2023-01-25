@@ -57,13 +57,18 @@ extension Engine: Monitor {
                     }
                 }
                 guard !file.url.pathComponents.contains(where: { $0.hasPrefix(".") }) else { continue }
+                let attrs = try? file.url.resourceValues(forKeys: [.contentModificationDateKey, .isDirectoryKey])
+                if attrs?.isDirectory == true {
+                    continue
+                }
+                if let last = times?[file.name],
+                   let modified = attrs?.contentModificationDate,
+                   Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
                 if file.name.isMarkdown {
                     var error: NSError?
                     NSFileCoordinator().coordinate(readingItemAt: file.url, error: &error) {
                         guard let attrs = try? file.url.resourceValues(forKeys: [.contentModificationDateKey]),
                               let modified = attrs.contentModificationDate else { return }
-                        if let last = times?[file.name],
-                           Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { return }
                         guard let text = try? String(contentsOf: $0).replacingOccurrences(of: "\r\n", with: "\n") else { return }
                         var name = file.name
                         if let related = name.related {
@@ -81,14 +86,7 @@ extension Engine: Monitor {
                     }
                     continue
                 }
-                let attrs = try? file.url.resourceValues(forKeys: [.contentModificationDateKey, .isDirectoryKey])
-                if attrs?.isDirectory == true {
-                    continue
-                }
-                let modified = attrs?.contentModificationDate ?? .distantPast
-                if let last = times?[file.name],
-                   Calendar.current.compare(last, to: modified, toGranularity: .second) == .orderedSame { continue }
-                try? Note(file: file.name, name: String(file.name.dropFirst()), text: "", modified: modified).insert(db, onConflict: .ignore)
+                try? Note(file: file.name, name: String(file.name.dropFirst()), text: "", modified: attrs?.contentModificationDate ?? .distantPast).insert(db, onConflict: .ignore)
             }
         }
         DispatchQueue.main.async {
