@@ -86,7 +86,7 @@ extension Engine: Monitor {
                     }
                     continue
                 }
-                if times?[file.name] != nil && attrs?.contentModificationDate == nil { continue }
+                if times?[file.name] != nil, attrs?.contentModificationDate == nil { continue }
                 try? Note(file: file.name, name: String(file.name.dropFirst()), text: "", modified: attrs?.contentModificationDate ?? .distantPast).insert(db, onConflict: .replace)
             }
         }
