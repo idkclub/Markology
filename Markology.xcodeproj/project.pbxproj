@@ -18,7 +18,6 @@
 		4E6B70D4296487020073977E /* EmptyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6B70D3296487020073977E /* EmptyController.swift */; };
 		4E7074762916693600FB00D4 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7074752916693600FB00D4 /* Engine.swift */; };
 		4E707479291669A000FB00D4 /* NotesUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E707478291669A000FB00D4 /* NotesUI */; };
-		4E70747C29166A1600FB00D4 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E70747B29166A1600FB00D4 /* Paths */; };
 		4E7107EF291EF3E800AAEC92 /* SnapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7107EE291EF3E800AAEC92 /* SnapTests.swift */; };
 		4E7776EB28F46E9E00DAEF80 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7776EA28F46E9E00DAEF80 /* Assets.xcassets */; };
 		4E7776F528F46EC100DAEF80 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7776F428F46EC100DAEF80 /* AppDelegate.swift */; };
@@ -26,7 +25,8 @@
 		4E77770428F486E900DAEF80 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770328F486E900DAEF80 /* MenuController.swift */; };
 		4E77770628F5008C00DAEF80 /* NoteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77770528F5008C00DAEF80 /* NoteController.swift */; };
 		4E77772028F9B42000DAEF80 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E77771F28F9B42000DAEF80 /* SearchController.swift */; };
-		4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7DBB6C2915BE2E00185CA3 /* Paths */; };
+		4EFE63E329D8A42200593C90 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4EFE63E229D8A42200593C90 /* Paths */; };
+		4EFE63E529D8A42C00593C90 /* Paths in Frameworks */ = {isa = PBXBuildFile; productRef = 4EFE63E429D8A42C00593C90 /* Paths */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,13 +71,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4E1ECA0E29D8A0A300A07F11 /* Notelets */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Notelets; sourceTree = "<group>"; };
 		4E36BBFD2915D7EF00673B84 /* Notes+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notes+.swift"; sourceTree = "<group>"; };
 		4E4583C728FBC1CA00C617BE /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		4E5964FD291399A2000BB2EC /* Import.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Import.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E5964FF291399A2000BB2EC /* ShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareController.swift; sourceTree = "<group>"; };
 		4E596504291399A2000BB2EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4E596508291399A2000BB2EC /* Import.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Import.entitlements; sourceTree = "<group>"; };
-		4E5965342913B073000BB2EC /* Swiftlets */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Swiftlets; sourceTree = "<group>"; };
 		4E6A3A6B28FF3E82005CCE32 /* NoteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDocument.swift; sourceTree = "<group>"; };
 		4E6B70CF2964867D0073977E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		4E6B70D1296486D60073977E /* SplitController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitController.swift; sourceTree = "<group>"; };
@@ -102,7 +102,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E707479291669A000FB00D4 /* NotesUI in Frameworks */,
-				4E70747C29166A1600FB00D4 /* Paths in Frameworks */,
+				4EFE63E529D8A42C00593C90 /* Paths in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,7 +118,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E59A2D2291657AE0038D4C0 /* NotesUI in Frameworks */,
-				4E7DBB6D2915BE2E00185CA3 /* Paths in Frameworks */,
+				4EFE63E329D8A42200593C90 /* Paths in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,7 +139,7 @@
 		4E59652F2913AA0A000BB2EC /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				4E5965342913B073000BB2EC /* Swiftlets */,
+				4E1ECA0E29D8A0A300A07F11 /* Notelets */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -160,6 +160,7 @@
 				4E7107EB291EF3E800AAEC92 /* MarkologyUITests */,
 				4E59652F2913AA0A000BB2EC /* Packages */,
 				4E7776E428F46E9C00DAEF80 /* Products */,
+				4EFE63E129D8A42200593C90 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -194,6 +195,13 @@
 			path = Markology;
 			sourceTree = "<group>";
 		};
+		4EFE63E129D8A42200593C90 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -212,7 +220,7 @@
 			name = Import;
 			packageProductDependencies = (
 				4E707478291669A000FB00D4 /* NotesUI */,
-				4E70747B29166A1600FB00D4 /* Paths */,
+				4EFE63E429D8A42C00593C90 /* Paths */,
 			);
 			productName = Import;
 			productReference = 4E5964FD291399A2000BB2EC /* Import.appex */;
@@ -253,8 +261,8 @@
 			);
 			name = Markology;
 			packageProductDependencies = (
-				4E7DBB6C2915BE2E00185CA3 /* Paths */,
 				4E59A2D1291657AE0038D4C0 /* NotesUI */,
+				4EFE63E229D8A42200593C90 /* Paths */,
 			);
 			productName = Markology;
 			productReference = 4E7776E328F46E9C00DAEF80 /* Markology.app */;
@@ -294,6 +302,7 @@
 			packageReferences = (
 				4E9E65542915E6D10035D4FC /* XCRemoteSwiftPackageReference "GRDB" */,
 				4E9E65572915E6DF0035D4FC /* XCRemoteSwiftPackageReference "swift-markdown" */,
+				4E1ECA1429D8A3A100A07F11 /* XCRemoteSwiftPackageReference "Swiftlets" */,
 			);
 			productRefGroup = 4E7776E428F46E9C00DAEF80 /* Products */;
 			projectDirPath = "";
@@ -665,6 +674,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		4E1ECA1429D8A3A100A07F11 /* XCRemoteSwiftPackageReference "Swiftlets" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/idkclub/Swiftlets/";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		4E9E65542915E6D10035D4FC /* XCRemoteSwiftPackageReference "GRDB" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/idkclub/GRDB.swift";
@@ -692,12 +709,14 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = NotesUI;
 		};
-		4E70747B29166A1600FB00D4 /* Paths */ = {
+		4EFE63E229D8A42200593C90 /* Paths */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 4E1ECA1429D8A3A100A07F11 /* XCRemoteSwiftPackageReference "Swiftlets" */;
 			productName = Paths;
 		};
-		4E7DBB6C2915BE2E00185CA3 /* Paths */ = {
+		4EFE63E429D8A42C00593C90 /* Paths */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 4E1ECA1429D8A3A100A07F11 /* XCRemoteSwiftPackageReference "Swiftlets" */;
 			productName = Paths;
 		};
 /* End XCSwiftPackageProductDependency section */

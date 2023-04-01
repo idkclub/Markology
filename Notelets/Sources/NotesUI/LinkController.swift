@@ -142,9 +142,7 @@ extension LinkController: UICollectionViewDelegate {
 
 extension LinkController {
     class LinkCell: UICollectionViewCell, RenderCell {
-        lazy var label: UILabel = {
-            UILabel().pinned(to: contentView)
-        }()
+        lazy var label: UILabel = UILabel().pinned(to: contentView)
 
         func render(_ text: String) {
             if text == "" {
@@ -160,9 +158,7 @@ extension LinkController {
 
 extension LinkController {
     class Header: UICollectionReusableView, RenderCell {
-        lazy var image: UIImageView = {
-            UIImageView().pinned(to: self)
-        }()
+        lazy var image: UIImageView = UIImageView().pinned(to: self)
 
         func render(_ symbol: String) {
             image.image = UIImage(systemName: symbol)
