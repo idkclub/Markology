@@ -26,6 +26,15 @@
         "branch" : "main",
         "revision" : "d491147940587dbadfb3472354f4d0c6e063e061"
       }
+    },
+    {
+      "identity" : "swiftlets",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/idkclub/Swiftlets",
+      "state" : {
+        "branch" : "master",
+        "revision" : "ed0577894139dfbf8bdf8056deadcc915572d126"
+      }
     }
   ],
   "version" : 2

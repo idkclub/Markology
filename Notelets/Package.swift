@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "Swiftlets",
+    name: "Notelets",
     platforms: [.iOS(.v14)],
     products: [
         .library(
@@ -26,18 +26,11 @@ let package = Package(
             name: "NotesUI",
             targets: ["NotesUI"]
         ),
-        .library(
-            name: "Paths",
-            targets: ["Paths"]
-        ),
-        .library(
-            name: "UIKitPlus",
-            targets: ["UIKitPlus"]
-        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-markdown.git", branch: "main"),
         .package(url: "https://github.com/idkclub/GRDB.swift", branch: "fts5"),
+        .package(url: "https://github.com/idkclub/Swiftlets", branch: "master"),
     ],
     targets: [
         .target(
@@ -50,7 +43,7 @@ let package = Package(
             name: "MarkCell",
             dependencies: [
                 "MarkView",
-                "UIKitPlus",
+                .product(name: "UIKitPlus", package: "Swiftlets"),
             ]
         ),
         .target(
@@ -70,16 +63,8 @@ let package = Package(
             dependencies: [
                 "MarkCell",
                 "Notes",
-                "UIKitPlus",
+                .product(name: "UIKitPlus", package: "Swiftlets"),
             ]
-        ),
-        .target(
-            name: "Paths",
-            dependencies: []
-        ),
-        .target(
-            name: "UIKitPlus",
-            dependencies: []
         ),
     ]
 )
