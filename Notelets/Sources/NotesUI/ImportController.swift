@@ -83,12 +83,12 @@ open class ImportController: UIViewController {
                     do {
                         switch data {
                         case let data as URL:
-                            items.append(try Item(delegate: delegate, url: data))
+                            try items.append(Item(delegate: delegate, url: data))
                         case let data as UIImage:
-                            items.append(try Item(delegate: delegate, image: data, name: provider.suggestedName ?? fallback))
+                            try items.append(Item(delegate: delegate, image: data, name: provider.suggestedName ?? fallback))
                         case let data as Data:
                             guard let image = UIImage(data: data) else { break }
-                            items.append(try Item(delegate: delegate, image: image, name: provider.suggestedName ?? fallback))
+                            try items.append(Item(delegate: delegate, image: image, name: provider.suggestedName ?? fallback))
                         default:
                             break
                         }
